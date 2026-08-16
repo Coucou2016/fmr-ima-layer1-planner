@@ -10,7 +10,7 @@
 | Branch | `main` |
 | Initial commit | `5c1394cfe643a4cb9ee994547c4f746ca9925f95` |
 | Packaging / §十九 commit | `0da8fe149cdd70cf0c35d9aaea7b281a483cb12e` |
-| Latest `main` | see `git rev-parse HEAD` after sync push |
+| Latest `main` | `512232921c02371a0894a3a708a9ecdfadeee079` |
 | ChatGPT told it can read full public code/docs | **Yes** (stated in brief; MCP paste blocked — see below) |
 
 ## 2. ChatGPT URL(s)
