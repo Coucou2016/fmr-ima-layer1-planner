@@ -1,7 +1,7 @@
 # ChatGPT brief — FMR GitHub review (2026-08-16)
 
 **Repo (public, full code/docs readable):** https://github.com/Coucou2016/fmr-ima-layer1-planner  
-**Commit:** `5c1394cfe643a4cb9ee994547c4f746ca9925f95`  
+**Commit:** `0da8fe149cdd70cf0c35d9aaea7b281a483cb12e`  
 **Role:** You are text-only senior advisor. Cursor implements. You may **web-search** and **read the public GitHub repo** (no file upload needed).
 
 ## Please do (in order)

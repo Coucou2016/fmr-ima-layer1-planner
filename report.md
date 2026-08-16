@@ -432,7 +432,7 @@ physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度
 | 项 | 内容 |
 |----|------|
 | GitHub URL | https://github.com/Coucou2016/fmr-ima-layer1-planner（PUBLIC；顾问可读完整代码/文档） |
-| Commit hash | `5c1394cfe643a4cb9ee994547c4f746ca9925f95` |
+| Commit hash | `0da8fe149cdd70cf0c35d9aaea7b281a483cb12e` |
 | Push status | main; tracking status: ## main...origin/main |
 | ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
 | ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
