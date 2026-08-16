@@ -436,8 +436,8 @@ physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度
 | 项 | 内容 |
 |----|------|
 | GitHub URL | https://github.com/Coucou2016/fmr-ima-layer1-planner（PUBLIC；顾问可读完整代码/文档） |
-| Commit hash | `unknown` |
-| Push status | git metadata unavailable: Command '['git', 'rev-parse', 'HEAD']' returned non-zero exit status 128. |
+| Commit hash | `d417216c3c23f412bca174327c5ccd3c7c641e16` |
+| Push status | main; tracking status: ## main...origin/main |
 | ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
 | ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
 | ChatGPT browser | BLOCKED — no usable browser MCP this turn; five local maturation rounds used archived literature reply + WebSearch + nature-skills. Ready briefs in docs/chatgpt_collab/rounds/round_01.md … round_05.md (no invented ChatGPT replies). |
