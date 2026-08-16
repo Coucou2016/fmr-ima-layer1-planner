@@ -1,0 +1,4 @@
+scenario,eta_ap,eta_cs,recommended_device,recommended_shortening_pct,n_sutures,ap_reduction_pct,physics_regurgitation_pct,jet_location,n_feasible,n_evaluated
+eta_nominal,0.3,0.66818,IMA-AP,60.0,2,18.0,0.1519,central,30,36
+eta_minus_20pct,0.24,0.53454,IMA-AP,70.0,2,16.8,0.0895,central,32,36
+eta_plus_20pct,0.36,0.80182,IMA-CS,20.0,0,16.036,0.2293,central,26,36

@@ -1,0 +1,4 @@
+case_id,galili_regurgitation_pct,surrogate_blended_pct,surrogate_physics_pct,galili_ap_mm,galili_ap_reduction_pct,note
+pathology,5.26,5.3310,5.3383,34.40,0.000,blended reporting at YAML anchors; physics used in paper sweep figures
+ima_cs_22,0.29,0.3000,0.3521,34.40,0.000,blended reporting at YAML anchors; physics used in paper sweep figures
+ima_ap_50,0.08,0.0931,0.1771,34.40,0.000,blended reporting at YAML anchors; physics used in paper sweep figures

@@ -1,0 +1,112 @@
+# Structured paper / specification reference values for FMR IMA demo validation.
+# Primary test anchors remain in results/reference_targets.json (subset used by pytest).
+
+meta:
+  title: "Functional mitral regurgitation — IMA-CS vs IMA-AP surrogate validation"
+  units:
+    length: mm
+    area: mm2
+    regurgitation: percent
+    strain: dimensionless
+    voltage: mV
+  note: >
+    Values trace the project research specification (LHHM-inspired FMR model).
+    Surrogate pipeline reproduces anchors via documented physics + YAML calibration blend.
+
+geometry_diastole:
+  ap_diameter_mm: 34.4
+  annulus_circumference_mm: 118.5
+  source_note: "Diastolic mitral annulus and AP diameter at pathology baseline"
+
+materials:
+  niti_bridge:
+    model: hyperelastic_14param
+    role: "IMA-CS coronary sinus bridge"
+  eptfe_suture:
+    cross_section_mm2: 0.074
+    role: "IMA-AP CS to interatrial septum suture"
+
+pathology:
+  posterior_papillary_passive_fraction: 0.44
+  active_threshold_mV: 100.0
+  sa_threshold_mV: 20.0
+  loading:
+    lv_la_phase_offset_ms: 50
+    peak_systole_fraction: 0.75
+
+sph_reference:
+  n_particles: 29000
+  regurgitation_definition: "particles_to_LA / (particles_to_LA + particles_to_aorta)"
+
+cases:
+  - id: pathology
+    device: null
+    annulus_circumference_mm: 118.5
+    ap_diameter_mm: 34.4
+    roa_mm2_typical: 35.0
+    regurgitation_pct: 5.26
+    contact_pattern: "posterior leaflet malcoaptation, broad jet"
+    notes: "44% posterior papillary muscle passive; baseline FMR"
+
+  - id: ima_cs_14
+    device: IMA-CS
+    bridge_shortening_pct: 14
+    regurgitation_pct: null
+    niti_engineering_strain_approx: 0.14
+    notes: "Intermediate CS bridge shortening"
+
+  - id: ima_cs_18
+    device: IMA-CS
+    bridge_shortening_pct: 18
+    regurgitation_pct: null
+    notes: "Intermediate"
+
+  - id: ima_cs_22
+    device: IMA-CS
+    bridge_shortening_pct: 22
+    annulus_circumference_mm: 115.0
+    ap_diameter_mm: 34.4
+    regurgitation_pct: 0.29
+    niti_engineering_strain_approx: 0.22
+    notes: "Annulus 118.5 → 115 mm; target regurgitation anchor"
+
+  - id: ima_ap_30
+    device: IMA-AP
+    shortening_pct: 30
+    regurgitation_pct: null
+    notes: "Intermediate AP suture shortening"
+
+  - id: ima_ap_50
+    device: IMA-AP
+    shortening_pct: 50
+    ap_diameter_mm: 34.4
+    annulus_circumference_mm: 116.0
+    roa_mm2_minimum: 27.3
+    regurgitation_pct: 0.08
+    notes: "Published optimum — minimum ROA and minimum regurgitation %"
+
+  - id: ima_ap_70
+    device: IMA-AP
+    shortening_pct: 70
+    ap_diameter_mm: 14.3
+    regurgitation_pct: null
+    contact_pattern: "commissural leak, excessive AP reduction"
+    notes: "Regurgitation worse than 50%; commissural jet mechanism"
+
+validation_anchors:
+  regurgitation_pct:
+    pathology: 5.26
+    ima_cs_22: 0.29
+    ima_ap_50: 0.08
+  roa_mm2:
+    pathology_typical: 35.0
+    ima_ap_50_minimum: 27.3
+  geometry_mm:
+    ima_cs_22_annulus: 115.0
+    ima_ap_50_ap: 34.4
+    ima_ap_70_ap: 14.3
+
+trend_constraints:
+  - "ima_cs_22 regurgitation < ima_cs_14 < pathology"
+  - "ima_ap_50 regurgitation < ima_ap_30 < pathology"
+  - "ima_ap_70 regurgitation > ima_ap_50"

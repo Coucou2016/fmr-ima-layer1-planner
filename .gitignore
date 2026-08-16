@@ -1,0 +1,40 @@
+# Virtual environments & Python caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Secrets & local env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Generated pipeline artifacts (regenerate with run_pipeline.py --paper).
+# Track paper_figures PNGs and paper_tables (small, reviewable); exclude bulky intermediates.
+results/output/**
+!results/output/paper_figures/
+!results/output/paper_figures/**
+!results/output/paper_tables/
+!results/output/paper_tables/**
+!results/output/planner/
+!results/output/planner/**
+
+# Optional: keep recommendation JSON only under planner; ignore other planner noise if added later

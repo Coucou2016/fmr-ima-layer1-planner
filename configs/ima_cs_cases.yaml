@@ -1,0 +1,22 @@
+device: IMA-CS
+material: niti_hyperelastic_14param
+implant_sequence:
+  - catheter_along_cs_centerline
+  - distal_anchor
+  - bridge_shortening
+  - proximal_anchor
+anchor_binding: [ventricle, atrium]
+
+cases:
+  - id: ima_cs_14
+    bridge_shortening_pct: 14
+  - id: ima_cs_18
+    bridge_shortening_pct: 18
+  - id: ima_cs_22
+    bridge_shortening_pct: 22
+    expected_annulus_circumference_mm: 115.0
+    expected_regurgitation_pct: 0.29
+
+geometry_baseline:
+  annulus_circumference_mm: 118.5
+  ap_diameter_mm: 34.4

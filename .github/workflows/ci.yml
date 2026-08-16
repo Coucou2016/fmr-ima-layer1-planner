@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run pipeline + paper bundle
+        run: python run_pipeline.py --seed 42 --paper --no-export
+      - name: Assert paper figures exist
+        run: |
+          set -e
+          FIG=results/output/paper_figures
+          test -f "$FIG/fig1_ima_ap_nonmonotonic_clinical_window.png"
+          test -f "$FIG/fig2_suture_vs_ap_reduction.png"
+          test -f "$FIG/fig3_jet_location.png"
+          test -f "$FIG/fig4_pareto_lcx_strain.png"
+          test -f "$FIG/fig5_dual_vs_single_suture.png"
+          test -f results/output/paper_tables/maveric_reduce_fmr_alignment.csv
+          test -f results/output/paper_tables/dual_vs_single_matched_ap.csv
+          test -f results/output/paper_tables/eta_sensitivity.json
+          test -f results/output/paper_tables/eta_sensitivity.csv
+          ls -la "$FIG"
+      - name: Pytest
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+        run: python -m pytest tests/ -q

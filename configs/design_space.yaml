@@ -1,0 +1,42 @@
+# Continuous design space for the Layer-1 preoperative planner.
+# Not a substitute for LHHM/Abaqus FSI. See results/clinical_references.yaml.
+
+ima_ap:
+  shortening_pct:
+    min: 10
+    max: 70
+    step: 5
+
+ima_cs:
+  shortening_pct:
+    min: 10
+    max: 25
+    step: 2
+
+dual_suture:
+  enabled: true
+  shortening_pct:
+    min: 10
+    max: 70
+    step: 5
+
+clinical_mapping:
+  # Innovation A: suture/bridge % → AP diameter reduction %.
+  # IMA-AP eta chosen so 50% suture ≈ 15% AP reduction (MAVERIC window).
+  ap_transfer_eta_ima_ap: 0.30
+  # IMA-CS eta chosen so 22% bridge ≈ MAVERIC 14.7% AP reduction.
+  ap_transfer_eta_ima_cs: 0.66818
+  maveric_baseline_ap_mm: 41.4
+
+constraints:
+  clinical_max_ap_reduction_pct: 20.0
+  clinical_window_ap_reduction_pct: [14.0, 20.0]
+  niti_alternating_strain_pct_max: 0.4
+  cs_lcx_min_mm: 8.6
+  # Illustrative preoperative CT CS–LCx (patient-specific input).
+  baseline_cs_lcx_mm: 11.0
+  cs_lcx_cinch_mm_per_pct: 0.12
+
+sweep:
+  mappings: ["galili", "clinical"]
+  include_pathology: true

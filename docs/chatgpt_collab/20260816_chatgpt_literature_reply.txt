@@ -1,0 +1,785 @@
+Below is the manuscript strategy I would use. The central positioning should be: this paper does not re-run or supersede Galili’s LHHM/FEA comparison; it converts prior biomechanical and clinical information into an explicit, inspectable Layer-1 planning coordinate system, continuous candidate sweep, and constraint-aware ranking framework.
+
+1. Papers to imitate for structure and tone
+
+Galili, White Zeira & Marom, 2022, Royal Society Open Science — “Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation.”
+
+Why it matters: this is the immediate computational predecessor. It explicitly compared generic IMA-CS and IMA-AP treatments using the Living Heart Human Model, finite-element analysis, and subsequent leakage modeling. Its discrete intervention levels included IMA-CS 14/18/22% shortening and IMA-AP 30/50/70% shortening. It also reported a non-monotonic IMA-AP result: the 50% case had lower ROA than further shortening to 70%. 
+PubMed
++1
+
+Imitate: the clean progression mechanism → intervention parameterization → geometry → functional surrogate → comparison; the explicit side-by-side treatment taxonomy; the willingness to discuss non-monotonic behavior rather than forcing “more cinch is better.”
+
+Do not copy: its claims to FEA, beating-heart modeling, LHHM mechanics, leaflet contact, ROA calculation, or SPH leakage. Those belong to Galili’s model, not this Layer-1 surrogate.
+
+Most important novelty implication: never claim the first computational comparison of IMA-CS and IMA-AP. Galili already did that.
+
+Also, do not write “Galili showed that 50% suture = 0% AP.” Galili did not. In your manuscript, that must be identified as your planner coordinate convention/reference transformation.
+
+Worthley et al., 2015, JACC: Cardiovascular Interventions — first-in-human MAVERIC/ARTO study.
+
+Why it matters: it provides the strongest direct clinical bridge for an AP-directed CS-to-septal concept. In the initial 11-patient study, the annular AP diameter went from 45.0 to 38.7 mm at 30 days, described by the authors as a 14% reduction. 
+PubMed
++1
+
+Imitate: concise definition of the treatment mechanism; strict separation of anatomical endpoints from MR endpoints; baseline-versus-post-treatment presentation.
+
+Do not copy: efficacy language into the surrogate manuscript. Do not say that your 18% modeled AP result predicts ARTO efficacy. Do not use MAVERIC's clinical MR volume as a calibration for your physics-regurgitation percentage.
+
+Best role in your paper: establish that an AP-directed transcatheter annuloplasty can produce an AP change on the order reported clinically, so the planner can identify whether a modeled candidate lies inside, near, or beyond a clinically observed geometric range.
+
+Patterson et al., MAVERIC one-year and two-year reports.
+
+The larger MAVERIC cohort reported AP diameter changing from 41.4 mm at baseline to 36.0 mm at 30 days—a 13% decrease—and 35.3 mm at one year. The two-year report described persistence of the AP reduction. 
+PubMed Central (PMC)
++2
+PubMed
++2
+
+Imitate: the discipline of reporting geometry separately from regurgitation, ventricular remodeling, symptoms, and safety. This is especially useful for your Results section: one metric should not rhetorically stand in for another.
+
+Do not copy: longitudinal clinical inference. Your Layer-1 calculation has no follow-up, remodeling, outcome, durability, or survival dimension.
+
+For your manuscript, “approximately 13–15% clinically observed AP reduction in MAVERIC reports” is more defensible than treating exactly 14% or 15% as a universal target.
+
+Witte et al., 2019, REDUCE-FMR, JACC: Heart Failure.
+
+Why it matters: REDUCE-FMR was a randomized, sham-controlled Carillon study designed around MR and LV remodeling, with coronary angiography used procedurally to assess circumflex compromise. 
+JACC
+
+Imitate: restrained causal language, endpoint hierarchy, and explicit device-versus-control framing. It is a good stylistic counterweight to overconfident computational prose.
+
+Do not copy: statements such as “the model reproduces the REDUCE-FMR treatment effect.” It does not. REDUCE-FMR can support directionality and clinical context for CS-based annuloplasty, not numerical validation of the Python equations.
+
+Recommended wording: “directionally consistent with clinical observations of CS-based annuloplasty,” not “validated against REDUCE-FMR.”
+
+Rottländer et al., 2021, Catheterization and Cardiovascular Interventions — CT planning for CS-based annuloplasty.
+
+This is the key source for your CS–LCx constraint. In 25 Carillon patients, the authors found that a CS-to-Cx distance <8.6 mm specifically in the distal device landing zone predicted circumflex compromise in their ROC analysis. They did not establish ≥8.6 mm as a universal guarantee of safety. 
+PubMed
+
+Imitate: the procedural-planning vocabulary: candidate eligibility, anatomical screening, landing-zone-specific constraint, feasible versus infeasible configuration.
+
+Do not copy: turn the ROC threshold into a deterministic biomechanical law.
+
+Therefore C3 should preferably say: “a literature-informed CS–LCx screening constraint based on the reported <8.6-mm risk threshold,” rather than simply “CS–LCx ≥8.6 mm is safe.”
+
+de Oliveira et al., 2023, Medical Engineering & Physics — “A geometry-based finite element tool for evaluating mitral valve biomechanics.”
+
+This paper is useful mainly for manuscript architecture. It presents a parameterized computational tool, clearly states what the framework generates, evaluates different geometries, and distinguishes model flexibility from biological truth. 
+PubMed
++1
+
+Imitate: modular Methods; explicit inputs and outputs; reproducible parameter definitions; “what this tool is for” language; separate validation/verification/illustrative-use concepts.
+
+Do not copy: FE terminology such as leaflet stresses, chordal forces, contact mechanics, closure dynamics, material-property validation, or biomechanical validation.
+
+Your analogous tone is: “rapid parametric screening tool,” “candidate-ranking framework,” or “pre-high-fidelity planning layer.”
+
+Siefert et al., 2015, Computer Methods in Biomechanics and Biomedical Engineering — “Isolated effect of geometry on mitral valve function for in silico model development.”
+
+The paper deliberately perturbs individual geometric factors and separately tracks coaptation, MR, jet direction, and strain. It is particularly relevant because it demonstrates the value of controlled parameter perturbations rather than collapsing everything into one composite endpoint. 
+PubMed
++1
+
+Imitate: isolated-variable sweeps, graphical response curves, sensitivity analysis, and separation of jet classification from regurgitation magnitude.
+
+Do not copy: its “ground-truth” language; Siefert had physical in-vitro measurements. Your YAML/physics surrogate is not ground truth.
+
+This paper gives you good stylistic precedent for C2: “systematically quantify how candidate dose changes affect individual planning outputs.”
+
+Kumar et al., 2013, Computer-Aided Design, plus TITAN II as device-integrity context.
+
+Kumar et al. discuss nitinol fatigue and cite prior nitinol stent testing in which a 0.4% alternating-strain endurance limit was observed for the tested specimens. That is useful precedent for an engineering screening threshold, but it is not a universal material constant or proof of your particular device's fatigue life. 
+ScienceDirect
+ TITAN II is clinically relevant because earlier Carillon iterations had wire-form fractures at high-strain locations and the modified device incorporated changes intended to improve fatigue resistance. 
+Open Heart
++1
+
+Imitate: treating fatigue as a separate design admissibility criterion rather than burying it in an efficacy score.
+
+Do not copy: “passed fatigue,” “fatigue safe,” “infinite life,” or FDA-equivalent device qualification. A Python Layer-1 strain estimator cannot make those claims.
+
+Prefer: “alternating-strain screening criterion <0.4%, adopted as a conservative engineering planning constraint.”
+
+Even better: call it a screen, not a validation threshold.
+
+2. Recommended full-paper writing framework
+Title
+
+Avoid titles containing “finite element,” “biomechanical simulation of the human heart,” or “patient-specific prediction.”
+
+A suitable structural pattern is:
+
+A constraint-aware Layer-1 computational planner for indirect mitral annuloplasty in functional mitral regurgitation
+
+Clinically referenced dose mapping and constrained parametric planning of indirect mitral annuloplasty
+
+A rapid surrogate framework for dose harmonization and preoperative screening of indirect mitral annuloplasty strategies
+
+The word surrogate should appear either in the title, abstract, or first Methods paragraph.
+
+Abstract
+
+Use five logical moves.
+
+Background: IMA-CS and AP-directed IMA act through different geometric mechanisms; prior high-fidelity work has already compared them.
+
+Gap: discrete device-shortening percentages are difficult to translate into a common clinically interpretable planning coordinate, and candidate selection must also respect anatomical/device constraints.
+
+Methods: introduce the Python Layer-1 surrogate, dose-coordinate mapping, continuous sweep, constraints, planner objective, sensitivity analysis.
+
+Results: give the seed-42 result exactly and narrowly:
+
+dual IMA-AP 60%
+
+modeled AP reduction 18%
+
+physics-regurgitation metric 0.152%
+
+central jet
+
+Conclusion: candidate screening/hypothesis prioritization before higher-fidelity modeling or procedural evaluation.
+
+The abstract should explicitly state that the 0.152% is a surrogate physics metric and not clinical regurgitant volume or regurgitant fraction.
+
+1. Introduction
+Paragraph 1 — Clinical/mechanistic problem
+
+FMR arises from ventricular/annular geometric dysfunction.
+
+Introduce indirect annuloplasty.
+
+Distinguish:
+
+IMA-CS: CS-based annular reshaping.
+
+IMA-AP: CS-to-septal/AP-directed shortening.
+
+Keep this clinically descriptive rather than computational.
+
+Paragraph 2 — Existing evidence
+
+Progress from clinical to computational:
+
+Carillon / REDUCE-FMR establishes clinical CS-based context. 
+JACC
+
+ARTO / MAVERIC establishes clinically observed AP-directed reshaping, approximately 13–14% at early follow-up in published reports. 
+JACC
++1
+
+Galili already compared IMA-CS and IMA-AP computationally with LHHM/FEA and discrete treatment settings. 
+PubMed
+
+This paragraph prevents the novelty problem before a reviewer raises it.
+
+Paragraph 3 — Actual gap
+
+This should carry most of the novelty argument:
+
+Prior work establishes mechanical and clinical plausibility, but it does not by itself provide a lightweight planning layer that places heterogeneous intervention controls on a common AP-oriented dose coordinate, continuously interrogates the candidate space, and rejects configurations that violate predefined anatomical or engineering constraints.
+
+That is much safer than saying nobody has compared the two therapies.
+
+Paragraph 4 — Contributions
+
+State C1–C3 and optional C4 explicitly.
+
+I would modify the labels slightly.
+
+C1 — Clinically referenced dose-coordinate harmonization.
+
+Translate intervention/suture control into a common planner AP coordinate.
+
+Explicitly define the planner convention in which Galili 50% suture shortening is assigned the reference value of 0% planner AP cinch.
+
+Crucially: state that this is a normalization/mapping convention, not a result reported by Galili and not an experimentally established clinical conversion.
+
+C2 — Continuous constrained candidate exploration.
+
+Replace a small set of discrete cases with a continuous or finely sampled sweep.
+
+Apply the same scoring structure throughout.
+
+Produce a preoperative candidate ranking rather than a retrospective comparison of isolated cases.
+
+C3 — Anatomical and device-integrity screening.
+
+CS–LCx screening based on the literature-reported <8.6-mm distal-zone risk threshold. 
+PubMed
+
+NiTi alternating-strain screen <0.4%.
+
+Make both admissibility gates, not terms whose violation can be compensated by better predicted MR.
+
+Optional C4 — Matched-dose architectural comparison.
+
+Compare dual versus single AP sutures at matched modeled AP reduction.
+
+This is more novel and cleaner than saying “dual versus single at nominal suture percentage,” because matched AP% attempts to isolate architecture from dose.
+
+2. Methods
+2.1 Scope and model class
+
+This subsection is mandatory.
+
+State immediately:
+
+Python Layer-1 surrogate.
+
+No new LHHM computation.
+
+No Abaqus simulation.
+
+No FSI.
+
+No leaflet/tissue stress calculation unless actually present.
+
+No patient-specific procedural prediction.
+
+Purpose: fast candidate screening before high-fidelity analysis.
+
+A useful sentence is:
+
+The framework is intended to rank and exclude candidate configurations under transparent assumptions rather than reproduce full mitral-device biomechanics.
+
+2.2 Reference intervention definitions
+
+Define all coordinates before equations.
+
+Use separate symbols for:
+
+nominal Galili/device or suture shortening,
+
+modeled AP reduction,
+
+clinical AP reduction,
+
+CS shortening,
+
+planner dose coordinate.
+
+Do not reuse % without a noun.
+
+For example, never write simply “60% dose.”
+
+Write:
+
+“60% nominal IMA-AP suture setting”
+
+“18% modeled AP reduction”
+
+This will eliminate a major reviewer objection.
+
+2.3 C1: dose-coordinate mapping
+
+This deserves its own Methods subsection, not a sentence in preprocessing.
+
+Define the mapping mathematically as something like:
+
+D
+AP
+	​
+
+=f(S)
+
+where S is nominal suture/device shortening and D
+AP
+	​
+
+ is the planner's AP-coordinate.
+
+Then explicitly specify:
+
+f(50%)=0
+
+only as your chosen reference convention.
+
+Do not write:
+
+Galili 50% produces 0% AP reduction.
+
+Instead:
+
+For harmonization within the Layer-1 planner, the Galili 50% nominal suture-shortening condition was assigned the zero reference of the planner AP-cinch coordinate.
+
+Then explain why a reference shift is useful.
+
+If the mapping is partly based on MAVERIC, call it:
+
+literature-informed,
+
+clinically referenced,
+
+approximate.
+
+Do not call it “validated.”
+
+2.4 Surrogate response model
+
+Separate two channels:
+
+physics-informed quantities,
+
+YAML/configuration-derived weighting or blending.
+
+A diagram should make this obvious.
+
+Reviewer-friendly architecture:
+
+candidate → dose mapping → surrogate physics → constraints → YAML scoring → rank
+
+Do not obscure the YAML contribution inside the physics equations.
+
+2.5 Regurgitation surrogate
+
+Give the equation and dimensional status.
+
+Use a term such as:
+
+physics regurgitation index,
+
+surrogate leakage percentage,
+
+dimensionless/surrogate regurgitation metric,
+
+depending on the actual formulation.
+
+Immediately state:
+
+This quantity is not an echocardiographic regurgitant volume, regurgitant fraction, EROA, or clinical MR grade.
+
+This sentence belongs in Methods and Discussion.
+
+2.6 Jet classifier
+
+Keep jet direction/class separate from regurgitation magnitude.
+
+This has useful precedent conceptually: Siefert separately considered MR magnitude and jet direction rather than treating them as the same endpoint. 
+PubMed
+
+For dual-suture behavior, emphasize that the principal seed-42 change may be jet-classification geometry rather than a dramatic reduction in the regurgitation surrogate.
+
+2.7 C2: continuous sweep
+
+Describe:
+
+parameter domain,
+
+increment/grid or continuous optimizer,
+
+single and dual candidates,
+
+constraints,
+
+outputs recorded at every candidate.
+
+Primary figure:
+
+dose-response curves over the entire candidate space, not just the winning point.
+
+That figure makes C2 tangible.
+
+2.8 C3a: CS–LCx constraint
+
+Write this carefully.
+
+Correct logic:
+
+Rottländer et al. identified CS-to-Cx distance <8.6 mm in the distal device landing zone as predictive of circumflex compromise in their retrospective cohort. The present Layer-1 planner therefore uses 8.6 mm as a literature-informed screening boundary. 
+PubMed
+
+Not:
+
+Distances ≥8.6 mm are clinically safe.
+
+Those statements are not equivalent.
+
+2.9 C3b: nitinol strain constraint
+
+Treat alternating strain as an engineering screening metric.
+
+State:
+
+definition of alternating strain,
+
+calculation method,
+
+source/rationale for <0.4% criterion,
+
+that no fatigue-life prediction is being claimed.
+
+The literature reports 0.4% as an endurance-limit observation for particular nitinol stent specimens; this is not sufficient to establish fatigue safety for a different architecture. 
+ScienceDirect
+
+2.10 C4: single versus dual at matched AP reduction
+
+If included, this is potentially one of the strongest sections.
+
+Design the comparison as:
+
+single and dual configurations matched as closely as possible for modeled AP reduction.
+
+Then compare:
+
+physics-regurgitation metric,
+
+jet class,
+
+constraints,
+
+score.
+
+This allows a defensible question:
+
+Does architecture add information after controlling approximately for geometric dose?
+
+That is much stronger than simply saying “dual performed better.”
+
+2.11 Planner objective
+
+Define every score term.
+
+Explicitly separate:
+
+J=J
+physics
+	​
+
++J
+planning/configuration
+	​
+
+
+or the actual architecture.
+
+Readers should be able to determine whether the selected candidate wins because of physics or YAML weights.
+
+2.12 η assumption
+
+Give η its own subsection or paragraph.
+
+Call η:
+
+planning parameter,
+
+modeling assumption,
+
+weighting/translation assumption,
+
+as appropriate.
+
+Do not imply it has been physiologically measured unless it has.
+
+The ±20% perturbation belongs in prespecified sensitivity analysis.
+
+2.13 Reproducibility
+
+Explain fixed seed 42.
+
+Do not imply that choosing seed 42 constitutes validation.
+
+It is a reproducibility case.
+
+3. Results
+3.1 Dose-coordinate transformation
+
+Show the original nominal parameter and mapped AP coordinate side by side.
+
+This is where C1 becomes visible.
+
+A reviewer should never have to reverse-engineer why “50%” became zero.
+
+3.2 Continuous response surfaces/sweeps
+
+This is the primary C2 result.
+
+Show:
+
+AP reduction versus intervention parameter,
+
+physics-regurgitation metric,
+
+jet classification,
+
+feasibility.
+
+Prefer curves and feasibility bands over a large winner table.
+
+3.3 Constraint map
+
+Present admissible/inadmissible regions separately.
+
+CS–LCx.
+
+NiTi strain.
+
+any additional hard constraint.
+
+Do not let score compensate for constraint violation.
+
+3.4 Seed-42 planner result
+
+State exactly:
+
+For the prespecified seed-42 scenario, the nominal planner selected dual IMA-AP 60%, corresponding to a modeled AP reduction of 18%, a physics-regurgitation metric of 0.152%, and a central jet classification.
+
+Immediately add:
+
+The 0.152% quantity is a surrogate physics output and is not a clinical regurgitant volume or fraction.
+
+3.5 Physics versus planner score
+
+Show enough decomposition to answer:
+
+Would physics alone have made the same choice?
+
+This result is important because otherwise a reviewer may characterize the method as a YAML preference engine dressed as physics.
+
+3.6 η sensitivity
+
+Show nominal, −20%, +20%.
+
+If, as currently observed, the recommendation can move from dual AP 60% to dual AP 70% or CS 20%, report that openly.
+
+Do not treat this as a failure.
+
+It is evidence that the recommendation is conditional.
+
+3.7 Optional C4 result
+
+At matched AP reduction:
+
+single versus dual,
+
+jet,
+
+regurgitation surrogate,
+
+constraints.
+
+The likely narrative is not “dual universally reduces MR more.”
+
+It is:
+
+Dual-suture architecture changes the predicted closure/jet phenotype while providing only a mild additional change in the Layer-1 regurgitation metric.
+
+That is much more credible.
+
+4. Discussion
+
+Use six short subsections or six conceptual paragraphs.
+
+Discussion paragraph 1 — principal finding
+
+Do not lead with “we developed the first…”
+
+Lead with:
+
+This study extends prior IMA modeling by introducing a lightweight translation and planning layer between discrete intervention parameterizations and constrained candidate selection.
+
+Then summarize C1–C3.
+
+Discussion paragraph 2 — relation to Galili
+
+This is the novelty-defense paragraph.
+
+State clearly:
+
+Galili already compared IMA-CS with IMA-AP in LHHM/FEA.
+
+Galili found intervention-response behavior that was not simply monotonic. 
+PubMed Central (PMC)
++1
+
+Your contribution is not the comparison itself.
+
+Your contribution is the mapping + sweep + constraints + planning decision layer.
+
+Discussion paragraph 3 — clinical dose context
+
+Compare modeled AP reduction with MAVERIC cautiously.
+
+Good:
+
+The 18% modeled AP reduction selected in the seed-42 scenario is somewhat above the approximately 13–14% early AP reduction reported in MAVERIC cohorts, emphasizing the value of treating clinical measurements as contextual bounds rather than direct calibration targets. 
+JACC
++1
+
+Do not conclude that 18% would be clinically superior.
+
+Discussion paragraph 4 — safety constraints
+
+Discuss CS–LCx and nitinol separately.
+
+Make clear:
+
+8.6 mm is a screening boundary based on one retrospective procedural dataset.
+
+0.4% is an engineering screen, not a fatigue qualification.
+
+This paragraph will materially improve credibility.
+
+Discussion paragraph 5 — dual versus single
+
+If C4 retained:
+
+matched-dose architecture, not nominal setting, is the scientifically interesting comparison.
+
+Explain central-jet behavior and mild regurgitation change.
+
+Avoid therapeutic recommendations.
+
+Discussion paragraph 6 — uncertainty and limitations
+
+Include:
+
+Layer-1 surrogate.
+
+no new FEA/FSI.
+
+no tissue stress/contact.
+
+no true clinical regurgitant volume.
+
+YAML dependence.
+
+η sensitivity.
+
+literature-derived rather than patient-specific constraints.
+
+fixed-seed result not population evidence.
+
+downstream validation required.
+
+5. Novelty phrasing bank
+
+Strongest formulations:
+
+“This study extends prior high-fidelity IMA comparisons with a lightweight, constraint-aware planning layer that maps heterogeneous intervention controls onto a common AP-oriented coordinate and systematically explores the candidate space.”
+
+“The novelty lies not in introducing the IMA-CS versus IMA-AP comparison, which has been addressed previously by Galili et al., but in translating discrete intervention settings into a continuous, clinically referenced planning framework.” 
+PubMed
+
+“We introduce a dose-coordinate harmonization strategy that separates nominal suture shortening from modeled AP reduction and clinical AP measurements.”
+
+“The framework converts previously discrete intervention concepts into a continuous constrained design space suitable for rapid candidate screening.”
+
+“Rather than replacing high-fidelity biomechanics, the proposed Layer-1 model is designed to identify candidate configurations and assumption-sensitive decisions that warrant subsequent higher-fidelity analysis.”
+
+“A central contribution is the explicit integration of anatomical feasibility and device-integrity screens with efficacy-oriented surrogate outputs.”
+
+“The planner treats coronary anatomy and engineering limits as admissibility constraints rather than compensable components of an efficacy score.”
+
+“The framework provides a reproducible mechanism for asking not only which candidate has the highest nominal score, but whether that ranking persists under variation of planning assumptions.”
+
+For C1 specifically:
+
+“A clinically referenced AP-dose coordinate was introduced to prevent direct equivalence between experimental suture-shortening percentages and clinically observed annular reduction.”
+
+“The Galili 50% suture-shortening case was assigned the zero reference of the planner AP-cinch coordinate; this is a normalization convention of the present framework rather than a clinical or biomechanical finding of Galili et al.”
+
+That second sentence is worth using nearly verbatim.
+
+For C2:
+
+“Continuous candidate exploration exposes response curvature and non-monotonic regions that may be missed by comparison of a small number of discrete device settings.”
+
+This is especially defensible given Galili's non-monotonic 50% versus 70% IMA-AP result. 
+PubMed Central (PMC)
+
+For C3:
+
+“Literature-derived thresholds were implemented as planning screens, not as validated patient-specific safety guarantees.”
+
+“The CS–LCx criterion operationalizes a reported procedural risk association into the Layer-1 feasibility screen without implying deterministic prediction of coronary compromise.”
+
+For C4:
+
+“Matched-AP comparison was used to partially decouple device architecture from geometric dose.”
+
+“The dual-versus-single analysis therefore tests whether predicted behavior differs after approximately controlling for AP reduction rather than merely comparing different nominal suture settings.”
+
+For the seed-42 finding:
+
+“In the prespecified seed-42 scenario, the planner selected dual IMA-AP 60%, corresponding to 18% modeled AP reduction, a 0.152% physics-regurgitation metric, and central jet classification.”
+
+Then always follow it with:
+
+“These are Layer-1 surrogate outputs; in particular, the physics-regurgitation percentage is not a clinical regurgitant volume or regurgitant fraction.”
+
+6. Claims I would specifically avoid
+
+“First comparison of IMA-CS and IMA-AP.”
+
+“First computational comparison of indirect annuloplasty devices.”
+
+“Validated against Galili.”
+
+“Validated against MAVERIC.”
+
+“Validated against REDUCE-FMR.”
+
+“50% Galili suture shortening produces 0% AP reduction.”
+
+“8.6 mm is the minimum safe CS–LCx distance.”
+
+“Alternating strain <0.4% proves fatigue safety.”
+
+“The model predicts regurgitant volume.”
+
+“0.152% residual MR.”
+
+“The planner predicts clinical treatment efficacy.”
+
+“Dual IMA-AP is optimal clinically.”
+
+“The Python surrogate reproduces LHHM biomechanics.”
+
+“The continuous sweep is equivalent to FEA interpolation.”
+
+7. Likely rejection risks
+
+Risk 1: novelty collapses to “Galili, but simpler.”
+This is the largest risk. Galili already performed the high-fidelity IMA-CS versus IMA-AP comparison. 
+PubMed
+ Your paper therefore needs to demonstrate that the planning formulation itself produces information absent from the original discrete FEA study: common dose coordinate, continuous sweep, hard constraints, sensitivity, and candidate ranking.
+
+Risk 2: C1 looks arbitrary.
+A reviewer may immediately ask why Galili 50% suture shortening is assigned zero AP cinch, particularly because Galili's actual 50% simulation produced substantial anatomical change. 
+researchgate.net
+ Do not hide this transformation. Define its mathematical purpose and label it a reference-coordinate convention. If it is partly empirically motivated, document precisely which observations determine the mapping.
+
+Risk 3: “clinical dose mapping” overclaims calibration.
+MAVERIC provides clinical AP measurements, but that does not automatically create a validated conversion from Galili suture shortening to clinical AP reduction. 
+JACC
++1
+ Unless there is formal calibration, “clinically referenced mapping” is safer than “clinical dose conversion.”
+
+Risk 4: the 8.6-mm inequality is reversed rhetorically.
+The source found <8.6 mm predictive of compromise in a particular distal landing zone; it did not prove that all configurations at ≥8.6 mm are safe. 
+PubMed
+ Reviewers in structural cardiology will notice this distinction.
+
+Risk 5: the NiTi threshold is treated as device qualification.
+The cited 0.4% value derives from specific nitinol fatigue testing reported in prior stent literature and should not be generalized into a universal pass/fail law. 
+ScienceDirect
+ Your code can enforce <0.4% as a conservative screen, but the paper must say what it is—and what it is not.
+
+Risk 6: the surrogate MR percentage is mistaken for a clinical quantity.
+This needs redundant safeguards: variable name, Methods definition, Results caption, and Discussion limitation. Do not put “MR volume (%)” on an axis if it is not MR volume.
+
+Risk 7: YAML overwhelms physics.
+If ranking cannot be decomposed into physics-derived versus configured terms, reviewers may conclude that the “planner” simply encodes the desired answer. Report component scores and at least one physics-only or ablation analysis.
+
+Risk 8: η sensitivity undermines an overly categorical conclusion.
+Because ±20% can move the recommendation among dual AP 60%, dual AP 70%, and CS 20%, the scientifically correct conclusion is that the nominal optimum is assumption-sensitive. That is publishable if framed as an uncertainty result; it is damaging only if the manuscript simultaneously calls dual AP 60% a robust optimum.
+
+Risk 9: one seed is presented as general validation.
+Seed 42 should be your reproducible worked case. If feasible, add a compact multi-seed or parameter-perturbation stability analysis. If not, keep claims explicitly scenario-specific.
+
+Risk 10: C4 is confounded by dose.
+Dual versus single is useful only if you compare at matched or closely matched modeled AP reduction. Otherwise a reviewer cannot tell whether jet differences arise from architecture or simply a different effective cinch.
+
+The strongest paper is therefore not “a new simulator of IMA.” It is a transparent pre-high-fidelity decision scaffold that solves the translation problem between heterogeneous intervention parameters, geometric dose, anatomical/device constraints, and candidate ranking while exposing sensitivity to assumptions. That positioning is both more novel relative to Galili and more defensible for the actual Python Layer-1 implementation.

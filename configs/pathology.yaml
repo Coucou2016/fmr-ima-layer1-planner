@@ -1,0 +1,20 @@
+# LHHM-inspired pathology model parameters
+name: pathology
+base_model: healthy_lhhm
+
+geometry_diastole:
+  ap_diameter_mm: 34.4
+  annulus_circumference_mm: 118.5
+
+papillary_muscle:
+  posterior_fraction_passive: 0.44
+  active_threshold_mV: 100.0
+  sa_threshold_mV: 20.0
+
+loading:
+  lv_la_phase_offset_ms: 50
+  peak_systole_fraction: 0.75
+
+sph:
+  n_particles: 29000
+  geometry_phase: peak_systole

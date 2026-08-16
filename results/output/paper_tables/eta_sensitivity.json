@@ -1,0 +1,102 @@
+{
+  "relative_delta": 0.2,
+  "honesty": "\u03b7\u00b120% is a planning-assumption sensitivity, not imaging\u2013FEA identification or Abaqus/LHHM uncertainty.",
+  "rows": [
+    {
+      "scenario": "eta_nominal",
+      "eta_ap": 0.3,
+      "eta_cs": 0.66818,
+      "recommended_device": "IMA-AP",
+      "recommended_shortening_pct": 60.0,
+      "n_sutures": 2,
+      "ap_reduction_pct": 18.0,
+      "physics_regurgitation_pct": 0.1519,
+      "jet_location": "central",
+      "n_feasible": 30,
+      "n_evaluated": 36
+    },
+    {
+      "scenario": "eta_minus_20pct",
+      "eta_ap": 0.24,
+      "eta_cs": 0.53454,
+      "recommended_device": "IMA-AP",
+      "recommended_shortening_pct": 70.0,
+      "n_sutures": 2,
+      "ap_reduction_pct": 16.8,
+      "physics_regurgitation_pct": 0.0895,
+      "jet_location": "central",
+      "n_feasible": 32,
+      "n_evaluated": 36
+    },
+    {
+      "scenario": "eta_plus_20pct",
+      "eta_ap": 0.36,
+      "eta_cs": 0.80182,
+      "recommended_device": "IMA-CS",
+      "recommended_shortening_pct": 20.0,
+      "n_sutures": 0,
+      "ap_reduction_pct": 16.036,
+      "physics_regurgitation_pct": 0.2293,
+      "jet_location": "central",
+      "n_feasible": 26,
+      "n_evaluated": 36
+    }
+  ],
+  "shifts_vs_nominal": [
+    {
+      "scenario": "eta_minus_20pct",
+      "device_changed": false,
+      "shortening_changed": true,
+      "nominal_setting": "IMA-AP 60.0% n_sutures=2",
+      "perturbed_setting": "IMA-AP 70.0% n_sutures=2"
+    },
+    {
+      "scenario": "eta_plus_20pct",
+      "device_changed": true,
+      "shortening_changed": true,
+      "nominal_setting": "IMA-AP 60.0% n_sutures=2",
+      "perturbed_setting": "IMA-CS 20.0% n_sutures=0"
+    }
+  ],
+  "by_scenario": {
+    "eta_nominal": {
+      "scenario": "eta_nominal",
+      "eta_ap": 0.3,
+      "eta_cs": 0.66818,
+      "recommended_device": "IMA-AP",
+      "recommended_shortening_pct": 60.0,
+      "n_sutures": 2,
+      "ap_reduction_pct": 18.0,
+      "physics_regurgitation_pct": 0.1519,
+      "jet_location": "central",
+      "n_feasible": 30,
+      "n_evaluated": 36
+    },
+    "eta_minus_20pct": {
+      "scenario": "eta_minus_20pct",
+      "eta_ap": 0.24,
+      "eta_cs": 0.53454,
+      "recommended_device": "IMA-AP",
+      "recommended_shortening_pct": 70.0,
+      "n_sutures": 2,
+      "ap_reduction_pct": 16.8,
+      "physics_regurgitation_pct": 0.0895,
+      "jet_location": "central",
+      "n_feasible": 32,
+      "n_evaluated": 36
+    },
+    "eta_plus_20pct": {
+      "scenario": "eta_plus_20pct",
+      "eta_ap": 0.36,
+      "eta_cs": 0.80182,
+      "recommended_device": "IMA-CS",
+      "recommended_shortening_pct": 20.0,
+      "n_sutures": 0,
+      "ap_reduction_pct": 16.036,
+      "physics_regurgitation_pct": 0.2293,
+      "jet_location": "central",
+      "n_feasible": 26,
+      "n_evaluated": 36
+    }
+  }
+}

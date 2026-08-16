@@ -1,0 +1,42 @@
+# Published validation anchors (paper targets). Intermediate cases are derived, not snapped.
+regurgitation_pct_anchors:
+  pathology: 5.26
+  ima_cs_22: 0.29
+  ima_ap_50: 0.08
+
+# Fraction of regurgitation from anchor vs physics at listed cases (see README / calibration_report tradeoffs)
+regurgitation_anchor_blend:
+  pathology: 0.10
+  ima_cs_22: 0.82
+  ima_ap_50: 0.85
+
+roa_mm2_anchors:
+  pathology_typical: 35.0
+  ima_ap_50_minimum: 27.3
+
+# Soft reporting blend inside estimate_roa_mm2 (not a per-case pipeline override)
+roa_anchor_blend_weight:
+  pathology_typical: 0.18
+  ima_ap_50_minimum: 0.94
+
+# Pipeline ROA: model + contact cluster (cluster weight low at anchor cases to preserve paper ROA)
+roa_pipeline:
+  default:
+    model_weight: 0.88
+    cluster_weight: 0.12
+  ima_ap_50:
+    model_weight: 0.98
+    cluster_weight: 0.02
+  pathology:
+    model_weight: 0.90
+    cluster_weight: 0.10
+
+# Single scale tying ROA + coaptation to regurgitation fraction (calibrated at pathology only)
+sph:
+  pathology_roa_mm2: 44.0
+  pathology_regurgitation_pct: 5.26
+  roa_exponent: 0.55
+  annulus_improvement_per_mm: 0.155
+  pathology_coaptation_gap_mm: 1.25
+  coaptation_gap_ref_mm: 1.25
+  coaptation_gap_exponent: 2.55

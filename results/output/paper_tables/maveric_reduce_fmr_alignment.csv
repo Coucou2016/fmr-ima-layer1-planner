@@ -1,0 +1,8 @@
+source,device_or_arm,setting,ap_reduction_pct,regurg_metric,literature_direction,model_direction,direction_agrees,magnitude_equated,note
+MAVERIC literature,Carillon (IMA-CS class),41.4→35.3 mm,14.734,(not used as surrogate target),AP↓,,,false,Carillon IMA-CS clinical series (MAVERIC); AP septal-lateral diameter at implant vs follow-up.
+MAVERIC literature,Carillon (IMA-CS class),45.0→38.7 mm,14.0,(not used as surrogate target),AP↓,,,false,second MAVERIC AP pair
+REDUCE-FMR literature,Carillon (IMA-CS class),device vs sham,,regurgitant volume ↓ (trial direction),regurg↓,,,false,Witte KK et al. A Randomized Sham-Controlled Study of Percutaneous Mitral Annuloplasty in Functional Mitral Regurgitation: The REDUCE FMR Trial. JACC Heart Fail. 2019;7(11):945-955.
+Layer-1 clinical mapping,IMA-AP,IMA-AP 50.0% n_sutures=1,15.0,physics regurg 0.3033% (jet=central),"AP↓, regurg↓","AP↓, regurg↓",yes,false,clinical IMA-AP 50% single (η=0.30 → 15% AP); magnitude not equated to trial %
+Layer-1 clinical mapping,IMA-CS,IMA-CS 22.0%,14.7,physics regurg 0.1347% (jet=central),"AP↓, regurg↓","AP↓, regurg↓",yes,false,clinical IMA-CS 22% bridge (~14.7% AP); magnitude not equated to trial %
+Layer-1 clinical mapping,IMA-AP,IMA-AP 60.0% n_sutures=2,18.0,physics regurg 0.1519% (jet=central),"AP↓, regurg↓","AP↓, regurg↓",yes,false,planner recommendation (seed run); magnitude not equated to trial %
+alignment policy,—,directionality only,,—,AP↓ (MAVERIC); regurg↓ (REDUCE-FMR),AP↓ and physics regurg↓ inside 14–20% window,yes,false,Do not equate Layer-1 physics % with trial regurgitant-volume %

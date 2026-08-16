@@ -1,0 +1,129 @@
+# Public clinical / computational anchors for paper tables.
+# These are literature numbers and *planning assumptions*, not new FEA of LHHM.
+
+meta:
+  title: "Clinical and computational references for IMA dose mapping"
+  note: >
+    Layer-1 surrogate for preoperative planning. Galili et al. RSOS 2022
+    remains the computational validation anchor. MAVERIC / REDUCE-FMR /
+    Rottländer supply clinical windows and an LCx safety constraint.
+    Do not read AP-reduction percentages as if they were suture-shortening
+    percentages.
+
+galili_rsos_2022:
+  citation: "Galili L. et al. Indirect mitral annuloplasty using a coronary sinus device versus an anteroposterior suture: a computational comparison. R. Soc. Open Sci. 2022."
+  geometry_diastole:
+    ap_diameter_mm: 34.4
+    annulus_circumference_mm: 118.5
+  regurgitation_pct_anchors:
+    pathology: 5.26
+    ima_cs_22: 0.29
+    ima_ap_50: 0.08
+  roa_mm2:
+    ima_ap_50_minimum: 27.3
+  ima_cs:
+    bridge_shortening_pct: [14, 18, 22]
+    annulus_at_22pct_mm: 115.0
+    ap_diameter_mm: 34.4
+    ap_reduction_pct_in_lhhm: 0.0
+  ima_ap:
+    suture_shortening_pct: [30, 50, 70]
+    ap_diameter_mm: [34.4, 34.4, 14.3]
+    ap_reduction_pct: [0.0, 0.0, 58.430]
+    notes: >
+      Galili suture shortening is NOT AP-diameter reduction. 30% and 50%
+      leave AP at 34.4 mm (0% AP reduction). 70% collapses AP to 14.3 mm
+      (~58% reduction) — a numerical extreme, not a clinical dose.
+
+maveric:
+  name: "MAVERIC / Carillon clinical AP (septal-lateral) reduction"
+  device: "Carillon Mitral Contour System (IMA-CS class)"
+  citation: "Carillon IMA-CS clinical series (MAVERIC); AP septal-lateral diameter at implant vs follow-up."
+  pairs_mm:
+    - {baseline: 41.4, followup: 35.3, reduction_pct: 14.734}
+    - {baseline: 45.0, followup: 38.7, reduction_pct: 14.000}
+  ap_reduction_window_pct: [14.0, 15.0]
+  planning_window_pct: [14.0, 20.0]
+  note: >
+    ~14–15% AP diameter reduction is treated as clinically attested.
+    The planner default ceiling is 20% AP reduction (configurable).
+
+reduce_fmr:
+  name: "REDUCE-FMR"
+  device: "Carillon Mitral Contour System (IMA-CS class)"
+  citation: "Witte KK et al. A Randomized Sham-Controlled Study of Percutaneous Mitral Annuloplasty in Functional Mitral Regurgitation: The REDUCE FMR Trial. JACC Heart Fail. 2019;7(11):945-955."
+  design: "Randomized sham-controlled percutaneous mitral annuloplasty in FMR"
+  directional_outcomes:
+    regurgitant_volume: "decreased vs sham (primary direction used in paper alignment)"
+    FMR_grade: "improved more often with device than sham (qualitative direction)"
+    remodeling: "favorable LV remodeling signals reported in trial narrative"
+  honesty: >
+    This repo stores REDUCE-FMR as *directionality* only (regurg ↓).
+    No trial mean AP-mm or regurgitant-volume magnitude is copied into
+    surrogate targets — magnitude is not equated to Layer-1 physics %.
+  note: >
+    Sham-controlled evidence that CS-based IMA reduces functional MR.
+    Used as clinical context for IMA-CS, not as a fitted AP-mm target
+    in this surrogate.
+
+maveric_alignment_policy:
+  title: "How MAVERIC / REDUCE-FMR enter paper tables"
+  compare_directionality_only: true
+  equate_magnitudes: false
+  model_side: >
+    Clinical-mapping sweep points inside the 14–20% AP window (and the
+    constrained planner recommendation) predict AP ↓ and physics regurg ↓
+    relative to pathology — aligned in *sign* with MAVERIC (AP ↓) and
+    REDUCE-FMR (regurg ↓).
+  literature_side: >
+    MAVERIC supplies AP septal-lateral pairs (~14–15%). REDUCE-FMR
+    supplies randomized evidence of FMR reduction without an AP-mm
+    pair in this YAML.
+
+lcx_compression:
+  name: "CS–LCx distal landing zone vs LCx compression"
+  citation: "Rottländer D. et al. 2021. CS–LCx distance < 8.6 mm in the distal landing zone predicts coronary compression with CS-based IMA."
+  cs_lcx_threshold_mm: 8.6
+  applies_to: "IMA-CS"
+  note: >
+    Planner constraint: CS–LCx ≥ 8.6 mm after cinching. Baseline CS–LCx
+    is a patient-specific CT input (default illustrative anatomy 11.0 mm
+    in configs/design_space.yaml).
+
+niti_fatigue:
+  alternating_strain_pct_max: 0.4
+  note: >
+    Alternating (cyclic) strain cap for NiTi fatigue planning. Distinct
+    from Galili-style engineering strain of prescribed bridge shortening
+    (14–22%).
+
+mapping_assumptions:
+  title: "Suture/bridge shortening % → AP diameter reduction % (Innovation A)"
+  honesty: >
+    This mapping is a documented planning assumption so that a surgeon
+    can talk in AP-mm (echo/CT), not in Galili's suture-% numerical
+    coordinates. It is not a new finite-element result.
+  ima_ap:
+    formula: "AP_reduction_pct = eta_ap * suture_shortening_pct"
+    eta_ap: 0.30
+    calibration: "eta chosen so 50% suture → 15% AP reduction (MAVERIC-like)."
+    galili_vs_clinical:
+      - {suture_pct: 30, galili_ap_mm: 34.4, galili_ap_red_pct: 0.0, clinical_ap_red_pct: 9.0, clinical_ap_mm_galili_scale: 31.304, clinical_ap_mm_maveric_scale: 37.674}
+      - {suture_pct: 50, galili_ap_mm: 34.4, galili_ap_red_pct: 0.0, clinical_ap_red_pct: 15.0, clinical_ap_mm_galili_scale: 29.240, clinical_ap_mm_maveric_scale: 35.190}
+      - {suture_pct: 70, galili_ap_mm: 14.3, galili_ap_red_pct: 58.430, clinical_ap_red_pct: 21.0, clinical_ap_mm_galili_scale: 27.176, clinical_ap_mm_maveric_scale: 32.706}
+  ima_cs:
+    formula: "AP_reduction_pct = eta_cs * bridge_shortening_pct"
+    eta_cs: 0.66818
+    calibration: "eta chosen so 22% bridge → ~14.7% AP reduction (MAVERIC 41.4→35.3)."
+    galili_vs_clinical:
+      - {bridge_pct: 22, galili_ap_mm: 34.4, galili_ap_red_pct: 0.0, clinical_ap_red_pct: 14.700, note: "Galili LHHM did not transmit CS cinching into AP diameter."}
+
+clinical_window:
+  ap_reduction_pct_min: 14.0
+  ap_reduction_pct_max: 20.0
+  default_planner_ceiling_pct: 20.0
+  numerical_extreme_example:
+    label: "Galili IMA-AP 70%"
+    ap_reduction_pct: 58.430
+    ap_mm: 14.3
+    clinically_attainable: false

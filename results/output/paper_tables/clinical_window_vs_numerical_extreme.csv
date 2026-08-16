@@ -1,0 +1,8 @@
+scenario,device,suture_or_bridge_pct,mapping_mode,ap_mm,ap_reduction_pct,physics_regurgitation_pct,jet_location,clinically_attainable,note
+MAVERIC pair 41.4→35.3 mm,IMA-CS (Carillon),,clinical_literature,35.3,14.734,,,true,Carillon IMA-CS clinical series (MAVERIC); AP septal-lateral diameter at implant vs follow-up.
+MAVERIC pair 45.0→38.7 mm,IMA-CS (Carillon),,clinical_literature,38.7,14.0,,,true,second MAVERIC AP pair
+Galili IMA-AP 50% suture (0% AP reduction),IMA-AP,50.0,galili,34.4,0.0,0.0796,central,false,LHHM optimum is not a 50% AP cinch
+"Galili IMA-AP 70% suture (~58% AP reduction, numerical extreme)",IMA-AP,70.0,galili,14.3,58.43,11.855,commissural,false,Not clinically attested; commissural leak in LHHM
+Clinical mapping IMA-AP 50% suture (~15% AP reduction),IMA-AP,50.0,clinical,29.24,15.0,0.3033,central,true,eta=0.30 planning assumption → MAVERIC-like AP dose
+Clinical mapping IMA-CS 22% bridge (~14.7% AP reduction),IMA-CS,22.0,clinical,29.343,14.7,0.1347,central,true,eta_cs calibrated to MAVERIC 14.7% at Galili 22% CS case; CS–LCx may fail on default 11 mm anatomy
+Planner AP-reduction ceiling,constraint,,clinical,,20.0,,,true,window 14.0-20.0%

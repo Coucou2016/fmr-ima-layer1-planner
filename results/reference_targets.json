@@ -1,0 +1,65 @@
+{
+  "geometry_diastole": {
+    "ap_diameter_mm": 34.4,
+    "annulus_circumference_mm": 118.5
+  },
+  "cases": [
+    {
+      "id": "pathology",
+      "device": null,
+      "shortening_pct": null,
+      "annulus_circumference_mm": 118.5,
+      "ap_diameter_mm": 34.4,
+      "roa_mm2": null,
+      "regurgitation_pct": 5.26,
+      "notes": "44% posterior papillary muscle passive"
+    },
+    {
+      "id": "ima_cs_14",
+      "device": "IMA-CS",
+      "shortening_pct": 14,
+      "regurgitation_pct": null,
+      "notes": "intermediate"
+    },
+    {
+      "id": "ima_cs_18",
+      "device": "IMA-CS",
+      "shortening_pct": 18,
+      "regurgitation_pct": null,
+      "notes": "intermediate"
+    },
+    {
+      "id": "ima_cs_22",
+      "device": "IMA-CS",
+      "shortening_pct": 22,
+      "annulus_circumference_mm": 115.0,
+      "ap_diameter_mm": 34.4,
+      "regurgitation_pct": 0.29,
+      "notes": "annulus 118.5 to 115 mm"
+    },
+    {
+      "id": "ima_ap_30",
+      "device": "IMA-AP",
+      "shortening_pct": 30,
+      "regurgitation_pct": null,
+      "notes": "intermediate"
+    },
+    {
+      "id": "ima_ap_50",
+      "device": "IMA-AP",
+      "shortening_pct": 50,
+      "ap_diameter_mm": 34.4,
+      "roa_mm2_min": 27.3,
+      "regurgitation_pct": 0.08,
+      "notes": "target optimum"
+    },
+    {
+      "id": "ima_ap_70",
+      "device": "IMA-AP",
+      "shortening_pct": 70,
+      "ap_diameter_mm": 14.3,
+      "regurgitation_pct": null,
+      "notes": "commissural leak; worse than 50%"
+    }
+  ]
+}
