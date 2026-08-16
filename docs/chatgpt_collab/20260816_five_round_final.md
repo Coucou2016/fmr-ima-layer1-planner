@@ -81,10 +81,9 @@
 |------|-------|
 | Repo | https://github.com/Coucou2016/fmr-ima-layer1-planner |
 | Branch | main |
-| Content commit (on origin) | `3da41b06fb3bdfe88713cadd26045e4f65e51eb4` — five-round manuscript maturation |
-| Packaging tip (on origin) | `d417216c3c23f412bca174327c5ccd3c7c641e16` — safe.directory git fix |
-| Local unpushed | `0383d74`, `c78b091` (§十九 hash sync / final note) — **push blocked by intermittent GitHub HTTPS (connection reset / empty reply)** after successful earlier push of maturation content |
-| Push policy | no force-push; no PR; no deploy |
+| Content commit | `3da41b06fb3bdfe88713cadd26045e4f65e51eb4` — five-round manuscript maturation |
+| Tip on origin | `a1928c8` (includes §十九 hash sync + push-status note); prior packaging fix `d417216` |
+| Push | **Done** — `main` → origin (PUBLIC); no force-push; no PR |
 | Scope | documentation / paper / report only; no secrets |
 
-**ChatGPT-readable now on GitHub:** matured `docs/manuscript_draft.md`, `docs/paper.*`, `report.*`, `docs/chatgpt_collab/rounds/round_01.md`…`round_05.md`, and this final file through commit `d417216`. Re-run `git push origin main` when HTTPS recovers to publish the two local §十九 sync commits.
+**ChatGPT-readable:** matured `docs/manuscript_draft.md`, `docs/paper.*`, `report.*`, `docs/chatgpt_collab/rounds/round_01.md`…`round_05.md`, `docs/chatgpt_collab/20260816_five_round_final.md`.
