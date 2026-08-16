@@ -82,6 +82,6 @@
 | Repo | https://github.com/Coucou2016/fmr-ima-layer1-planner |
 | Branch | main |
 | Content commit | `3da41b06fb3bdfe88713cadd26045e4f65e51eb4` (five-round manuscript maturation) |
-| Tip after sync | recorded in regenerated report §十九 after packaging with `safe.directory` |
-| Push | `main` pushed to origin (PUBLIC); no force-push; no PR |
+| Packaging/metadata tip | `d417216c3c23f412bca174327c5ccd3c7c641e16` (safe.directory git fix + §十九); subsequent sync commit may advance tip |
+| Push | `main` → origin (PUBLIC); no force-push; no PR |
 | Scope | documentation / paper / report only; no secrets |
