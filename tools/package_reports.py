@@ -982,14 +982,15 @@ def main() -> None:
     try:
         import subprocess
 
+        git = ["git", "-c", f"safe.directory={ROOT.as_posix()}"]
         commit_hash = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+            [*git, "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
         ).strip()
         branch = subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+            [*git, "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
         ).strip()
         ahead = subprocess.check_output(
-            ["git", "status", "-sb"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+            [*git, "status", "-sb"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
         ).splitlines()[0]
         push_status = f"{branch}; tracking status: {ahead}"
     except Exception as exc:  # noqa: BLE001

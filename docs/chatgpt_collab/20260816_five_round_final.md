@@ -75,12 +75,13 @@
 
 ---
 
-## Git push (filled at commit time)
+## Git push
 
 | Item | Value |
 |------|-------|
 | Repo | https://github.com/Coucou2016/fmr-ima-layer1-planner |
 | Branch | main |
-| Commit | _(filled after commit)_ |
-| Push | _(filled after push)_ |
-| Scope | documentation / paper / report only; no secrets; no force-push |
+| Content commit | `3da41b06fb3bdfe88713cadd26045e4f65e51eb4` (five-round manuscript maturation) |
+| Tip after sync | recorded in regenerated report §十九 after packaging with `safe.directory` |
+| Push | `main` pushed to origin (PUBLIC); no force-push; no PR |
+| Scope | documentation / paper / report only; no secrets |
