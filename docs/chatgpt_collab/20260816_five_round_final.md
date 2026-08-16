@@ -81,7 +81,10 @@
 |------|-------|
 | Repo | https://github.com/Coucou2016/fmr-ima-layer1-planner |
 | Branch | main |
-| Content commit | `3da41b06fb3bdfe88713cadd26045e4f65e51eb4` (five-round manuscript maturation) |
-| Packaging/metadata tip | `d417216c3c23f412bca174327c5ccd3c7c641e16` (safe.directory git fix + §十九); subsequent sync commit may advance tip |
-| Push | `main` → origin (PUBLIC); no force-push; no PR |
+| Content commit (on origin) | `3da41b06fb3bdfe88713cadd26045e4f65e51eb4` — five-round manuscript maturation |
+| Packaging tip (on origin) | `d417216c3c23f412bca174327c5ccd3c7c641e16` — safe.directory git fix |
+| Local unpushed | `0383d74`, `c78b091` (§十九 hash sync / final note) — **push blocked by intermittent GitHub HTTPS (connection reset / empty reply)** after successful earlier push of maturation content |
+| Push policy | no force-push; no PR; no deploy |
 | Scope | documentation / paper / report only; no secrets |
+
+**ChatGPT-readable now on GitHub:** matured `docs/manuscript_draft.md`, `docs/paper.*`, `report.*`, `docs/chatgpt_collab/rounds/round_01.md`…`round_05.md`, and this final file through commit `d417216`. Re-run `git push origin main` when HTTPS recovers to publish the two local §十九 sync commits.
