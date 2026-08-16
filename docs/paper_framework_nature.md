@@ -109,7 +109,7 @@ Avoid:
 - [x] Methods paper drafting order preferred
 - [x] Claim verbs calibrated
 - [x] Evidence = seed-42 artifacts + golden tests
-- [ ] Full EN prose polish of every section (ongoing in `manuscript_draft.md`)
+- [x] Full EN prose polish of Introduction / Discussion / Abstract / Methods claim audit (2026-08-16 five-round maturation)
 - [ ] Citation manager / DOI lock via `nature-citation` (future)
 
 ---
