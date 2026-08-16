@@ -415,28 +415,34 @@ physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度
 
 见同目录 HTML 终报章节或下方「打包时写入」的终报正文（生成脚本在 HTML 中展开完整第十九节）。
 
+**GitHub（公开）：** https://github.com/Coucou2016/fmr-ima-layer1-planner  
 **ChatGPT URL：** https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65  
-**本轮性质：** 报告/论文 HTML–MD–PDF 打包；文本顾问既有文献框架已并入 `docs/paper_framework_nature.md`；本轮未强制新一轮上传（ChatGPT = text-only）。  
-**本地-only：** 是（无 git commit/push/PR）。
+**本轮性质：** 公开仓库推送 + 报告/论文打包；顾问可读完整公开代码/文档；ChatGPT 浏览器 MCP 本轮受阻（见完整第十九节）。  
+**推送：** 已 push `main`（PUBLIC）；无 PR。
 
 
 ### 打包脚本状态附记
 
-- PDF：report.pdf: PASS → report.pdf (1505741 bytes); paper.pdf: PASS → docs/paper.pdf (1500390 bytes)
-- report.html size：1269843 bytes
+- PDF：report.pdf: PASS → report.pdf (1512668 bytes); paper.pdf: PASS → docs/paper.pdf (1500390 bytes)
+- report.html size：1270915 bytes
 - data:image count：5
 
 ## 第十九节（完整）：双代理协作终报
 
 | 项 | 内容 |
 |----|------|
+| GitHub URL | https://github.com/Coucou2016/fmr-ima-layer1-planner（PUBLIC；顾问可读完整代码/文档） |
+| Commit hash | `5c1394cfe643a4cb9ee994547c4f746ca9925f95` |
+| Push status | main; tracking status: ## main...origin/main |
 | ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
+| ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
+| ChatGPT browser | BLOCKED — cursor-ide-browser MCP cannot retain tabs (navigate → “No browser tab available”). Brief ready at docs/chatgpt_collab/20260816_github_review_brief.md for manual paste. |
 | Baseline | seed-42 dual 60% / AP 18% / physics 0.152% / central；SciencePlots 五图；golden tests；manuscript + nature framework |
-| Context pasted | 本轮以本地核验产物打包为主；文献框架轮次建议已并入 `docs/paper_framework_nature.md`；未上传文件（text-only） |
+| Context / brief | `docs/chatgpt_collab/20260816_github_review_brief.md`（含仓库 URL + 阅读路径 + A–D 交付要求） |
 | Accepted | 规划/翻译层新颖性；Galili 表约定措辞；LCx 筛查边界；NiTi 工程筛查；physics≠临床反流容积 |
 | Rejected | Layer-1=LHHM；无证据升级冲旗舰 Nature |
-| Files | report.html, report.md, report.pdf, docs/report.html, docs/report.md, docs/paper.html, docs/paper.md, docs/paper.pdf, tools/package_reports.py, requirements.txt, docs/chatgpt_collab/20260816_packaging_final_report.md |
+| Files | report.html, report.md, report.pdf, docs/report.html, docs/report.md, docs/paper.html, docs/paper.md, docs/paper.pdf, tools/package_reports.py, requirements.txt, .gitignore, README.md, docs/chatgpt_collab/20260816_github_review_brief.md, docs/chatgpt_collab/20260816_github_packaging_final_report.md, docs/chatgpt_collab/20260816_chatgpt_browser_blocker.md |
 | Tests | PASS — PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -q (40 passed); PASS — python run_pipeline.py --seed 42 --paper --no-export (planner: IMA-AP dual 60%, AP 18.0%, physics 0.152%, jet=central) |
-| PDF | report.pdf: PASS → report.pdf (1505741 bytes); paper.pdf: PASS → docs/paper.pdf (1500390 bytes) |
-| Risks | base64 HTML 体积大；示意解剖与 η 限制外推；Level-2 待补充 |
-| Scope | **local-only**（无 commit/push/PR） |
+| PDF | report.pdf: PASS → report.pdf (1512668 bytes); paper.pdf: PASS → docs/paper.pdf (1500390 bytes) |
+| Risks | base64 HTML 体积大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待补档 |
+| Scope | 公开 push 已完成；无 PR；无 deploy |

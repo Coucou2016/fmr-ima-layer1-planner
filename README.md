@@ -1,5 +1,7 @@
 # Functional Mitral Regurgitation (FMR) — IMA Computational Biomechanics
 
+**Public repository:** https://github.com/Coucou2016/fmr-ima-layer1-planner
+
 Computational comparison of **Indirect Mitral Annuloplasty** strategies for functional mitral regurgitation (FMR):
 
 - **IMA-CS** — coronary sinus anchors + NiTi bridge shortening (14%, 18%, 22%)

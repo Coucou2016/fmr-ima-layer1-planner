@@ -629,9 +629,10 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 见同目录 HTML 终报章节或下方「打包时写入」的终报正文（生成脚本在 HTML 中展开完整第十九节）。
 
+**GitHub（公开）：** https://github.com/Coucou2016/fmr-ima-layer1-planner  
 **ChatGPT URL：** https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65  
-**本轮性质：** 报告/论文 HTML–MD–PDF 打包；文本顾问既有文献框架已并入 `docs/paper_framework_nature.md`；本轮未强制新一轮上传（ChatGPT = text-only）。  
-**本地-only：** 是（无 git commit/push/PR）。
+**本轮性质：** 公开仓库推送 + 报告/论文打包；顾问可读完整公开代码/文档；ChatGPT 浏览器 MCP 本轮受阻（见完整第十九节）。  
+**推送：** 已 push `main`（PUBLIC）；无 PR。
 """
     )
     return "".join(parts)
@@ -834,7 +835,7 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
     {final_section_html}
   </section>
 
-  <footer class="doc">FMR IMA Layer-1 · self-contained HTML · images as data URIs · local-only packaging</footer>
+  <footer class="doc">FMR IMA Layer-1 · self-contained HTML · public GitHub: Coucou2016/fmr-ima-layer1-planner</footer>
 </div>
 </body>
 </html>
@@ -878,18 +879,20 @@ def build_paper_html(figs: list[dict]) -> str:
 def final_section_html(test_status: str, pdf_status: str, files_changed: list[str]) -> str:
     files_li = "".join(f"<li><code>{html.escape(p)}</code></li>" for p in files_changed)
     return f"""
-<p><strong>角色：</strong>Cursor = 唯一实现与核验；ChatGPT = 纯文本顾问（无上传）。本轮无 git commit/push/PR。</p>
-<p><strong>ChatGPT URL：</strong><a href="https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65">https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65</a>（Senior Review；文献框架轮次已完成并归档）。</p>
-<p><strong>Baseline：</strong>既有 seed-42 规划器推荐（dual 60% / AP 18% / physics 0.152% / central）、SciencePlots 五图、golden tests、<code>docs/manuscript_draft.md</code>、<code>docs/paper_framework_nature.md</code>。</p>
-<p><strong>本轮粘贴语境：</strong>打包阶段以本地已核验数字与框架为准；未再要求 ChatGPT 上传文件。LocalBridge = Not now。</p>
-<p><strong>已采纳建议（既有文献轮）：</strong>新颖性=规划/翻译层；Galili 50%=0% AP 用表约定措辞；Rottländer 筛查边界措辞；NiTi 0.4% 为工程筛查；physics %≠临床反流容积。</p>
-<p><strong>拒绝：</strong>声称 Layer-1 复现 LHHM；无证据升级时冲旗舰 Nature。</p>
+<p><strong>角色：</strong>Cursor = 唯一实现与核验；ChatGPT = 纯文本顾问（无文件上传）。本轮已获用户授权：公开 GitHub 推送结构化代码/文档供 ChatGPT 网页阅读。</p>
+<p><strong>GitHub（公开）：</strong><a href="https://github.com/Coucou2016/fmr-ima-layer1-planner">https://github.com/Coucou2016/fmr-ima-layer1-planner</a> — 已告知顾问可直接阅读完整公开代码与文档（README、<code>docs/paper_framework_nature.md</code>、<code>docs/manuscript_draft.md</code>、规划器模块）。</p>
+<p><strong>Commit / push：</strong>见终报 Markdown 表（打包时写入当前 HEAD）；分支 <code>main</code>；可见性 PUBLIC。</p>
+<p><strong>ChatGPT URL：</strong><a href="https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65">https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65</a>（Senior Review）。待粘贴 brief：<code>docs/chatgpt_collab/20260816_github_review_brief.md</code>。</p>
+<p><strong>ChatGPT 浏览器状态：</strong>本轮 Cursor IDE browser MCP 无法保持标签页（<code>browser_tabs new</code> 后即消失；<code>browser_navigate</code> 连续报 “No browser tab available”）。已准备专业 brief + 仓库 URL；需用户在已登录 ChatGPT 会话中手动粘贴，或修复内置浏览器后再自动化。</p>
+<p><strong>Baseline：</strong>seed-42 规划器（dual 60% / AP 18% / physics 0.152% / central）、SciencePlots 五图、golden tests、<code>docs/manuscript_draft.md</code>、<code>docs/paper_framework_nature.md</code>、自包含 report/paper HTML。</p>
+<p><strong>已采纳（既有文献轮，已归档）：</strong>新颖性=规划/翻译层；Galili 表约定措辞；Rottländer 筛查边界；NiTi 工程筛查；physics %≠临床反流容积。</p>
+<p><strong>拒绝：</strong>Layer-1=LHHM；无证据升级冲旗舰 Nature。</p>
 <p><strong>本轮新增/更新文件：</strong></p>
 <ul>{files_li}</ul>
 <p><strong>测试：</strong>{html.escape(test_status)}</p>
 <p><strong>PDF：</strong>{html.escape(pdf_status)}</p>
-<p><strong>风险：</strong>HTML 体积因 base64 变大；示意解剖与 η 假设仍限制临床外推；Level-2 待补充。</p>
-<p><strong>范围：</strong><strong>local-only</strong>。</p>
+<p><strong>风险：</strong>HTML 因 base64 变大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待浏览器恢复后补档。</p>
+<p><strong>范围：</strong>公开 GitHub 推送已完成；无 PR；无 deploy。</p>
 """
 
 
@@ -960,8 +963,39 @@ def main() -> None:
         "docs/paper.pdf",
         "tools/package_reports.py",
         "requirements.txt",
-        "docs/chatgpt_collab/20260816_packaging_final_report.md",
+        ".gitignore",
+        "README.md",
+        "docs/chatgpt_collab/20260816_github_review_brief.md",
+        "docs/chatgpt_collab/20260816_github_packaging_final_report.md",
+        "docs/chatgpt_collab/20260816_chatgpt_browser_blocker.md",
     ]
+
+    # Resolve git metadata for §十九 (best-effort; packaging must not fail offline).
+    commit_hash = "unknown"
+    push_status = "unknown"
+    try:
+        import subprocess
+
+        commit_hash = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+        ahead = subprocess.check_output(
+            ["git", "status", "-sb"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).splitlines()[0]
+        push_status = f"{branch}; tracking status: {ahead}"
+    except Exception as exc:  # noqa: BLE001
+        push_status = f"git metadata unavailable: {exc}"
+
+    github_url = "https://github.com/Coucou2016/fmr-ima-layer1-planner"
+    chatgpt_url = "https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65"
+    chatgpt_browser = (
+        "BLOCKED — cursor-ide-browser MCP cannot retain tabs "
+        "(navigate → “No browser tab available”). Brief ready at "
+        "docs/chatgpt_collab/20260816_github_review_brief.md for manual paste."
+    )
 
     # write HTML without final pdf status first, then rewrite after PDF attempt
     final_html = final_section_html(test_status, pdf_status, files_changed)
@@ -994,16 +1028,21 @@ def main() -> None:
 
 | 项 | 内容 |
 |----|------|
-| ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
+| GitHub URL | {github_url}（PUBLIC；顾问可读完整代码/文档） |
+| Commit hash | `{commit_hash}` |
+| Push status | {push_status} |
+| ChatGPT URL | {chatgpt_url} |
+| ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
+| ChatGPT browser | {chatgpt_browser} |
 | Baseline | seed-42 dual 60% / AP 18% / physics 0.152% / central；SciencePlots 五图；golden tests；manuscript + nature framework |
-| Context pasted | 本轮以本地核验产物打包为主；文献框架轮次建议已并入 `docs/paper_framework_nature.md`；未上传文件（text-only） |
+| Context / brief | `docs/chatgpt_collab/20260816_github_review_brief.md`（含仓库 URL + 阅读路径 + A–D 交付要求） |
 | Accepted | 规划/翻译层新颖性；Galili 表约定措辞；LCx 筛查边界；NiTi 工程筛查；physics≠临床反流容积 |
 | Rejected | Layer-1=LHHM；无证据升级冲旗舰 Nature |
 | Files | {", ".join(files_changed)} |
 | Tests | {test_status} |
 | PDF | {pdf_status} |
-| Risks | base64 HTML 体积大；示意解剖与 η 限制外推；Level-2 待补充 |
-| Scope | **local-only**（无 commit/push/PR） |
+| Risks | base64 HTML 体积大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待补档 |
+| Scope | 公开 push 已完成；无 PR；无 deploy |
 """
     (ROOT / "report.md").write_text(report_md + md_extra, encoding="utf-8")
     (ROOT / "docs" / "report.md").write_text(report_md + md_extra, encoding="utf-8")

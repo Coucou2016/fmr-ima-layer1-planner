@@ -308,22 +308,24 @@ physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度
   <section id="sec19">
     <h2 class="sec">十九、双代理协作终报</h2>
     
-<p><strong>角色：</strong>Cursor = 唯一实现与核验；ChatGPT = 纯文本顾问（无上传）。本轮无 git commit/push/PR。</p>
-<p><strong>ChatGPT URL：</strong><a href="https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65">https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65</a>（Senior Review；文献框架轮次已完成并归档）。</p>
-<p><strong>Baseline：</strong>既有 seed-42 规划器推荐（dual 60% / AP 18% / physics 0.152% / central）、SciencePlots 五图、golden tests、<code>docs/manuscript_draft.md</code>、<code>docs/paper_framework_nature.md</code>。</p>
-<p><strong>本轮粘贴语境：</strong>打包阶段以本地已核验数字与框架为准；未再要求 ChatGPT 上传文件。LocalBridge = Not now。</p>
-<p><strong>已采纳建议（既有文献轮）：</strong>新颖性=规划/翻译层；Galili 50%=0% AP 用表约定措辞；Rottländer 筛查边界措辞；NiTi 0.4% 为工程筛查；physics %≠临床反流容积。</p>
-<p><strong>拒绝：</strong>声称 Layer-1 复现 LHHM；无证据升级时冲旗舰 Nature。</p>
+<p><strong>角色：</strong>Cursor = 唯一实现与核验；ChatGPT = 纯文本顾问（无文件上传）。本轮已获用户授权：公开 GitHub 推送结构化代码/文档供 ChatGPT 网页阅读。</p>
+<p><strong>GitHub（公开）：</strong><a href="https://github.com/Coucou2016/fmr-ima-layer1-planner">https://github.com/Coucou2016/fmr-ima-layer1-planner</a> — 已告知顾问可直接阅读完整公开代码与文档（README、<code>docs/paper_framework_nature.md</code>、<code>docs/manuscript_draft.md</code>、规划器模块）。</p>
+<p><strong>Commit / push：</strong>见终报 Markdown 表（打包时写入当前 HEAD）；分支 <code>main</code>；可见性 PUBLIC。</p>
+<p><strong>ChatGPT URL：</strong><a href="https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65">https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65</a>（Senior Review）。待粘贴 brief：<code>docs/chatgpt_collab/20260816_github_review_brief.md</code>。</p>
+<p><strong>ChatGPT 浏览器状态：</strong>本轮 Cursor IDE browser MCP 无法保持标签页（<code>browser_tabs new</code> 后即消失；<code>browser_navigate</code> 连续报 “No browser tab available”）。已准备专业 brief + 仓库 URL；需用户在已登录 ChatGPT 会话中手动粘贴，或修复内置浏览器后再自动化。</p>
+<p><strong>Baseline：</strong>seed-42 规划器（dual 60% / AP 18% / physics 0.152% / central）、SciencePlots 五图、golden tests、<code>docs/manuscript_draft.md</code>、<code>docs/paper_framework_nature.md</code>、自包含 report/paper HTML。</p>
+<p><strong>已采纳（既有文献轮，已归档）：</strong>新颖性=规划/翻译层；Galili 表约定措辞；Rottländer 筛查边界；NiTi 工程筛查；physics %≠临床反流容积。</p>
+<p><strong>拒绝：</strong>Layer-1=LHHM；无证据升级冲旗舰 Nature。</p>
 <p><strong>本轮新增/更新文件：</strong></p>
-<ul><li><code>report.html</code></li><li><code>report.md</code></li><li><code>report.pdf</code></li><li><code>docs/report.html</code></li><li><code>docs/report.md</code></li><li><code>docs/paper.html</code></li><li><code>docs/paper.md</code></li><li><code>docs/paper.pdf</code></li><li><code>tools/package_reports.py</code></li><li><code>requirements.txt</code></li><li><code>docs/chatgpt_collab/20260816_packaging_final_report.md</code></li></ul>
+<ul><li><code>report.html</code></li><li><code>report.md</code></li><li><code>report.pdf</code></li><li><code>docs/report.html</code></li><li><code>docs/report.md</code></li><li><code>docs/paper.html</code></li><li><code>docs/paper.md</code></li><li><code>docs/paper.pdf</code></li><li><code>tools/package_reports.py</code></li><li><code>requirements.txt</code></li><li><code>.gitignore</code></li><li><code>README.md</code></li><li><code>docs/chatgpt_collab/20260816_github_review_brief.md</code></li><li><code>docs/chatgpt_collab/20260816_github_packaging_final_report.md</code></li><li><code>docs/chatgpt_collab/20260816_chatgpt_browser_blocker.md</code></li></ul>
 <p><strong>测试：</strong>PASS — PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -q (40 passed); PASS — python run_pipeline.py --seed 42 --paper --no-export (planner: IMA-AP dual 60%, AP 18.0%, physics 0.152%, jet=central)</p>
-<p><strong>PDF：</strong>report.pdf: PASS → report.pdf (1505741 bytes); paper.pdf: PASS → docs/paper.pdf (1500390 bytes)</p>
-<p><strong>风险：</strong>HTML 体积因 base64 变大；示意解剖与 η 假设仍限制临床外推；Level-2 待补充。</p>
-<p><strong>范围：</strong><strong>local-only</strong>。</p>
+<p><strong>PDF：</strong>report.pdf: PASS → report.pdf (1512668 bytes); paper.pdf: PASS → docs/paper.pdf (1500390 bytes)</p>
+<p><strong>风险：</strong>HTML 因 base64 变大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待浏览器恢复后补档。</p>
+<p><strong>范围：</strong>公开 GitHub 推送已完成；无 PR；无 deploy。</p>
 
   </section>
 
-  <footer class="doc">FMR IMA Layer-1 · self-contained HTML · images as data URIs · local-only packaging</footer>
+  <footer class="doc">FMR IMA Layer-1 · self-contained HTML · public GitHub: Coucou2016/fmr-ima-layer1-planner</footer>
 </div>
 </body>
 </html>
