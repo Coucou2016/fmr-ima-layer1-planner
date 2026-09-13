@@ -1,4 +1,4 @@
-"""ROA estimate and synthetic contact nodes from FEA surrogate outputs."""
+"""ROA estimate and synthetic contact nodes from mechanics-proxy outputs."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from analysis.roa import ContactNode, compute_roa_from_contacts
 from models.devices import IMA_AP, IMA_CS
 from models.heart_geometry import HeartGeometry
 from simulation.calibration import load_surrogate_calibration
-from simulation.run_case import FEASurrogateResult
+from simulation.run_case import FEASurrogateResult, MechanicsProxyResult
 
 
 def stable_case_seed(base_seed: int, case_id: str) -> int:
@@ -72,7 +72,8 @@ def estimate_roa_mm2(
             optim = 0.88 + 0.002 * abs(device.shortening_pct - 50.0)
             roa *= optim
         elif device.commissural_leak_risk():
-            ap_deficit = max(0.0, (34.4 - geometry.ap_diameter_mm) / 20.0)
+            # Peak-systole disease AP = 26.1 mm; large deficit → commissural jet area.
+            ap_deficit = max(0.0, (26.1 - geometry.ap_diameter_mm) / 14.0)
             jet_minor = 0.85 + 0.95 * ap_deficit
             if n_sutures >= 2:
                 jet_minor *= 0.55

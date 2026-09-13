@@ -1,25 +1,49 @@
-# Published validation anchors (paper targets). Intermediate cases are derived, not snapped.
+# Literature-calibrated leakage / ROA reporting configuration.
+#
+# Honesty:
+# - calibration_targets are used for anchor blend / scale setting (reproduction).
+# - heldout_targets are reserved for leave-one-out checks (P1 Dryad import).
+# - High anchor-weight reproduction is NOT external validation.
+# - Do not say "validated against Galili" for anchor-blended cases; prefer
+#   "calibrated to and reproduced selected published Galili cases".
+
+calibration_targets:
+  case_ids: [pathology, ima_cs_22, ima_ap_50]
+
+heldout_targets:
+  case_ids: [ima_cs_14, ima_cs_18, ima_ap_30, ima_ap_70]
+  leave_one_out_plan: >
+    With only seven discrete Galili cases, rotate each case out of the
+    calibration set and score peak-systolic AP / ROA / leakage reproduction
+    without raising that case's anchor blend. Full Dryad time-series training
+    is P1 (doi:10.5061/dryad.bzkh1899d).
+
+# Published leakage anchors used for reproduction blend at calibration IDs.
 regurgitation_pct_anchors:
   pathology: 5.26
   ima_cs_22: 0.29
   ima_ap_50: 0.08
 
-# Fraction of regurgitation from anchor vs physics at listed cases (see README / calibration_report tradeoffs)
+# Fraction of regurgitation from anchor vs physics at listed cases.
+# High w = reproduction of published leakage, not independent validation.
 regurgitation_anchor_blend:
-  pathology: 0.10
+  # Higher pathology weight restores published 5.26% after peak-systole ROA scale update.
+  # This is calibration/reproduction weight — not external validation.
+  pathology: 0.72
   ima_cs_22: 0.82
   ima_ap_50: 0.85
 
 roa_mm2_anchors:
-  pathology_typical: 35.0
+  # Peak-systole Galili ROA (pathology was previously mis-stated as ~35).
+  pathology_typical: 172.8
   ima_ap_50_minimum: 27.3
 
 # Soft reporting blend inside estimate_roa_mm2 (not a per-case pipeline override)
 roa_anchor_blend_weight:
-  pathology_typical: 0.18
+  pathology_typical: 0.85
   ima_ap_50_minimum: 0.94
 
-# Pipeline ROA: model + contact cluster (cluster weight low at anchor cases to preserve paper ROA)
+# Pipeline ROA: model + contact cluster (cluster weight low at anchor cases)
 roa_pipeline:
   default:
     model_weight: 0.88
@@ -28,15 +52,17 @@ roa_pipeline:
     model_weight: 0.98
     cluster_weight: 0.02
   pathology:
-    model_weight: 0.90
-    cluster_weight: 0.10
+    model_weight: 0.95
+    cluster_weight: 0.05
 
-# Single scale tying ROA + coaptation to regurgitation fraction (calibrated at pathology only)
+# Leakage-proxy scale (literature-calibrated at pathology only).
+# Physics regurg % ≠ clinical regurgitant volume.
 sph:
-  pathology_roa_mm2: 44.0
+  pathology_roa_mm2: 172.8
   pathology_regurgitation_pct: 5.26
   roa_exponent: 0.55
   annulus_improvement_per_mm: 0.155
   pathology_coaptation_gap_mm: 1.25
   coaptation_gap_ref_mm: 1.25
   coaptation_gap_exponent: 2.55
+  reference_ap_mm_peak_systole: 26.1

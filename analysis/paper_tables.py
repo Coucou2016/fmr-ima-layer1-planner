@@ -50,11 +50,11 @@ def table_galili_vs_surrogate(
     galili = refs["galili_rsos_2022"]
     anchors = galili["regurgitation_pct_anchors"]
     ap_map = {
-        "pathology": (34.4, 0.0),
-        "ima_cs_22": (34.4, 0.0),
-        "ima_ap_30": (34.4, 0.0),
-        "ima_ap_50": (34.4, 0.0),
-        "ima_ap_70": (14.3, 58.430),
+        "pathology": (26.1, 0.0),
+        "ima_cs_22": (24.8, 100.0 * (26.1 - 24.8) / 26.1),
+        "ima_ap_30": (20.7, 100.0 * (26.1 - 20.7) / 26.1),
+        "ima_ap_50": (15.9, 100.0 * (26.1 - 15.9) / 26.1),
+        "ima_ap_70": (12.4, 100.0 * (26.1 - 12.4) / 26.1),
     }
     pipe = {m.case_id: m for m in pipeline_metrics} if pipeline_metrics else {}
 
@@ -75,7 +75,7 @@ def table_galili_vs_surrogate(
                 "surrogate_physics_pct": "" if physics is None else f"{physics:.4f}",
                 "galili_ap_mm": "" if ap_mm is None else f"{ap_mm:.2f}",
                 "galili_ap_reduction_pct": "" if ap_red is None else f"{ap_red:.3f}",
-                "note": "blended reporting at YAML anchors; physics used in paper sweep figures",
+                "note": "calibrated/reproduced at YAML anchors; physics used in paper sweep figures",
             }
         )
     return rows
@@ -86,8 +86,8 @@ def table_clinical_window_vs_extreme(sweep_points: list[DesignPoint]) -> list[di
     window = refs["clinical_window"]
     rows: list[dict[str, Any]] = [
         {
-            "scenario": "MAVERIC pair 41.4→35.3 mm",
-            "device": "IMA-CS (Carillon)",
+            "scenario": "MAVERIC/ARTO pair 41.4→35.3 mm",
+            "device": "ARTO (IMA-AP class)",
             "suture_or_bridge_pct": "",
             "mapping_mode": "clinical_literature",
             "ap_mm": 35.3,
@@ -98,8 +98,8 @@ def table_clinical_window_vs_extreme(sweep_points: list[DesignPoint]) -> list[di
             "note": refs["maveric"]["citation"],
         },
         {
-            "scenario": "MAVERIC pair 45.0→38.7 mm",
-            "device": "IMA-CS (Carillon)",
+            "scenario": "MAVERIC/ARTO pair 45.0→38.7 mm",
+            "device": "ARTO (IMA-AP class)",
             "suture_or_bridge_pct": "",
             "mapping_mode": "clinical_literature",
             "ap_mm": 38.7,
@@ -107,7 +107,21 @@ def table_clinical_window_vs_extreme(sweep_points: list[DesignPoint]) -> list[di
             "physics_regurgitation_pct": "",
             "jet_location": "",
             "clinically_attainable": "true",
-            "note": "second MAVERIC AP pair",
+            "note": "second ARTO/MAVERIC AP pair",
+        },
+        {
+            "scenario": "Carillon TITAN II AP context ~15%",
+            "device": "Carillon (IMA-CS class)",
+            "suture_or_bridge_pct": "",
+            "mapping_mode": "clinical_literature",
+            "ap_mm": "",
+            "ap_reduction_pct": 15.0,
+            "physics_regurgitation_pct": "",
+            "jet_location": "",
+            "clinically_attainable": "true",
+            "note": refs.get("carillon", {}).get("titan_ii", {}).get(
+                "note", "Carillon context; not MAVERIC"
+            ),
         },
     ]
 
@@ -117,39 +131,39 @@ def table_clinical_window_vs_extreme(sweep_points: list[DesignPoint]) -> list[di
 
     picks = [
         (
-            "Galili IMA-AP 50% suture (0% AP reduction)",
+            "Galili IMA-AP 50% suture (peak-systolic AP 15.9 mm)",
             lambda p: p.device == "IMA-AP"
             and p.n_sutures == 1
             and p.mapping_mode == "galili"
             and p.shortening_pct == 50,
             False,
-            "LHHM optimum is not a 50% AP cinch",
+            "Near-direct AP effect; not undeformed 34.4 mm / not 0% AP reduction",
         ),
         (
-            "Galili IMA-AP 70% suture (~58% AP reduction, numerical extreme)",
+            "Galili IMA-AP 70% suture (peak-systolic AP 12.4 mm)",
             lambda p: p.device == "IMA-AP"
             and p.n_sutures == 1
             and p.mapping_mode == "galili"
             and p.shortening_pct == 70,
             False,
-            "Not clinically attested; commissural leak in LHHM",
+            "Excessive AP reduction; commissural leak in LHHM",
         ),
         (
-            "Clinical mapping IMA-AP 50% suture (~15% AP reduction)",
+            "Planning map IMA-AP 50% suture (~15% AP; assumption η_ap=0.30)",
             lambda p: p.device == "IMA-AP"
             and p.n_sutures == 1
             and p.mapping_mode == "clinical"
             and p.shortening_pct == 50,
             True,
-            "eta=0.30 planning assumption → MAVERIC-like AP dose",
+            "assumption prior → ARTO/MAVERIC-like AP talk track (not FEA-identified)",
         ),
         (
-            "Clinical mapping IMA-CS 22% bridge (~14.7% AP reduction)",
+            "Planning map IMA-CS 22% bridge (assumption η_cs; not MAVERIC-fit)",
             lambda p: p.device == "IMA-CS"
             and p.mapping_mode == "clinical"
             and p.shortening_pct == 22,
             True,
-            "eta_cs calibrated to MAVERIC 14.7% at Galili 22% CS case; CS–LCx may fail on default 11 mm anatomy",
+            "η_cs is assumption prior only; CS–LCx may fail on default 11 mm anatomy",
         ),
     ]
     for scenario, pred, attainable, note in picks:
@@ -277,8 +291,8 @@ def table_maveric_reduce_fmr_alignment(
 
     rows: list[dict[str, Any]] = [
         _row(
-            source="MAVERIC literature",
-            device="Carillon (IMA-CS class)",
+            source="MAVERIC literature (ARTO)",
+            device="ARTO (IMA-AP class)",
             setting="41.4→35.3 mm",
             ap_red=14.734,
             regurg="(not used as surrogate target)",
@@ -287,14 +301,24 @@ def table_maveric_reduce_fmr_alignment(
             note=refs["maveric"]["citation"],
         ),
         _row(
-            source="MAVERIC literature",
-            device="Carillon (IMA-CS class)",
+            source="MAVERIC literature (ARTO)",
+            device="ARTO (IMA-AP class)",
             setting="45.0→38.7 mm",
             ap_red=14.0,
             regurg="(not used as surrogate target)",
             literature_direction="AP↓",
             model_direction="",
-            note="second MAVERIC AP pair",
+            note="second ARTO/MAVERIC AP pair — not Carillon",
+        ),
+        _row(
+            source="Carillon TITAN II context",
+            device="Carillon (IMA-CS class)",
+            setting="~15% AP context",
+            ap_red=15.0,
+            regurg="(not used as η_CS fit)",
+            literature_direction="AP↓",
+            model_direction="",
+            note="Carillon clinical context; do not calibrate η_CS from MAVERIC/ARTO",
         ),
         _row(
             source="REDUCE-FMR literature",
@@ -312,22 +336,24 @@ def table_maveric_reduce_fmr_alignment(
     picks: list[tuple[str, Any]] = []
     for label, pred in (
         (
-            "clinical IMA-AP 50% single (η=0.30 → 15% AP)",
+            "planning IMA-AP 50% single (assumption η_ap=0.30 → 15% AP)",
             lambda p: p.device == "IMA-AP" and p.n_sutures == 1 and p.shortening_pct == 50,
         ),
         (
-            "clinical IMA-CS 22% bridge (~14.7% AP)",
+            "planning IMA-CS 22% bridge (assumption η_cs; not MAVERIC-fit)",
             lambda p: p.device == "IMA-CS" and p.shortening_pct == 22,
         ),
     ):
         hit = next((p for p in clinical if pred(p)), None)
         picks.append((label, hit))
 
-    rec = (recommendation or {}).get("recommended")
+    rec = (recommendation or {}).get("best_candidate") or (recommendation or {}).get(
+        "recommended"
+    )
     if isinstance(rec, dict) and rec.get("device"):
         picks.append(
             (
-                "planner recommendation (seed run)",
+                "planner best_candidate (seed run)",
                 {
                     "device": rec.get("device"),
                     "n_sutures": int(rec.get("n_sutures") or 0),
@@ -385,11 +411,11 @@ def table_maveric_reduce_fmr_alignment(
             "setting": "directionality only",
             "ap_reduction_pct": "",
             "regurg_metric": "—",
-            "literature_direction": "AP↓ (MAVERIC); regurg↓ (REDUCE-FMR)",
+            "literature_direction": "AP↓ (ARTO/MAVERIC; Carillon TITAN II context); regurg↓ (REDUCE-FMR)",
             "model_direction": "AP↓ and physics regurg↓ inside 14–20% window",
             "direction_agrees": "yes",
             "magnitude_equated": "false",
-            "note": "Do not equate Layer-1 physics % with trial regurgitant-volume %",
+            "note": "Do not equate Layer-1 physics % with trial regurgitant-volume %; MAVERIC≠Carillon",
         }
     )
     return rows
@@ -446,17 +472,18 @@ def eta_sensitivity(
     relative_delta: float = 0.20,
     design_space: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
-    """Re-run clinical planner at η±relative_delta; report recommendation shifts.
+    """Re-run clinical scenario ranker at η±relative_delta; report ranking shifts.
 
-    η is a planning assumption — this is not FEA uncertainty quantification.
+    η is an assumption prior — this is not FEA uncertainty quantification.
+    η_CS must not be interpreted as MAVERIC-calibrated.
     """
     from analysis.design_sweep import run_sweep
-    from analysis.planner import run_planner
+    from analysis.planner import run_scenario_ranker
 
     base_cfg = copy.deepcopy(design_space or load_design_space())
     cmap = base_cfg.setdefault("clinical_mapping", {})
     eta_ap0 = float(cmap.get("ap_transfer_eta_ima_ap", 0.30))
-    eta_cs0 = float(cmap.get("ap_transfer_eta_ima_cs", 0.66818))
+    eta_cs0 = float(cmap.get("ap_transfer_eta_ima_cs", 0.55))
 
     scenarios = {
         "eta_nominal": (eta_ap0, eta_cs0),
@@ -477,14 +504,14 @@ def eta_sensitivity(
             apply_planner_constraints=False,
             write_outputs=False,
         )
-        rec = run_planner(
+        rec = run_scenario_ranker(
             points=points,
             seed=seed,
             mapping_mode="clinical",
             design_space=cfg,
             output_dir=ROOT / "results" / "output" / "planner" / "eta_sensitivity_runs" / name,
         )
-        rec_pt = rec.get("recommended") or {}
+        rec_pt = rec.get("best_candidate") or rec.get("recommended") or {}
         row = {
             "scenario": name,
             "eta_ap": round(eta_ap, 5),
@@ -530,8 +557,9 @@ def eta_sensitivity(
     return {
         "relative_delta": relative_delta,
         "honesty": (
-            "η±20% is a planning-assumption sensitivity, not imaging–FEA identification "
-            "or Abaqus/LHHM uncertainty."
+            "η±20% is an assumption-prior sensitivity for exploratory ranking, "
+            "not imaging–FEA identification, Abaqus/LHHM UQ, or clinical calibration. "
+            "η_CS is not derived from MAVERIC/ARTO."
         ),
         "rows": rows,
         "shifts_vs_nominal": shifts,
@@ -601,9 +629,10 @@ def export_paper_bundle(
         "eta_sensitivity": eta_payload,
         "clinical_references": _rel(ROOT / "results" / "clinical_references.yaml"),
         "disclaimer": (
-            "Layer-1 surrogate for planning. Physics regurgitation in sweep/planner; "
-            "YAML blend only at Galili validation case IDs. Not new LHHM FEA. "
-            "MAVERIC/REDUCE-FMR alignment is directionality-only (magnitudes not equated)."
+            "Layer-1 exploratory surrogate. Physics leakage proxy in sweep/ranker; "
+            "YAML blend only at Galili calibration case IDs (reproduction, not external "
+            "validation). Not FEA. MAVERIC=ARTO (IMA-AP class); Carillon/REDUCE-FMR = IMA-CS. "
+            "Directionality-only clinical alignment (magnitudes not equated)."
         ),
     }
     (tables_dir / "paper_summary.json").write_text(

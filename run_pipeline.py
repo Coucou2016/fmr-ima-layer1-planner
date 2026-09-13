@@ -4,9 +4,8 @@
 
 FMR computational biomechanics demo pipeline.
 
-
-
-Compares IMA-CS vs IMA-AP for functional mitral regurgitation (surrogate FEA + SPH).
+Compares IMA-CS vs IMA-AP for functional mitral regurgitation
+(algebraic mechanics proxy + literature-calibrated leakage surrogate).
 
 """
 
@@ -48,7 +47,7 @@ from models.devices import IMA_CS, IMA_AP
 
 from simulation.loading import PressureLoading
 
-from simulation.run_case import run_fea_surrogate
+from simulation.run_case import run_mechanics_proxy, run_fea_surrogate
 
 from simulation.fea_export import export_inp_stub, export_vtk_annulus
 
@@ -212,7 +211,11 @@ def run_all(export_fea: bool = True, seed: int = 42) -> list[CaseMetrics]:
     geometries: dict[str, HeartGeometry] = {}
     commissural_flags: dict[str, bool] = {}
 
-    baseline = HeartGeometry()
+    baseline = HeartGeometry(
+        ap_diameter_mm=26.1,
+        annulus_circumference_mm=118.5,
+        cardiac_phase="peak_systole",
+    )
 
     for case in build_cases():
 
@@ -242,7 +245,7 @@ def run_all(export_fea: bool = True, seed: int = 42) -> list[CaseMetrics]:
 
 
 
-        fea = run_fea_surrogate(case_id, geom, elements, device_obj)
+        fea = run_mechanics_proxy(case_id, geom, elements, device_obj)
 
         if isinstance(device_obj, IMA_CS):
 
@@ -464,12 +467,12 @@ def main():
         rec = None
         if args.plan or args.paper:
             rec = run_planner(points=points, seed=args.seed)
-            rec_pt = rec.get("recommended") or {}
+            rec_pt = rec.get("best_candidate") or rec.get("recommended") or {}
             if rec_pt:
                 ns = rec_pt.get("n_sutures") or 0
                 suture_note = f" dual" if rec_pt.get("device") == "IMA-AP" and ns >= 2 else ""
                 print(
-                    "\nPlanner: "
+                    "\nBest candidate under assumptions: "
                     f"{rec_pt.get('device')}{suture_note} {rec_pt.get('shortening_pct')}%  "
                     f"AP reduction {rec_pt.get('ap_reduction_pct'):.2f}%  "
                     f"jet={rec_pt.get('jet_location')}  "

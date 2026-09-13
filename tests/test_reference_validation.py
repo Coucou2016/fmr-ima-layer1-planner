@@ -51,16 +51,33 @@ def test_geometry_targets(metrics, reference):
     by_id = {m.case_id: m for m in metrics}
     cs22 = ref_cases["ima_cs_22"]
     assert abs(by_id["ima_cs_22"].annulus_circumference_mm - cs22["annulus_circumference_mm"]) < 0.2
+    assert abs(by_id["ima_cs_22"].ap_diameter_mm - cs22["ap_diameter_mm"]) < 0.1
     ap50 = ref_cases["ima_ap_50"]
     assert abs(by_id["ima_ap_50"].ap_diameter_mm - ap50["ap_diameter_mm"]) < 0.1
+    assert abs(by_id["ima_ap_50"].ap_diameter_mm - 15.9) < 0.1
     ap70 = ref_cases["ima_ap_70"]
     assert abs(by_id["ima_ap_70"].ap_diameter_mm - ap70["ap_diameter_mm"]) < 0.2
+    assert abs(by_id["pathology"].ap_diameter_mm - 26.1) < 0.1
+
+
+def test_reference_data_yaml_covers_anchors():
+    data = yaml.safe_load((ROOT / "results" / "reference_data.yaml").read_text(encoding="utf-8"))
+    anchors = data["literature_anchors"]["regurgitation_pct"]
+    ref = load_reference_targets(ROOT / "results" / "reference_targets.json")
+    for c in ref["cases"]:
+        pct = c.get("regurgitation_pct")
+        if pct is not None and c["id"] in ("pathology", "ima_cs_22", "ima_ap_50"):
+            assert abs(anchors[c["id"]] - pct) < 1e-9
+    assert data["literature_anchors"]["ap_diameter_mm"]["ima_ap_50"] == 15.9
+    assert data["geometry_undeformed_diastole"]["ap_diameter_mm"] == 34.4
+    assert "calibration_targets" in data
+    assert "heldout_targets" in data
 
 
 def test_ima_ap_50_roa_near_minimum(metrics, reference):
-    """ROA at optimum: within 2.5 mm² of paper minimum (surrogate reporting blend documented in YAML)."""
+    """ROA at optimum: within 2.5 mm² of paper minimum (surrogate reporting blend)."""
     ref_cases = _case_map(reference)
-    target_roa = ref_cases["ima_ap_50"]["roa_mm2_min"]
+    target_roa = ref_cases["ima_ap_50"].get("roa_mm2_min") or ref_cases["ima_ap_50"]["roa_mm2"]
     by_id = {m.case_id: m for m in metrics}
     assert abs(by_id["ima_ap_50"].roa_mm2 - target_roa) < 2.5
 
@@ -75,16 +92,6 @@ def test_intermediate_cases_monotonic_trend_cs(metrics):
     by_id = {m.case_id: m for m in metrics}
     assert by_id["ima_cs_22"].regurgitation_pct < by_id["ima_cs_14"].regurgitation_pct
     assert by_id["ima_cs_22"].regurgitation_pct < by_id["pathology"].regurgitation_pct
-
-
-def test_reference_data_yaml_covers_anchors():
-    data = yaml.safe_load((ROOT / "results" / "reference_data.yaml").read_text(encoding="utf-8"))
-    anchors = data["validation_anchors"]["regurgitation_pct"]
-    ref = load_reference_targets(ROOT / "results" / "reference_targets.json")
-    for c in ref["cases"]:
-        pct = c.get("regurgitation_pct")
-        if pct is not None:
-            assert anchors[c["id"]] == pct
 
 
 def test_calibration_report_physics_and_tradeoffs():

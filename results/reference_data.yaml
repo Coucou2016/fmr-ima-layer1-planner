@@ -1,8 +1,11 @@
-# Structured paper / specification reference values for FMR IMA demo validation.
-# Primary test anchors remain in results/reference_targets.json (subset used by pytest).
+# Literature-anchored reference quantities for the FMR IMA Layer-1 surrogate.
+# Primary pytest subset: results/reference_targets.json
+#
+# CRITICAL: do not mix undeformed/diastolic geometry with peak-systolic ROA/leakage
+# in one case record without an explicit cardiac_phase field.
 
 meta:
-  title: "Functional mitral regurgitation — IMA-CS vs IMA-AP surrogate validation"
+  title: "Functional mitral regurgitation — IMA-CS vs IMA-AP literature anchors"
   units:
     length: mm
     area: mm2
@@ -10,13 +13,23 @@ meta:
     strain: dimensionless
     voltage: mV
   note: >
-    Values trace the project research specification (LHHM-inspired FMR model).
-    Surrogate pipeline reproduces anchors via documented physics + YAML calibration blend.
+    Peak-systolic AP, ROA, and leakage fractions are taken from Galili et al.
+    R. Soc. Open Sci. 2022 (computational LHHM comparison). Undeformed/diastolic
+    AP = 34.4 mm must not be paired with peak-systolic ROA/leakage without phase tags.
+    Surrogate outputs are calibrated to / reproduce selected published cases;
+    that is not independent external validation.
 
-geometry_diastole:
+doi:
+  galili_rsos_2022: "10.1098/rsos.211726"
+  dryad_supporting: "10.5061/dryad.bzkh1899d"
+
+geometry_undeformed_diastole:
+  cardiac_phase: undeformed_diastole
   ap_diameter_mm: 34.4
   annulus_circumference_mm: 118.5
-  source_note: "Diastolic mitral annulus and AP diameter at pathology baseline"
+  quantity: mitral_annulus_geometry
+  source: "Galili et al. RSOS 2022 — undeformed / diastolic baseline geometry"
+  note: "NOT peak-systole; do not use as the AP paired with peak-systolic ROA/leakage."
 
 materials:
   niti_bridge:
@@ -34,79 +47,164 @@ pathology:
     lv_la_phase_offset_ms: 50
     peak_systole_fraction: 0.75
 
-sph_reference:
-  n_particles: 29000
-  regurgitation_definition: "particles_to_LA / (particles_to_LA + particles_to_aorta)"
+leakage_definition:
+  cardiac_phase: peak_systole
+  quantity: physics_particle_leakage_fraction
+  unit: percent
+  definition: "particles_to_LA / (particles_to_LA + particles_to_aorta)"
+  note: "Literature computational leakage % — not clinical regurgitant volume."
+  n_particles_reported: 29000
 
+# Peak-systole Galili table (literature facts).
 cases:
   - id: pathology
     device: null
-    annulus_circumference_mm: 118.5
-    ap_diameter_mm: 34.4
-    roa_mm2_typical: 35.0
+    cardiac_phase: peak_systole
+    ap_diameter_mm: 26.1
+    roa_mm2: 172.8
     regurgitation_pct: 5.26
+    quantity_set: [ap_diameter, roa, leakage_fraction]
+    source: "Galili et al. RSOS 2022"
+    table_or_figure: "peak-systole disease / untreated FMR"
+    doi: "10.1098/rsos.211726"
     contact_pattern: "posterior leaflet malcoaptation, broad jet"
-    notes: "44% posterior papillary muscle passive; baseline FMR"
+    notes: "44% posterior papillary muscle passive; baseline FMR at peak systole"
 
   - id: ima_cs_14
     device: IMA-CS
     bridge_shortening_pct: 14
-    regurgitation_pct: null
-    niti_engineering_strain_approx: 0.14
+    cardiac_phase: peak_systole
+    ap_diameter_mm: 25.5
+    roa_mm2: 56.7
+    regurgitation_pct: 0.52
+    source: "Galili et al. RSOS 2022"
+    doi: "10.1098/rsos.211726"
     notes: "Intermediate CS bridge shortening"
 
   - id: ima_cs_18
     device: IMA-CS
     bridge_shortening_pct: 18
-    regurgitation_pct: null
-    notes: "Intermediate"
+    cardiac_phase: peak_systole
+    ap_diameter_mm: 24.7
+    roa_mm2: 55.3
+    regurgitation_pct: 0.41
+    source: "Galili et al. RSOS 2022"
+    doi: "10.1098/rsos.211726"
+    notes: "Intermediate CS bridge shortening"
 
   - id: ima_cs_22
     device: IMA-CS
     bridge_shortening_pct: 22
+    cardiac_phase: peak_systole
     annulus_circumference_mm: 115.0
-    ap_diameter_mm: 34.4
+    ap_diameter_mm: 24.8
+    roa_mm2: 48.2
     regurgitation_pct: 0.29
     niti_engineering_strain_approx: 0.22
-    notes: "Annulus 118.5 → 115 mm; target regurgitation anchor"
+    source: "Galili et al. RSOS 2022"
+    doi: "10.1098/rsos.211726"
+    notes: "Annulus circumference reported 118.5 → 115 mm; peak-systolic AP 24.8 mm (not 34.4)"
 
   - id: ima_ap_30
     device: IMA-AP
     shortening_pct: 30
-    regurgitation_pct: null
-    notes: "Intermediate AP suture shortening"
+    cardiac_phase: peak_systole
+    ap_diameter_mm: 20.7
+    roa_mm2: 51.1
+    regurgitation_pct: 0.16
+    source: "Galili et al. RSOS 2022"
+    doi: "10.1098/rsos.211726"
+    notes: "IMA-AP has near-direct effect on AP diameter (Galili)"
 
   - id: ima_ap_50
     device: IMA-AP
     shortening_pct: 50
-    ap_diameter_mm: 34.4
-    annulus_circumference_mm: 116.0
-    roa_mm2_minimum: 27.3
+    cardiac_phase: peak_systole
+    ap_diameter_mm: 15.9
+    roa_mm2: 27.3
     regurgitation_pct: 0.08
-    notes: "Published optimum — minimum ROA and minimum regurgitation %"
+    source: "Galili et al. RSOS 2022"
+    doi: "10.1098/rsos.211726"
+    notes: >
+      Published ROA / leakage minimum among reported IMA-AP settings.
+      Peak-systolic AP = 15.9 mm — NOT undeformed 34.4 mm and NOT 0% AP reduction.
 
   - id: ima_ap_70
     device: IMA-AP
     shortening_pct: 70
-    ap_diameter_mm: 14.3
-    regurgitation_pct: null
+    cardiac_phase: peak_systole
+    ap_diameter_mm: 12.4
+    roa_mm2: 46.1
+    regurgitation_pct: 0.13
+    source: "Galili et al. RSOS 2022"
+    doi: "10.1098/rsos.211726"
     contact_pattern: "commissural leak, excessive AP reduction"
-    notes: "Regurgitation worse than 50%; commissural jet mechanism"
+    notes: "Leakage and ROA worse than IMA-AP 50%; commissural jet mechanism"
 
+calibration_targets:
+  description: >
+    Cases used for anchor blend / scale setting (reproduction), not external validation.
+  case_ids: [pathology, ima_cs_22, ima_ap_50]
+
+heldout_targets:
+  description: >
+    Reserved for leave-one-out / held-out checks once Dryad time-series are imported (P1).
+    With only seven discrete Galili cases, full independent validation is not claimed.
+  case_ids: [ima_cs_14, ima_cs_18, ima_ap_30, ima_ap_70]
+  leave_one_out_plan: >
+    Rotate each of the seven cases out of the calibration set; score reproduction of
+    held-out peak-systolic AP / ROA / leakage without raising anchor blend on that case.
+
+literature_anchors:
+  regurgitation_pct:
+    cardiac_phase: peak_systole
+    pathology: 5.26
+    ima_cs_14: 0.52
+    ima_cs_18: 0.41
+    ima_cs_22: 0.29
+    ima_ap_30: 0.16
+    ima_ap_50: 0.08
+    ima_ap_70: 0.13
+  roa_mm2:
+    cardiac_phase: peak_systole
+    pathology: 172.8
+    ima_cs_14: 56.7
+    ima_cs_18: 55.3
+    ima_cs_22: 48.2
+    ima_ap_30: 51.1
+    ima_ap_50: 27.3
+    ima_ap_70: 46.1
+  ap_diameter_mm:
+    cardiac_phase: peak_systole
+    pathology: 26.1
+    ima_cs_14: 25.5
+    ima_cs_18: 24.7
+    ima_cs_22: 24.8
+    ima_ap_30: 20.7
+    ima_ap_50: 15.9
+    ima_ap_70: 12.4
+
+# Backward-compat alias used by older tests/docs; prefer literature_anchors.
 validation_anchors:
+  note: "Alias of literature_anchors for legacy loaders; means calibration/reproduction anchors."
   regurgitation_pct:
     pathology: 5.26
     ima_cs_22: 0.29
     ima_ap_50: 0.08
   roa_mm2:
-    pathology_typical: 35.0
+    pathology_typical: 172.8
     ima_ap_50_minimum: 27.3
   geometry_mm:
+    cardiac_phase: peak_systole
+    pathology_ap: 26.1
     ima_cs_22_annulus: 115.0
-    ima_ap_50_ap: 34.4
-    ima_ap_70_ap: 14.3
+    ima_cs_22_ap: 24.8
+    ima_ap_50_ap: 15.9
+    ima_ap_70_ap: 12.4
+    undeformed_diastole_ap: 34.4
 
 trend_constraints:
   - "ima_cs_22 regurgitation < ima_cs_14 < pathology"
   - "ima_ap_50 regurgitation < ima_ap_30 < pathology"
   - "ima_ap_70 regurgitation > ima_ap_50"
+  - "ima_ap peak-systolic AP decreases nearly directly with suture shortening"

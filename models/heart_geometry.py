@@ -1,4 +1,9 @@
-"""Parametric mitral annulus / AP geometry (diastole baseline)."""
+"""Parametric mitral annulus / AP geometry.
+
+Default numeric fields historically matched undeformed diastole (AP=34.4 mm).
+Galili peak-systole disease AP is 26.1 mm — always set ``cardiac_phase`` when
+pairing geometry with ROA/leakage anchors.
+"""
 
 from dataclasses import dataclass
 import math
@@ -6,10 +11,11 @@ import math
 
 @dataclass
 class HeartGeometry:
-    """Simplified annulus as ellipse; AP and annulus circumference from paper."""
+    """Simplified annulus as ellipse; AP and annulus circumference."""
 
     ap_diameter_mm: float = 34.4
     annulus_circumference_mm: float = 118.5
+    cardiac_phase: str = "undeformed_diastole"
 
     @property
     def annulus_radius_mm(self) -> float:

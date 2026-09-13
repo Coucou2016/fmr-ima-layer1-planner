@@ -1,13 +1,12 @@
-"""Reduced-order SPH surrogate for regurgitation fraction.
-
-
+"""Literature-calibrated leakage surrogate (SPH-inspired proxy).
 
 Regurgitation ratio = particles to LA / (particles to LA + particles to aorta)
 
 Derived from ROA, annulus tightening, coaptation gap, and commissural leak — not per-case dict lookup.
 
-Published anchors in configs/surrogate_calibration.yaml are used only to set global scale.
-
+Published anchors in configs/surrogate_calibration.yaml set global scale for
+reproduction of selected Galili cases. Physics regurg % ≠ clinical regurgitant volume.
+This is not a full Lagrangian SPH solver.
 """
 
 
@@ -154,7 +153,11 @@ def regurgitation_fraction_from_physics(
     f_ann = max(0.35, 1.0 - sph["annulus_improvement_per_mm"] * annulus_improve)
 
     frac_central = k * f_leak * f_ann
-    ap_ratio = geometry.ap_diameter_mm / 34.4
+    # Peak-systole disease AP = 26.1 mm (Galili); undeformed diastole 34.4 is a different phase.
+    ref_ap = float(sph.get("reference_ap_mm_peak_systole", 26.1))
+    if getattr(geometry, "cardiac_phase", "") == "undeformed_diastole":
+        ref_ap = 34.4
+    ap_ratio = geometry.ap_diameter_mm / max(ref_ap, 1e-9)
     frac_central *= max(ap_ratio, 0.5) ** 0.2
 
     comm = 1.0 + 3.5 * max(0.0, 1.0 - ap_ratio) ** 1.05
@@ -176,9 +179,13 @@ def regurgitation_fraction_from_physics(
 
 
 
-class SPHSurrogate:
+class LeakageProxy:
+    """Literature-calibrated leakage proxy; anchors set reproduction scale only."""
 
-    """Maps geometry + ROA + coaptation to regurgitation %; anchors set scale only."""
+
+class SPHSurrogate(LeakageProxy):
+
+    """SPH-inspired leakage proxy (alias retained for compatibility)."""
 
 
 

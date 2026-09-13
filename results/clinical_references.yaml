@@ -1,52 +1,103 @@
 # Public clinical / computational anchors for paper tables.
-# These are literature numbers and *planning assumptions*, not new FEA of LHHM.
+# Literature numbers and *planning assumptions* — not FEA of LHHM.
 
 meta:
-  title: "Clinical and computational references for IMA dose mapping"
+  title: "Clinical and computational references for IMA exploratory screening"
   note: >
-    Layer-1 surrogate for preoperative planning. Galili et al. RSOS 2022
-    remains the computational validation anchor. MAVERIC / REDUCE-FMR /
-    Rottländer supply clinical windows and an LCx safety constraint.
-    Do not read AP-reduction percentages as if they were suture-shortening
-    percentages.
+    Layer-1 algebraic / phenomenological surrogate for exploratory screening of
+    indirect mitral annuloplasty strategies. Galili et al. RSOS 2022 supplies
+    peak-systolic computational anchors (calibrated to / reproduced — not
+    independently validated for blended cases). MAVERIC = ARTO (CS–IAS) ≈ IMA-AP
+    mechanism class. Carillon / REDUCE-FMR / TITAN II supply IMA-CS clinical
+    context. Rottländer supplies an LCx *risk-screening* threshold, not safety.
 
 galili_rsos_2022:
   citation: "Galili L. et al. Indirect mitral annuloplasty using a coronary sinus device versus an anteroposterior suture: a computational comparison. R. Soc. Open Sci. 2022."
-  geometry_diastole:
+  doi: "10.1098/rsos.211726"
+  dryad_doi: "10.5061/dryad.bzkh1899d"
+  geometry_undeformed_diastole:
+    cardiac_phase: undeformed_diastole
     ap_diameter_mm: 34.4
     annulus_circumference_mm: 118.5
-  regurgitation_pct_anchors:
+    note: "Do not mix with peak-systolic ROA/leakage without cardiac_phase."
+  peak_systole:
+    cardiac_phase: peak_systole
+    ap_diameter_mm:
+      pathology: 26.1
+      ima_cs_14: 25.5
+      ima_cs_18: 24.7
+      ima_cs_22: 24.8
+      ima_ap_30: 20.7
+      ima_ap_50: 15.9
+      ima_ap_70: 12.4
+    roa_mm2:
+      pathology: 172.8
+      ima_cs_14: 56.7
+      ima_cs_18: 55.3
+      ima_cs_22: 48.2
+      ima_ap_30: 51.1
+      ima_ap_50: 27.3
+      ima_ap_70: 46.1
+    regurgitation_pct_anchors:
+      pathology: 5.26
+      ima_cs_14: 0.52
+      ima_cs_18: 0.41
+      ima_cs_22: 0.29
+      ima_ap_30: 0.16
+      ima_ap_50: 0.08
+      ima_ap_70: 0.13
+  regurgitation_pct_anchors:  # legacy flat keys used by table builders
     pathology: 5.26
     ima_cs_22: 0.29
     ima_ap_50: 0.08
   roa_mm2:
+    pathology: 172.8
     ima_ap_50_minimum: 27.3
   ima_cs:
     bridge_shortening_pct: [14, 18, 22]
     annulus_at_22pct_mm: 115.0
-    ap_diameter_mm: 34.4
-    ap_reduction_pct_in_lhhm: 0.0
+    peak_systole_ap_mm: [25.5, 24.7, 24.8]
+    note: "Peak-systolic AP remains near disease (~25 mm); CS effect is mainly annular."
   ima_ap:
     suture_shortening_pct: [30, 50, 70]
-    ap_diameter_mm: [34.4, 34.4, 14.3]
-    ap_reduction_pct: [0.0, 0.0, 58.430]
+    peak_systole_ap_mm: [20.7, 15.9, 12.4]
+    ap_reduction_pct_vs_disease_peak_sys: [20.69, 39.08, 52.49]
     notes: >
-      Galili suture shortening is NOT AP-diameter reduction. 30% and 50%
-      leave AP at 34.4 mm (0% AP reduction). 70% collapses AP to 14.3 mm
-      (~58% reduction) — a numerical extreme, not a clinical dose.
+      Galili: IMA-AP has an almost direct effect on AP diameter.
+      IMA-AP 50% → peak-systolic AP 15.9 mm (~39% reduction from disease 26.1 mm).
+      Undeformed diastole 34.4 mm is a different cardiac phase — never claim 0% AP reduction at AP50.
 
+# MAVERIC = ARTO System (CS–IAS suture) ≈ IMA-AP mechanism — NOT Carillon / IMA-CS.
 maveric:
-  name: "MAVERIC / Carillon clinical AP (septal-lateral) reduction"
-  device: "Carillon Mitral Contour System (IMA-CS class)"
-  citation: "Carillon IMA-CS clinical series (MAVERIC); AP septal-lateral diameter at implant vs follow-up."
+  name: "MAVERIC (ARTO System)"
+  device: "ARTO System (CS–IAS suture; IMA-AP mechanism class)"
+  not_device: "Carillon Mitral Contour System"
+  citation: "MAVERIC — ARTO System clinical series; AP septal-lateral diameter at implant vs follow-up."
+  mechanism_class: "IMA-AP"
   pairs_mm:
     - {baseline: 41.4, followup: 35.3, reduction_pct: 14.734}
     - {baseline: 45.0, followup: 38.7, reduction_pct: 14.000}
   ap_reduction_window_pct: [14.0, 15.0]
   planning_window_pct: [14.0, 20.0]
   note: >
-    ~14–15% AP diameter reduction is treated as clinically attested.
-    The planner default ceiling is 20% AP reduction (configurable).
+    ~14–15% AP diameter reduction is treated as clinically attested for the
+    ARTO / IMA-AP mechanism class. Do NOT use these pairs to calibrate Carillon
+    / IMA-CS transfer efficiency η_CS.
+
+carillon:
+  name: "Carillon Mitral Contour System (IMA-CS class)"
+  device: "Carillon Mitral Contour System"
+  mechanism_class: "IMA-CS"
+  titan_ii:
+    citation: "TITAN II — Carillon clinical series (context)."
+    ap_reduction_context_pct_approx: 15.0
+    note: >
+      ~15% AP reduction is directional clinical context for Carillon, not a
+      fitted η_CS from bridge-shortening % and not derived from MAVERIC/ARTO.
+  reduce_fmr_cross_ref: "reduce_fmr"
+  honesty: >
+    No quantitative η_CS is fabricated from MAVERIC. Prefer ΔAP / target_AP_reduction
+    as the planning variable for IMA-CS exploratory ranking.
 
 reduce_fmr:
   name: "REDUCE-FMR"
@@ -58,72 +109,76 @@ reduce_fmr:
     FMR_grade: "improved more often with device than sham (qualitative direction)"
     remodeling: "favorable LV remodeling signals reported in trial narrative"
   honesty: >
-    This repo stores REDUCE-FMR as *directionality* only (regurg ↓).
-    No trial mean AP-mm or regurgitant-volume magnitude is copied into
-    surrogate targets — magnitude is not equated to Layer-1 physics %.
+    Directionality only (regurg ↓). No trial mean AP-mm or regurgitant-volume
+    magnitude is copied into surrogate targets.
   note: >
     Sham-controlled evidence that CS-based IMA reduces functional MR.
-    Used as clinical context for IMA-CS, not as a fitted AP-mm target
-    in this surrogate.
+    Clinical context for IMA-CS / Carillon, not an ARTO/MAVERIC AP-mm fit.
 
 maveric_alignment_policy:
-  title: "How MAVERIC / REDUCE-FMR enter paper tables"
+  title: "How MAVERIC (ARTO) / Carillon / REDUCE-FMR enter paper tables"
   compare_directionality_only: true
   equate_magnitudes: false
+  maveric_maps_to: "IMA-AP (ARTO)"
+  carillon_maps_to: "IMA-CS"
   model_side: >
-    Clinical-mapping sweep points inside the 14–20% AP window (and the
-    constrained planner recommendation) predict AP ↓ and physics regurg ↓
-    relative to pathology — aligned in *sign* with MAVERIC (AP ↓) and
-    REDUCE-FMR (regurg ↓).
+    Exploratory clinical-mapping sweep points inside a 14–20% AP planning window
+    predict AP ↓ and physics-leakage-proxy ↓ relative to pathology — aligned in
+    *sign* with ARTO/MAVERIC (AP ↓ for IMA-AP class) and REDUCE-FMR (regurg ↓ for CS).
   literature_side: >
-    MAVERIC supplies AP septal-lateral pairs (~14–15%). REDUCE-FMR
-    supplies randomized evidence of FMR reduction without an AP-mm
-    pair in this YAML.
+    MAVERIC/ARTO supplies AP pairs (~14–15%) for IMA-AP-class context.
+    TITAN II supplies ~15% AP context for Carillon; REDUCE-FMR supplies
+    randomized FMR-reduction directionality without an AP-mm pair here.
 
 lcx_compression:
-  name: "CS–LCx distal landing zone vs LCx compression"
+  name: "CS–LCx distal landing zone vs LCx compression risk screen"
   citation: "Rottländer D. et al. 2021. CS–LCx distance < 8.6 mm in the distal landing zone predicts coronary compression with CS-based IMA."
   cs_lcx_threshold_mm: 8.6
   applies_to: "IMA-CS"
+  role: "literature-derived risk-screening threshold — not a safety clearance"
   note: >
-    Planner constraint: CS–LCx ≥ 8.6 mm after cinching. Baseline CS–LCx
-    is a patient-specific CT input (default illustrative anatomy 11.0 mm
-    in configs/design_space.yaml).
+    Prefer patient-measured CS–LCx as planner input. Default illustrative baseline
+    11.0 mm and cinch slope 0.12 mm per % shortening are assumptions
+    (cs_lcx ≈ 11 − 0.12×shortening). ≥8.6 mm is not asserted as proven safe.
 
 niti_fatigue:
   alternating_strain_pct_max: 0.4
+  role: "illustrative engineering screen only — not fatigue qualification"
   note: >
-    Alternating (cyclic) strain cap for NiTi fatigue planning. Distinct
-    from Galili-style engineering strain of prescribed bridge shortening
-    (14–22%).
+    Alternating (cyclic) strain cap for exploratory NiTi screening. Distinct
+    from Galili-style engineering strain of prescribed bridge shortening (14–22%).
 
 mapping_assumptions:
-  title: "Suture/bridge shortening % → AP diameter reduction % (Innovation A)"
+  title: "Suture/bridge shortening % → AP diameter reduction % (exploratory)"
   honesty: >
-    This mapping is a documented planning assumption so that a surgeon
-    can talk in AP-mm (echo/CT), not in Galili's suture-% numerical
-    coordinates. It is not a new finite-element result.
+    Prefer ΔAP / target_AP_reduction as the planning variable. Any η is an
+    assumption prior / distribution mean for exploratory ranking — not a
+    clinically calibrated constant. η_CS must never be fitted from MAVERIC/ARTO.
   ima_ap:
-    formula: "AP_reduction_pct = eta_ap * suture_shortening_pct"
+    formula: "AP_reduction_pct = eta_ap * suture_shortening_pct   OR   target_ap_reduction_pct"
     eta_ap: 0.30
-    calibration: "eta chosen so 50% suture → 15% AP reduction (MAVERIC-like)."
-    galili_vs_clinical:
-      - {suture_pct: 30, galili_ap_mm: 34.4, galili_ap_red_pct: 0.0, clinical_ap_red_pct: 9.0, clinical_ap_mm_galili_scale: 31.304, clinical_ap_mm_maveric_scale: 37.674}
-      - {suture_pct: 50, galili_ap_mm: 34.4, galili_ap_red_pct: 0.0, clinical_ap_red_pct: 15.0, clinical_ap_mm_galili_scale: 29.240, clinical_ap_mm_maveric_scale: 35.190}
-      - {suture_pct: 70, galili_ap_mm: 14.3, galili_ap_red_pct: 58.430, clinical_ap_red_pct: 21.0, clinical_ap_mm_galili_scale: 27.176, clinical_ap_mm_maveric_scale: 32.706}
+    eta_role: "assumption prior (exploratory); ARTO/MAVERIC window provides geometric talk track"
+    calibration: "NOT clinically calibrated; 50% suture → 15% AP is a planning assumption."
+    galili_peak_systole_vs_planning:
+      - {suture_pct: 30, galili_peak_sys_ap_mm: 20.7, galili_ap_red_pct_vs_disease: 20.69, planning_ap_red_pct_eta03: 9.0}
+      - {suture_pct: 50, galili_peak_sys_ap_mm: 15.9, galili_ap_red_pct_vs_disease: 39.08, planning_ap_red_pct_eta03: 15.0}
+      - {suture_pct: 70, galili_peak_sys_ap_mm: 12.4, galili_ap_red_pct_vs_disease: 52.49, planning_ap_red_pct_eta03: 21.0}
   ima_cs:
-    formula: "AP_reduction_pct = eta_cs * bridge_shortening_pct"
-    eta_cs: 0.66818
-    calibration: "eta chosen so 22% bridge → ~14.7% AP reduction (MAVERIC 41.4→35.3)."
-    galili_vs_clinical:
-      - {bridge_pct: 22, galili_ap_mm: 34.4, galili_ap_red_pct: 0.0, clinical_ap_red_pct: 14.700, note: "Galili LHHM did not transmit CS cinching into AP diameter."}
+    preferred_variable: target_ap_reduction_pct
+    formula: "prefer target_ap_reduction_pct; else AP_reduction_pct = assumption_eta_cs * bridge_shortening_pct"
+    assumption_eta_cs: 0.55
+    eta_role: "assumption distribution mean for exploratory ranking ONLY"
+    calibration: "NOT from MAVERIC/ARTO. Carillon TITAN II ~15% AP is context, not η fit."
+    invalid_prior_calibration_removed: "eta_cs ≈ 0.668 from MAVERIC 41.4→35.3 at Galili 22% CS — DELETED (wrong device class)."
 
 clinical_window:
   ap_reduction_pct_min: 14.0
   ap_reduction_pct_max: 20.0
   default_planner_ceiling_pct: 20.0
+  context_arto_maveric_pct: [14.0, 15.0]
+  context_carillon_titan_ii_pct_approx: 15.0
   numerical_extreme_example:
-    label: "Galili IMA-AP 70%"
-    ap_reduction_pct: 58.430
-    ap_mm: 14.3
+    label: "Galili IMA-AP 70% peak systole"
+    ap_mm: 12.4
+    ap_reduction_pct_vs_disease_peak_sys: 52.49
     clinically_attainable: false

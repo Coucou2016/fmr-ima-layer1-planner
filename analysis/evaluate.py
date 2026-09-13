@@ -14,6 +14,8 @@ import yaml
 
 from analysis.jet import classify_jet
 from models.devices import (
+    ASSUMPTION_ETA_IMA_AP,
+    ASSUMPTION_ETA_IMA_CS,
     CS_LCX_COMPRESSION_THRESHOLD_MM,
     IMA_AP,
     IMA_CS,
@@ -25,7 +27,7 @@ from models.heart_geometry import HeartGeometry
 from models.pathology import apply_papillary_pathology, make_papillary_mesh
 from simulation.calibration import load_surrogate_calibration
 from simulation.roa_surrogate import estimate_roa_mm2, niti_bridge_strain
-from simulation.run_case import run_fea_surrogate
+from simulation.run_case import run_mechanics_proxy, run_fea_surrogate
 from sph.hemodynamics import regurgitation_fraction_from_physics, SPHSurrogate
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -120,7 +122,9 @@ def _make_device(
         return IMA_CS(
             bridge_shortening_pct=float(shortening_pct),
             mapping_mode=mapping_mode,
-            clinical_ap_transfer_eta=float(cmap.get("ap_transfer_eta_ima_cs", 0.66818)),
+            clinical_ap_transfer_eta=float(
+                cmap.get("ap_transfer_eta_ima_cs", ASSUMPTION_ETA_IMA_CS)
+            ),
             baseline_cs_lcx_mm=float(cons.get("baseline_cs_lcx_mm", 11.0)),
             cs_lcx_cinch_mm_per_pct=float(cons.get("cs_lcx_cinch_mm_per_pct", 0.12)),
         )
@@ -129,7 +133,9 @@ def _make_device(
         return IMA_AP(
             shortening_pct=float(shortening_pct),
             mapping_mode=mapping_mode,
-            clinical_ap_transfer_eta=float(cmap.get("ap_transfer_eta_ima_ap", 0.30)),
+            clinical_ap_transfer_eta=float(
+                cmap.get("ap_transfer_eta_ima_ap", ASSUMPTION_ETA_IMA_AP)
+            ),
             n_sutures=ns,
         )
     raise ValueError(f"Unknown device_type: {device_type}")
@@ -170,10 +176,14 @@ def evaluate_design_point(
         n_sutures=n_sutures,
         design_space=cfg,
     )
-    geom = device.apply() if device is not None else HeartGeometry()
+    geom = device.apply() if device is not None else HeartGeometry(
+        ap_diameter_mm=26.1,
+        annulus_circumference_mm=118.5,
+        cardiac_phase="peak_systole",
+    )
     cid = case_id or _default_case_id(device_type, shortening_pct, mapping_mode, n_sutures)
 
-    fea = run_fea_surrogate(cid, geom, elements, device)
+    fea = run_mechanics_proxy(cid, geom, elements, device)
     if isinstance(device, IMA_CS):
         fea.max_principal_strain = max(
             fea.max_principal_strain,

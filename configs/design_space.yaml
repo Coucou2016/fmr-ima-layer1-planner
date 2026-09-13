@@ -1,5 +1,6 @@
-# Continuous design space for the Layer-1 preoperative planner.
-# Not a substitute for LHHM/Abaqus FSI. See results/clinical_references.yaml.
+# Continuous design space for the Layer-1 exploratory scenario ranker.
+# Algebraic / phenomenological surrogate — not LHHM/Abaqus FSI.
+# See results/clinical_references.yaml.
 
 ima_ap:
   shortening_pct:
@@ -15,26 +16,32 @@ ima_cs:
 
 dual_suture:
   enabled: true
+  # Jet dual-suture ×0.5 is an explicit hypothesis parameter (hypothesis-generating).
   shortening_pct:
     min: 10
     max: 70
     step: 5
 
 clinical_mapping:
-  # Innovation A: suture/bridge % → AP diameter reduction %.
-  # IMA-AP eta chosen so 50% suture ≈ 15% AP reduction (MAVERIC window).
+  # Prefer ΔAP / target_AP_reduction as planning variable.
+  # Any eta below is an assumption prior — NOT a clinically calibrated constant.
+  # IMA-AP: assumption so 50% suture ≈ 15% AP (ARTO/MAVERIC geometric talk track).
   ap_transfer_eta_ima_ap: 0.30
-  # IMA-CS eta chosen so 22% bridge ≈ MAVERIC 14.7% AP reduction.
-  ap_transfer_eta_ima_cs: 0.66818
+  # IMA-CS: assumption distribution mean for exploratory ranking ONLY.
+  # NOT fitted from MAVERIC/ARTO (wrong device). Carillon TITAN II ~15% AP = context.
+  ap_transfer_eta_ima_cs: 0.55
+  eta_role: assumption_prior
+  # Reporting scale for ARTO/MAVERIC pairs (IMA-AP class).
   maveric_baseline_ap_mm: 41.4
 
 constraints:
   clinical_max_ap_reduction_pct: 20.0
   clinical_window_ap_reduction_pct: [14.0, 20.0]
-  niti_alternating_strain_pct_max: 0.4
-  cs_lcx_min_mm: 8.6
-  # Illustrative preoperative CT CS–LCx (patient-specific input).
+  niti_alternating_strain_pct_max: 0.4  # illustrative engineering screen
+  cs_lcx_min_mm: 8.6  # Rottländer risk-screening threshold — not safety
+  # Prefer patient-measured CS–LCx; default is illustrative.
   baseline_cs_lcx_mm: 11.0
+  # Assumption: cs_lcx ≈ 11 − 0.12×shortening
   cs_lcx_cinch_mm_per_pct: 0.12
 
 sweep:

@@ -30,20 +30,15 @@ FIGURES = [
         "IMA-AP 物理反流随缝线缩短百分比的变化：Galili 映射 vs 临床映射",
         "fig1_ima_ap_nonmonotonic_clinical_window.png",
         """
-来龙去脉与读图说明：本图回答“计算缝线缩短百分比能否直接当作临床前后径（AP，anteroposterior，
-指二尖瓣环前后方向直径）剂量？”这一核心问题。横轴为 IMA-AP（indirect mitral annuloplasty–anteroposterior，
-间接二尖瓣成形之冠状窦–房间隔缝线路径）的缝线缩短百分比（suture shortening %，装置几何缩短的计算参数）；
-纵轴为 Layer-1 代理模型输出的 physics_regurgitation_pct（物理通道反流百分比：由降阶 FEA 间隙与 SPH 泄漏指数导出，
-不是超声测得的反流容积分数）。
+来龙去脉与读图说明：本图回答“计算缝线缩短百分比能否直接当作临床前后径（AP）剂量？”横轴为 IMA-AP 缝线缩短 %；
+纵轴为 Layer-1 泄漏代理 physics_regurgitation_pct（代数力学代理 + 文献校准泄漏代理；不是超声反流容积分数）。
 
-如何读子曲线：图中对照两条映射。（1）Galili 映射复现发表 LHHM（Living Heart Human Model，活体人心计算模型）
-离散坐标约定：IMA-AP 50% 缝线在表中仍对应舒张期 AP=34.4 mm，即映射 AP 缩减 0%；70% 缝线才塌缩至约 58% AP，
-并出现交界区（commissural）泄漏升高——这是数值极端，不是临床可植入剂量。（2）临床映射采用规划假设
-AP_reduction% = η × shortening%，默认 η=0.30，使 50% 缝线对应约 15% AP，落入 MAVERIC（Carillon 临床系列）
-约 14–15% 的 AP 窗口。绿色带标出约 14–20% AP 窗口在 η=0.30 下对应的缝线区间。
+如何读：（1）Galili 映射复现发表峰缩期 AP：IMA-AP 50% → 峰缩期 AP=15.9 mm（相对疾病 26.1 mm 约 39% AP 缩减），
+并非未变形舒张期 34.4 mm / 0% AP；70% → 12.4 mm 并交界区泄漏升高。（2）规划映射采用假设先验
+AP_reduction% = η × shortening%，默认 η_ap=0.30（假设，非临床标定），使 50% 缝线对应约 15% AP，落入
+ARTO/MAVERIC（IMA-AP 类，不是 Carillon）约 14–15% 对话窗口。绿色带为约 14–20% AP 窗口。
 
-结论（仅限本代理）：临床映射下，反流随缝线缩短在窗口内总体下降且射流偏中央；Galili 映射下 70% 点表现为
-非单调恶化。主曲线均为 physics，无 YAML 锚点混合。勿将纵轴百分比等同于临床试验反流容积。
+结论（仅限本代理）：规划映射下窗口内总体可筛查；Galili 峰缩期映射下 70% 非单调恶化。勿将纵轴等同临床试验反流容积。
 """,
     ),
     (
@@ -52,18 +47,11 @@ AP_reduction% = η × shortening%，默认 η=0.30，使 50% 缝线对应约 15%
         "装置缩短百分比到 AP 直径缩减百分比的剂量映射",
         "fig2_suture_vs_ap_reduction.png",
         """
-来龙去脉与读图说明：本图把“计算参数（缝线/桥缩短 %）”显式翻译成“临床可对话的 AP 直径缩减 %”。
-横轴仍为缩短百分比；纵轴为 AP 缩减百分比。三条（或多条）映射轨迹分别对应：Galili LHHM 坐标、
-临床 IMA-AP（η=0.30）、临床 IMA-CS（η≈0.668，IMA-CS 为 coronary-sinus–based annuloplasty，
-经冠状窦/桥缩短重塑瓣环的路径，临床代表如 Carillon）。水平带标出临床 AP 窗口 14–20%；虚线标出
-Galili 70% 数值极端（~58% AP）。
+来龙去脉与读图说明：横轴为缩短 %；纵轴为 AP 缩减 %。轨迹对照：Galili 峰缩期（IMA-AP 近直接缩 AP）、
+规划 IMA-AP（假设 η_ap=0.30）、规划 IMA-CS（假设 η_cs=0.55，非 MAVERIC 拟合；Carillon/TITAN II ~15% 仅语境）。
+MAVERIC=ARTO（IMA-AP 类）。水平带 14–20% 为探索性规划窗口。
 
-如何读：若某点落在水平带内，表示在当前规划假设下几何剂量与 MAVERIC 量级一致；若落在带外高位，
-则属于数值极端，不应用于术前推荐。本图强调缝线 % ≠ AP %：同一缩短百分比在不同映射下对应截然不同的 AP 缩减。
-
-结论：规划器默认使用临床映射与 20% AP 上限，避免把 Galili 70% 塌缩误写成“缩 AP 一半/七成”。
-η 是规划假设，不是新成像–FEA 辨识参数。本图回答“候选是否落在 MAVERIC 量级 AP 对话内”，
-而非“模型已验证临床试验反流容积”。
+如何读：同一缩短 % 在不同映射下 AP 缩减截然不同。η 为假设先验，不是成像–FEA 辨识，也不是“临床标定常数”。
 """,
     ),
     (
@@ -116,7 +104,7 @@ seed-42 推荐双缝线 60% 的机制来源可在本图与图 5 对照中追溯�
 physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度改善相对温和。70% 点 AP 缩减 21%
 超出默认 20% 规划上限，仅作机制对照，不作推荐植入。
 
-结论：双缝线是机制草图；seed-42 规划器推荐双缝线 60% 正是在该对照下选出的网格点。
+结论：双缝线是机制草图；seed-42 场景排序最优候选双缝线 60% 正是在该对照下选出的网格点。
 勿将 0.152% physics 等同于临床反流容积改善。
 """,
     ),
@@ -392,7 +380,7 @@ def figure_md(fig: dict, rel_img: str) -> str:
 
 def build_report_md(rec: dict, tables: dict, figs: list[dict]) -> str:
     today = date.today().isoformat()
-    rec_rec = rec["recommended"]
+    rec_rec = rec.get("best_candidate") or rec["recommended"]
     alt_cs = rec["alternatives"]["best_ima_cs"]
     alt_s = rec["alternatives"]["best_ima_ap_single"]
 
@@ -436,8 +424,8 @@ def build_report_md(rec: dict, tables: dict, figs: list[dict]) -> str:
 | 课题 | Functional Mitral Regurgitation（FMR，功能性二尖瓣反流）下的 IMA 术前规划代理 |
 | IMA-CS | Indirect mitral annuloplasty via coronary sinus（经冠状窦路径的间接成形，Carillon 类） |
 | IMA-AP | Indirect mitral annuloplasty via CS–IAS suture（冠状窦–房间隔缝线前后径收紧路径） |
-| 模型定位 | Layer-1 Python 代理（降阶 FEA + SPH 泄漏指数），**不是**生产级 LHHM/Abaqus FSI |
-| 主推荐（seed=42） | IMA-AP 双缝线 60%；AP 缩减 18.0%；physics 反流 0.152%；jet=`central` |
+| 模型定位 | Layer-1 Python 代理（代数力学代理 + 文献校准泄漏代理），**不是**生产级 LHHM/Abaqus FSI |
+| 假设下最优候选（seed=42） | IMA-AP 双缝线 60%；AP 缩减 18.0%；physics 泄漏代理（见 JSON）；jet=`central` |
 | 诚实边界 | 不声称 first CS vs AP 比较；不把 physics % 当作临床反流容积；η 为规划假设 |
 
 <div class="honesty">（Markdown 阅读提示）下文凡写「待补充」处，表示仓库当前无更高保真或患者特异证据，禁止臆造。</div>
@@ -448,23 +436,23 @@ def build_report_md(rec: dict, tables: dict, figs: list[dict]) -> str:
 
 ### 中文摘要
 
-**背景：** 间接二尖瓣成形（IMA，indirect mitral annuloplasty）术前规划常把计算文献中的缝线/桥缩短百分比直接当作前后径（AP，anteroposterior diameter，瓣环前后方向直径）缩减百分比。Galili 等（*R. Soc. Open Sci.* 2022）LHHM（Living Heart Human Model）算例表明，在本仓库 Galili 映射表约定下，IMA-AP 50% 缝线仍对应舒张期 AP=34.4 mm（映射 AP 缩减 0%），而 70% 缝线才塌缩至约 58% AP——后者是数值极端而非临床剂量。
+**背景：** 间接二尖瓣成形（IMA，indirect mitral annuloplasty）术前规划常把计算文献中的缝线/桥缩短百分比直接当作前后径（AP，anteroposterior diameter，瓣环前后方向直径）缩减百分比。Galili 等（*R. Soc. Open Sci.* 2022）LHHM（Living Heart Human Model）算例表明，在本仓库 Galili 映射表约定下，IMA-AP 50% 峰缩期 AP=15.9 mm（近直接缩 AP；勿与未变形舒张期 34.4 mm 混用），而 70% 缝线才塌缩至约 58% AP——后者是数值极端而非临床剂量。
 
-**方法：** 在可复现的 Python 一层代理（reduced-order FEA，降阶有限元代理 + SPH-inspired leak index，平滑粒子流体启发的泄漏指数）上实现：（C1）缝线/桥缩短 % → 临床可达 AP 缩减（MAVERIC ~14–15%，规划上限 20%）；（C2）连续设计空间扫掠 + 约束网格搜索术前规划器；（C3）IMA-CS 远端着陆区 CS–LCx（coronary sinus–left circumflex，冠状窦–左回旋支间距）≥ 8.6 mm 与 NiTi（镍钛）交变应变 &lt; 0.4%；可选（C4）双缝线 vs 单缝线在相同 AP 缩减下的交界区泄漏对照。主图使用 **physics** 反流；YAML 锚点混合仅用于 Galili 验证病例 ID。
+**方法：** 在可复现的 Python 一层代理（代数力学代理 + SPH-inspired 文献校准泄漏代理）上实现：（C1）缝线/桥缩短 % → 临床可达 AP 缩减（MAVERIC ~14–15%，规划上限 20%）；（C2）连续设计空间扫掠 + 约束网格搜索术前规划器；（C3）IMA-CS 远端着陆区 CS–LCx（coronary sinus–left circumflex，冠状窦–左回旋支间距）≥ 8.6 mm 与 NiTi（镍钛）交变应变 &lt; 0.4%；可选（C4）双缝线 vs 单缝线在相同 AP 缩减下的交界区泄漏对照。主图使用 **physics** 反流；YAML 锚点混合仅用于 Galili 验证病例 ID。
 
-**结果（seed=42）：** 临床映射下，规划器评估 36 个网格点、保留 30 个可行设计；推荐 **IMA-AP 双缝线 60%**（η=0.30 → AP 缩减 **18.0%**，physics 反流 **0.152%**，jet=`central`）。同剂量单缝线为 jet=`mixed`、交界区分数更高。IMA-CS 在默认解剖（基线 CS–LCx 11.0 mm）上，可行最优为桥缩短 **20%**（CS–LCx 恰为 **8.6 mm**）。
+**结果（seed=42）：** 临床映射下，规划器评估 36 个网格点、保留 30 个可行设计；推荐 **IMA-AP 双缝线 60%**（η=0.30 → AP 缩减 **18.0%**，physics 泄漏代理（见 JSON），jet=`central`）。同剂量单缝线为 jet=`mixed`、交界区分数更高。IMA-CS 在默认解剖（基线 CS–LCx 11.0 mm）上，可行最优为桥缩短 **20%**（CS–LCx 恰为 **8.6 mm**）。
 
-**结论：** 一层代理可将临床 AP 窗口、射流位置与 LCx 安全写成可部署的术前建议；不能替代患者特异 LHHM/FSI，也不能把 η 当作新 FEA 辨识结果。
+**结论：** 一层代理可将临床 AP 窗口、射流位置与 LCx 安全写成探索性筛查候选（非临床推荐）；不能替代患者特异 LHHM/FSI，也不能把 η 当作新 FEA 辨识结果。
 
 ### English abstract（与稿件一致）
 
-Background: Preoperative planning for IMA often treats computational suture/bridge shortening percentages as if they were AP diameter reductions. Under the Galili-mapping table convention used here, IMA-AP 50% suture retains diastolic AP = 34.4 mm (0% mapped AP cinch), whereas 70% collapses AP by ~58%—a numerical extreme, not a clinical dose.
+Background: Preoperative planning for IMA often treats computational suture/bridge shortening percentages as if they were AP diameter reductions. Under the Galili-mapping table convention used here, IMA-AP 50% peak-systole AP = 15.9 mm (near-direct AP effect; not undeformed 34.4 mm), whereas 70% collapses AP by ~58%—a numerical extreme, not a clinical dose.
 
-Methods: On a reproducible Python Layer-1 surrogate (reduced-order FEA + SPH leak index) we implement C1–C3 (and optional C4). Main figures use physics regurgitation; YAML anchor blending is restricted to Galili validation case IDs.
+Methods: On a reproducible Python Layer-1 surrogate (algebraic mechanics + literature-calibrated leakage proxy) we implement C1–C3 (and optional C4). Main figures use physics regurgitation; YAML anchor blending is restricted to Galili validation case IDs.
 
-Results (seed=42): The planner evaluates 36 points and retains 30 feasible designs; it recommends IMA-AP dual suture 60% (η=0.30 → AP reduction 18.0%, physics regurgitation 0.152%, jet=`central`).
+Results (seed=42): The planner evaluates 36 points and retains 30 feasible designs; it recommends IMA-AP dual suture 60% (η=0.30 → AP reduction 18.0%, physics leakage-proxy (see JSON), jet=`central`).
 
-Conclusions: A Layer-1 surrogate can encode the clinical AP window, jet location, and LCx safety into a deployable preoperative recommendation. It does not replace patient-specific LHHM/FSI and must not treat η as a newly identified FEA parameter.
+Conclusions: A Layer-1 surrogate can encode the clinical AP window, jet location, and LCx safety into a exploratory screening candidate (not a clinical recommendation). It does not replace patient-specific LHHM/FSI and must not treat η as a newly identified FEA parameter.
 
 **关键词 / Keywords：** functional mitral regurgitation; indirect mitral annuloplasty; preoperative planning; coronary sinus; LCx; Layer-1 surrogate
 
@@ -483,7 +471,7 @@ Conclusions: A Layer-1 surrogate can encode the clinical AP window, jet location
 3. **C3** — 显式编码 CS–LCx 筛查边界与 NiTi 交变应变筛查。
 4. **C4（可选）** — 匹配 AP 缩减下双/单缝线交界区机制对照。
 
-**明确不声称：** 新的 LHHM/Abaqus FSI；“首次” IMA-CS vs IMA-AP 比较（Galili 2022 已在 LHHM 完成）；physics 0.152% = 临床反流分数；η±20% = FEA 不确定性量化。
+**明确不声称：** 新的 LHHM/Abaqus FSI；“首次” IMA-CS vs IMA-AP 比较（Galili 2022 已在 LHHM 完成）；physics (see JSON) = 临床反流分数；η±20% = FEA 不确定性量化。
 
 ---
 
@@ -497,12 +485,12 @@ Conclusions: A Layer-1 surrogate can encode the clinical AP window, jet location
 ### 装置与剂量映射（C1）
 
 - IMA-CS：NiTi 桥缩短；IMA-AP：CS–IAS 缝线缩短；可选双缝线。
-- Galili 映射：复现发表离散几何坐标（50% 缝线 → 映射 0% AP 缩减；70% → ~58% AP）。
-- 临床映射：\\(\\mathrm{{AP\\_reduction\\%}}=\\eta\\times\\mathrm{{shortening\\%}}\\)；IMA-AP η=0.30；IMA-CS η≈0.668；规划上限 20% AP。
+- Galili 映射：复现发表离散几何坐标（50% 缝线 → 峰缩期 AP 15.9 mm；70% → 12.4 mm）。
+- 临床映射：\\(\\mathrm{{AP\\_reduction\\%}}=\\eta\\times\\mathrm{{shortening\\%}}\\)；IMA-AP η=0.30；IMA-CS η≈0.55（假设先验，非 MAVERIC 拟合）；规划上限 20% AP。
 
 ### 物理通道
 
-- 降阶 FEA → 对合间隙/应变/接触代理。
+- 代数力学代理 → 对合间隙/应变/接触代理分数。
 - ROA 由间隙估计；SPH 启发泄漏指数 → `physics_regurgitation_pct`。
 - 射流位置 ∈ {{central, commissural, mixed}}（代理口机制标签）。
 
@@ -540,12 +528,12 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 | 指标 | 数值 |
 |------|------|
 | 评估点数 / 可行点数 | {rec['n_evaluated']} / {rec['n_feasible']} |
-| 推荐装置 | {rec_rec['device']}，n_sutures={rec_rec['n_sutures']} |
+| 假设下最优候选 | {rec_rec['device']}，n_sutures={rec_rec['n_sutures']} |
 | 缩短 % | {rec_rec['shortening_pct']} |
 | AP 直径 / 缩减 | {rec_rec['ap_diameter_mm']:.3f} mm / {rec_rec['ap_reduction_pct']:.1f}% |
 | MAVERIC 标尺 AP | {rec_rec['ap_diameter_maveric_scale_mm']:.3f} mm |
 | ROA | {rec_rec['roa_mm2']:.3f} mm² |
-| physics 反流 | {rec_rec['physics_regurgitation_pct']*100/100:.4f}% → 报告 **0.152%** |
+| physics 反流 | {rec_rec['physics_regurgitation_pct']*100/100:.4f}%  |
 | jet / 交界分数 | {rec_rec['jet_location']} / {rec_rec['commissural_fraction']:.3f} |
 
 **备选单缝线 60%：** physics ≈ {alt_s['physics_regurgitation_pct']:.4f}% ，jet=`{alt_s['jet_location']}`，交界分数 {alt_s['commissural_fraction']:.3f}。
@@ -585,7 +573,7 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 ## 分析与讨论
 
-1. **剂量语义：** 在本仓库 Galili 映射表约定下，发表离散 50% 缝线病例保留 AP=34.4 mm（0% 映射 AP cinch）。这是规划坐标/表约定，不宜写成“Galili 临床结论称 50% 缝线=0% AP”。
+1. **剂量语义：** 在本仓库 Galili 映射表约定下，峰缩期 IMA-AP 50% AP=15.9 mm（非舒张期 34.4 / 0%）。这是规划坐标/表约定，不宜写成“Galili 临床结论称 50% 缝线=0% AP”。
 2. **临床窗口：** MAVERIC 提供约 14–15% AP 量级；本规划器上限 20%。REDUCE-FMR 仅提供反流下降的方向性语境，不作幅度校准。
 3. **LCx：** 默认解剖上 CS 20% 贴边可行；&lt;8.6 mm 在文献中为预测妥协的筛查信号，**不等于**证明 ≥8.6 mm 即安全。
 4. **双缝线：** 主要改善 jet 分类与交界份额；physics 降幅温和。
@@ -596,7 +584,7 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 ## 结论
 
-在 seed-42、临床映射与默认约束下，一层代理规划器给出可复现推荐：**IMA-AP 双缝线 60%**，AP 缩减 **18%**，physics 反流 **0.152%**，jet=`central`。该结果展示了如何把临床 AP 窗口、射流机制与 LCx/NiTi 筛查写入可部署流程，同时严格保持 Level-1 边界。
+在 seed-42、临床映射与默认约束下，一层代理规划器给出可复现推荐：**IMA-AP 双缝线 60%**，AP 缩减 **18%**，physics 泄漏代理（见 JSON），jet=`central`。该结果展示了如何把临床 AP 窗口、射流机制与 LCx/NiTi 筛查写入可部署流程，同时严格保持 Level-1 边界。
 
 ---
 
@@ -644,7 +632,7 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_html: str) -> str:
     today = date.today().isoformat()
-    rec_rec = rec["recommended"]
+    rec_rec = rec.get("best_candidate") or rec["recommended"]
     alt_cs = rec["alternatives"]["best_ima_cs"]
     alt_s = rec["alternatives"]["best_ima_ap_single"]
     dual_key = [r for r in tables["dual"] if r["suture_shortening_pct"] in {"50.0", "60.0", "70.0"}]
@@ -666,7 +654,7 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
             ),
         },
         {"指标": "ROA", "数值": f"{rec_rec['roa_mm2']:.3f} mm²"},
-        {"指标": "physics 反流", "数值": "0.152%"},
+        {"指标": "physics 泄漏代理", "数值": f"{float(rec_rec['physics_regurgitation_pct']):.4f}%"},
         {
             "指标": "jet / 交界分数",
             "数值": (
@@ -718,7 +706,7 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
     <div><span class="badge">研究报告</span><span class="badge">Layer-1</span><span class="badge">seed=42</span></div>
     <h1>功能性质二尖瓣反流（FMR）间接二尖瓣成形（IMA）一层代理术前规划研究报告</h1>
     <p class="en">Clinically constrained preoperative planning of indirect mitral annuloplasty: mapping suture dose to AP-diameter reduction, jet location, and LCx safety on a Layer-1 surrogate</p>
-    <p class="meta">生成日期：{today} · 数据：<code>run_pipeline.py --seed 42 --paper</code> · 主推荐：IMA-AP 双缝线 60% · AP 18.0% · physics 0.152% · jet=central</p>
+    <p class="meta">生成日期：{today} · 数据：<code>run_pipeline.py --seed 42 --paper</code> · 假设下最优候选：IMA-AP 双缝线 60% · AP 18.0% · physics (see JSON) · jet=central</p>
   </header>
 
   <nav class="toc" id="toc">
@@ -740,12 +728,12 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
   <section id="abstract">
     <h2 class="sec">一、摘要</h2>
     <h3>中文摘要</h3>
-    <p><strong>背景：</strong>间接二尖瓣成形（IMA，indirect mitral annuloplasty，不直接修补瓣叶而经装置重塑瓣环几何的介入策略）术前规划，常把计算文献中的缝线/桥缩短百分比直接当作前后径（AP，anteroposterior diameter，二尖瓣环前后方向直径）缩减百分比。在本仓库 Galili 映射表约定下，IMA-AP 50% 缝线仍对应舒张期 AP=34.4 mm（映射 AP 缩减 0%），70% 才塌缩至约 58% AP——后者是数值极端而非临床剂量。</p>
+    <p><strong>背景：</strong>间接二尖瓣成形（IMA，indirect mitral annuloplasty，不直接修补瓣叶而经装置重塑瓣环几何的介入策略）术前规划，常把计算文献中的缝线/桥缩短百分比直接当作前后径（AP，anteroposterior diameter，二尖瓣环前后方向直径）缩减百分比。在本仓库 Galili 映射表约定下，IMA-AP 50% 峰缩期 AP=15.9 mm（近直接缩 AP；勿与未变形舒张期 34.4 mm 混用），70% 才塌缩至约 58% AP——后者是数值极端而非临床剂量。</p>
     <p><strong>方法：</strong>在可复现 Python 一层代理（降阶 FEA + SPH 启发泄漏指数）上实现 C1 临床剂量映射、C2 扫掠与约束规划器、C3 LCx/NiTi 筛查，以及可选 C4 双缝线对照。主图使用 physics 反流；YAML 混合仅限 Galili 验证病例。</p>
     <p><strong>结果（seed=42）：</strong>评估 36 / 可行 30；推荐 <strong>IMA-AP 双缝线 60%</strong>（η=0.30 → AP 缩减 <strong>18.0%</strong>，physics 反流 <strong>0.152%</strong>，jet=<code>central</code>）。同剂量单缝线 jet=<code>mixed</code>。IMA-CS 可行最优桥缩短 <strong>20%</strong>（CS–LCx=<strong>8.6 mm</strong>）。</p>
     <p><strong>结论：</strong>一层代理可编码临床 AP 窗口、射流位置与 LCx 安全；不能替代患者特异 LHHM/FSI，不能把 η 当作新 FEA 辨识结果。</p>
     <h3>English abstract</h3>
-    <p>A Layer-1 surrogate encodes clinical AP dose, jet location, and LCx safety into a constrained preoperative planner. Seed-42 recommendation: dual IMA-AP 60%, AP reduction 18.0%, physics regurgitation 0.152%, jet=central. Not production FEA; η is a planning assumption.</p>
+    <p>A Layer-1 surrogate encodes clinical AP dose, jet location, and LCx safety into a constrained preoperative planner. Seed-42 recommendation: dual IMA-AP 60%, AP reduction 18.0%, physics leakage-proxy (see JSON), jet=central. Not production FEA; η is a planning assumption.</p>
     <p class="abbr"><strong>Keywords:</strong> FMR; IMA; preoperative planning; coronary sinus; LCx; Layer-1 surrogate</p>
   </section>
 
@@ -758,7 +746,7 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
 
   <section id="methods">
     <h2 class="sec">三、数据与方法</h2>
-    <p>基线几何：瓣环周长 118.5 mm，AP 34.4 mm。临床映射 \\(AP\\_reduction\\%=\\eta\\times shortening\\%\\)（IMA-AP η=0.30；IMA-CS η≈0.668；AP 上限 20%）。规划器最小化 <code>physics_regurgitation_pct</code>，约束含 CS–LCx≥8.6 mm（文献筛查边界；默认基线 11.0 mm）与 NiTi 交变应变&lt;0.4%。</p>
+    <p>基线几何：瓣环周长 118.5 mm，AP 34.4 mm。临床映射 \\(AP\\_reduction\\%=\\eta\\times shortening\\%\\)（IMA-AP η=0.30；IMA-CS η≈0.55（假设先验，非 MAVERIC 拟合）；AP 上限 20%）。规划器最小化 <code>physics_regurgitation_pct</code>，约束含 CS–LCx≥8.6 mm（文献筛查边界；默认基线 11.0 mm）与 NiTi 交变应变&lt;0.4%。</p>
     <p>网格：IMA-AP 10–70%（步长 5%）；IMA-CS 10–25%（步长 2%）；双缝线同 AP 网格。论文图由 SciencePlots + Times New Roman、dpi≥300 导出；轴标签保留英文，中文释义见图注长说明。</p>
   </section>
 
@@ -807,7 +795,7 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
 
   <section id="conclusions">
     <h2 class="sec">七、结论</h2>
-    <p>在 seed-42 与默认约束下，Layer-1 规划器推荐 <strong>IMA-AP 双缝线 60%</strong>，AP 缩减 <strong>18%</strong>，physics 反流 <strong>0.152%</strong>，jet=<code>central</code>。该输出是可追溯筛查建议，不是治疗处方。</p>
+    <p>在 seed-42 与默认约束下，Layer-1 场景排序最优候选 <strong>IMA-AP 双缝线 60%</strong>，AP 缩减 <strong>18%</strong>，physics 反流 <strong>0.152%</strong>，jet=<code>central</code>。该输出是可追溯筛查建议，不是治疗处方。</p>
   </section>
 
   <section id="limitations">
@@ -888,7 +876,7 @@ def final_section_html(test_status: str, pdf_status: str, files_changed: list[st
 <p><strong>Commit / push：</strong>见终报 Markdown 表与 <code>docs/chatgpt_collab/20260816_five_round_final.md</code>；分支 <code>main</code>；PUBLIC。</p>
 <p><strong>ChatGPT URL：</strong><a href="https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65">https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65</a>（Senior Review）。各轮 ready brief 见 <code>docs/chatgpt_collab/rounds/round_0N.md</code>。</p>
 <p><strong>ChatGPT 浏览器状态：</strong><strong>BLOCKED</strong> — 无 browser MCP / 标签页不可用。五轮均为本地成熟化：既有文献回复 + WebSearch + nature-skills。未虚构任何新的 ChatGPT 回复。</p>
-<p><strong>Baseline：</strong>seed-42（dual 60% / AP 18% / physics 0.152% / central）、SciencePlots 五图、golden tests、成熟化后的 manuscript / report / paper。</p>
+<p><strong>Baseline：</strong>seed-42（dual 60% / AP 18% / physics (see JSON) / central）、SciencePlots 五图、golden tests、成熟化后的 manuscript / report / paper。</p>
 <p><strong>已采纳：</strong>规划/翻译层新颖性；Galili 表约定；LCx/NiTi 筛查措辞；physics≠临床反流容积；Intro/Discussion nature-writing 抛光；Results 来龙去脉；Methods claim audit。</p>
 <p><strong>拒绝：</strong>Layer-1=LHHM；first CS-vs-AP；≥8.6 mm=safe；η±20%=FEA UQ；旗舰 Nature 无证据升级。</p>
 <p><strong>本轮新增/更新文件：</strong></p>
@@ -944,7 +932,7 @@ def main() -> None:
     test_status = (
         "PASS — PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -q (40 passed); "
         "PASS — python run_pipeline.py --seed 42 --paper --no-export "
-        "(planner: IMA-AP dual 60%, AP 18.0%, physics 0.152%, jet=central)"
+        "(planner: IMA-AP dual 60%, AP 18.0%, physics (see JSON), jet=central)"
     )
     pdf_status = "生成中"
 
@@ -1041,7 +1029,7 @@ def main() -> None:
 | ChatGPT URL | {chatgpt_url} |
 | ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
 | ChatGPT browser | {chatgpt_browser} |
-| Baseline | seed-42 dual 60% / AP 18% / physics 0.152% / central；SciencePlots 五图；golden tests；manuscript + nature framework |
+| Baseline | seed-42 dual 60% / AP 18% / physics (see JSON) / central；SciencePlots 五图；golden tests；manuscript + nature framework |
 | Context / brief | `docs/chatgpt_collab/rounds/` + `20260816_five_round_final.md` |
 | Accepted | 规划/翻译层新颖性；Galili 表约定；LCx/NiTi 筛查；physics≠临床容积；Intro/Discussion 抛光；Results 来龙去脉；Methods claim audit |
 | Rejected | Layer-1=LHHM；first CS-vs-AP；≥8.6 mm=safe；η±20%=FEA UQ；旗舰 Nature |

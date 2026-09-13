@@ -1,5 +1,10 @@
 {
-  "geometry_diastole": {
+  "meta": {
+    "note": "Subset of results/reference_data.yaml for pytest. Peak-systole Galili facts; undeformed diastole AP=34.4 is separate.",
+    "doi": "10.1098/rsos.211726"
+  },
+  "geometry_undeformed_diastole": {
+    "cardiac_phase": "undeformed_diastole",
     "ap_diameter_mm": 34.4,
     "annulus_circumference_mm": 118.5
   },
@@ -8,58 +13,76 @@
       "id": "pathology",
       "device": null,
       "shortening_pct": null,
+      "cardiac_phase": "peak_systole",
       "annulus_circumference_mm": 118.5,
-      "ap_diameter_mm": 34.4,
-      "roa_mm2": null,
+      "ap_diameter_mm": 26.1,
+      "roa_mm2": 172.8,
       "regurgitation_pct": 5.26,
-      "notes": "44% posterior papillary muscle passive"
+      "notes": "peak-systole disease; not undeformed 34.4 mm AP"
     },
     {
       "id": "ima_cs_14",
       "device": "IMA-CS",
       "shortening_pct": 14,
-      "regurgitation_pct": null,
-      "notes": "intermediate"
+      "cardiac_phase": "peak_systole",
+      "ap_diameter_mm": 25.5,
+      "roa_mm2": 56.7,
+      "regurgitation_pct": 0.52,
+      "notes": "held-out / intermediate"
     },
     {
       "id": "ima_cs_18",
       "device": "IMA-CS",
       "shortening_pct": 18,
-      "regurgitation_pct": null,
-      "notes": "intermediate"
+      "cardiac_phase": "peak_systole",
+      "ap_diameter_mm": 24.7,
+      "roa_mm2": 55.3,
+      "regurgitation_pct": 0.41,
+      "notes": "held-out / intermediate"
     },
     {
       "id": "ima_cs_22",
       "device": "IMA-CS",
       "shortening_pct": 22,
+      "cardiac_phase": "peak_systole",
       "annulus_circumference_mm": 115.0,
-      "ap_diameter_mm": 34.4,
+      "ap_diameter_mm": 24.8,
+      "roa_mm2": 48.2,
       "regurgitation_pct": 0.29,
-      "notes": "annulus 118.5 to 115 mm"
+      "notes": "calibration/reproduction anchor"
     },
     {
       "id": "ima_ap_30",
       "device": "IMA-AP",
       "shortening_pct": 30,
-      "regurgitation_pct": null,
-      "notes": "intermediate"
+      "cardiac_phase": "peak_systole",
+      "ap_diameter_mm": 20.7,
+      "roa_mm2": 51.1,
+      "regurgitation_pct": 0.16,
+      "notes": "held-out / intermediate"
     },
     {
       "id": "ima_ap_50",
       "device": "IMA-AP",
       "shortening_pct": 50,
-      "ap_diameter_mm": 34.4,
+      "cardiac_phase": "peak_systole",
+      "ap_diameter_mm": 15.9,
       "roa_mm2_min": 27.3,
+      "roa_mm2": 27.3,
       "regurgitation_pct": 0.08,
-      "notes": "target optimum"
+      "notes": "calibration/reproduction anchor; peak-systolic AP=15.9 not 34.4"
     },
     {
       "id": "ima_ap_70",
       "device": "IMA-AP",
       "shortening_pct": 70,
-      "ap_diameter_mm": 14.3,
-      "regurgitation_pct": null,
-      "notes": "commissural leak; worse than 50%"
+      "cardiac_phase": "peak_systole",
+      "ap_diameter_mm": 12.4,
+      "roa_mm2": 46.1,
+      "regurgitation_pct": 0.13,
+      "notes": "held-out; commissural leak; worse than 50%"
     }
-  ]
+  ],
+  "calibration_targets": ["pathology", "ima_cs_22", "ima_ap_50"],
+  "heldout_targets": ["ima_cs_14", "ima_cs_18", "ima_ap_30", "ima_ap_70"]
 }
