@@ -510,6 +510,7 @@ def eta_sensitivity(
             mapping_mode="clinical",
             design_space=cfg,
             output_dir=ROOT / "results" / "output" / "planner" / "eta_sensitivity_runs" / name,
+            skip_uncertainty=True,
         )
         rec_pt = rec.get("best_candidate") or rec.get("recommended") or {}
         row = {

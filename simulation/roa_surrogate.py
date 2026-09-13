@@ -108,10 +108,12 @@ def pipeline_roa_mm2(
     calibration: Optional[dict[str, Any]] = None,
 ) -> float:
     """
-    Effective ROA used by the pipeline: model estimate + contact-cluster area.
+    Pipeline ROA: model estimate + optional contact-cluster descriptor.
 
-    Per-case model/cluster weights come from configs/surrogate_calibration.yaml so
-    published ROA anchors (e.g. IMA-AP 50% minimum) are not washed out by cluster noise.
+    Contact-cluster area is visualization / soft descriptor only — not independent
+    validation of published Galili ROA. Per-case model/cluster weights in
+    configs/surrogate_calibration.yaml keep published anchors from being washed
+    out by synthetic cluster noise at calibration IDs.
     """
     cfg = calibration or load_surrogate_calibration()
     model_weight, cluster_weight = _pipeline_weights(case_id, cfg)

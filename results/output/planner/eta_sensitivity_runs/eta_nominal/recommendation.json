@@ -2,16 +2,25 @@
   "objective": "minimize physics_regurgitation_pct",
   "ranker": "scenario_ranker",
   "mapping_mode": "clinical",
+  "framing": "exploratory_screening_best_under_assumptions",
   "constraints": {
     "clinical_max_ap_reduction_pct": 20.0,
     "niti_alternating_strain_pct_max": 0.4,
     "cs_lcx_min_mm": 8.6,
     "enforce_lcx": true,
     "baseline_cs_lcx_mm": 11.0,
+    "baseline_cs_lcx_source": "design_space_assumption",
+    "cs_lcx_cinch_mm_per_pct": 0.12,
+    "cs_lcx_cinch_role": "labeled_assumption_slope",
     "lcx_role": "risk_screening_threshold"
+  },
+  "hypotheses": {
+    "dual_suture_commissural_factor": 0.5,
+    "dual_suture_role": "exploratory_hypothesis_parameter"
   },
   "n_evaluated": 36,
   "n_feasible": 30,
+  "p_feasible": 0.8571,
   "best_candidate": {
     "case_id": "sweep_ap_dual60_clinical",
     "device": "IMA-AP",
@@ -144,15 +153,94 @@
       "feasible": true
     }
   },
+  "pareto_frontier": [
+    {
+      "case_id": "sweep_ap_dual60_clinical",
+      "device": "IMA-AP",
+      "shortening_pct": 60.0,
+      "mapping_mode": "clinical",
+      "n_sutures": 2,
+      "annulus_circumference_mm": 115.5,
+      "ap_diameter_mm": 28.208000000000002,
+      "ap_reduction_mm": 6.191999999999997,
+      "ap_reduction_pct": 18.0,
+      "ap_diameter_maveric_scale_mm": 33.948,
+      "roa_mm2": 8.991892374756384,
+      "central_roa_mm2": 7.508230132921581,
+      "commissural_roa_mm2": 1.4836622418348036,
+      "jet_location": "central",
+      "commissural_fraction": 0.165,
+      "physics_regurgitation_pct": 0.07354032490281888,
+      "blended_regurgitation_pct": null,
+      "coaptation_gap_mm": 0.20399999999999996,
+      "max_principal_strain": 0.1154,
+      "niti_alternating_strain_pct": null,
+      "niti_engineering_strain": null,
+      "cs_lcx_mm": null,
+      "constraint_violations": "",
+      "feasible": true,
+      "pareto_objectives": {
+        "minimize_physics_regurgitation_pct": 0.07354032490281888,
+        "maximize_ap_reduction_pct": 18.0,
+        "maximize_cs_lcx_mm_or_neutral": null,
+        "minimize_niti_alternating_strain_pct_or_neutral": null
+      }
+    },
+    {
+      "case_id": "sweep_ap_dual65_clinical",
+      "device": "IMA-AP",
+      "shortening_pct": 65.0,
+      "mapping_mode": "clinical",
+      "n_sutures": 2,
+      "annulus_circumference_mm": 115.25,
+      "ap_diameter_mm": 27.691999999999997,
+      "ap_reduction_mm": 6.708000000000002,
+      "ap_reduction_pct": 19.5,
+      "ap_diameter_maveric_scale_mm": 33.327,
+      "roa_mm2": 11.115335626343272,
+      "central_roa_mm2": 8.947845179206334,
+      "commissural_roa_mm2": 2.167490447136938,
+      "jet_location": "central",
+      "commissural_fraction": 0.195,
+      "physics_regurgitation_pct": 0.11600227761461973,
+      "blended_regurgitation_pct": null,
+      "coaptation_gap_mm": 0.26650000000000007,
+      "max_principal_strain": 0.11515,
+      "niti_alternating_strain_pct": null,
+      "niti_engineering_strain": null,
+      "cs_lcx_mm": null,
+      "constraint_violations": "",
+      "feasible": true,
+      "pareto_objectives": {
+        "minimize_physics_regurgitation_pct": 0.11600227761461973,
+        "maximize_ap_reduction_pct": 19.5,
+        "maximize_cs_lcx_mm_or_neutral": null,
+        "minimize_niti_alternating_strain_pct_or_neutral": null
+      }
+    }
+  ],
+  "uncertainty": {
+    "skipped": true,
+    "mean_fraction_feasible": null,
+    "ranking_stability_top1_fraction": null,
+    "best_candidate_win_counts": [],
+    "honesty": "Uncertainty sweep skipped for this call.",
+    "p_feasible_at_nominal_grid": 0.8571
+  },
   "notes": [
-    "Layer-1 exploratory scenario ranker \u2014 not full FSI / LHHM / Abaqus.",
+    "Layer-1 exploratory scenario ranker \u2014 phenomenological mechanics + literature-calibrated leakage proxy.",
+    "Not full FSI / LHHM / Abaqus; not a clinical recommendation engine.",
     "Objective is physics leakage-proxy regurgitation (no YAML anchor blend).",
-    "best_candidate = best feasible grid point under stated surrogate assumptions (not a clinical recommendation).",
+    "best_candidate = best feasible grid point under stated surrogate assumptions (exploratory ranking / best under assumptions).",
     "AP reduction ceiling = 20.0% (ARTO/MAVERIC ~14\u201315% IMA-AP context; Carillon TITAN II ~15% IMA-CS context; default planning max 20%).",
-    "IMA-CS LCx uses literature risk-screening threshold (Rottl\u00e4nder 8.6 mm) and illustrative baseline CS\u2013LCx from design_space.yaml (prefer patient CT).",
-    "\u03b7 values are assumption priors \u2014 not clinically calibrated constants; \u03b7_CS is NOT from MAVERIC/ARTO.",
-    "Reported settings are grid points (suture/bridge % steps), not interpolated implants.",
+    "Prefer \u0394AP / target_ap_reduction_pct as planning variable; \u03b7 values are assumption-prior distribution means \u2014 not clinically calibrated constants; \u03b7_CS is NOT from MAVERIC/ARTO.",
+    "Dual-suture commissural factor \u00d70.5 is an explicit hypothesis parameter.",
+    "LCx: prefer optional patient-measured CS\u2013LCx baseline; cinch model `baseline \u2212 0.12\u00d7shortening` is a labeled assumption (default baseline 11 mm from design_space.yaml).",
+    "NiTi 0.4% = illustrative engineering screen only.",
+    "Pareto frontier is multi-objective exploratory screening language (leakage vs AP reduction vs LCx vs strain) \u2014 not a medical recommendation set.",
     "Physics regurg % \u2260 clinical regurgitant volume.",
+    "Reported settings are grid points (suture/bridge % steps), not interpolated implants.",
+    "No patient CS\u2013LCx provided; using illustrative baseline_cs_lcx_mm from design_space.yaml.",
     "Best candidate under assumptions: IMA-AP 60.0% (clinical mapping), jet=central, AP reduction 18.0%, physics regurg 0.074%."
   ]
 }

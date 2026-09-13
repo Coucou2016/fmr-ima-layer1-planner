@@ -1,6 +1,11 @@
-"""Regurgitant orifice area (ROA) from contact node forces + geometric search.
+"""Contact-cluster ROA helper (visualization / descriptor only).
 
-Matlab-style auto identification: cluster high-contact nodes, fit minimum area ellipse.
+Matlab-style clustering of high-contact nodes with a minimum-area ellipse fit.
+
+Honesty: synthetic or pipeline contact-cluster ROA is **not** an independent
+validation of published Galili ROA. Prefer model ``estimate_roa_mm2`` /
+literature anchors for quantitative claims; use this module for plots and
+contact descriptors.
 """
 
 from dataclasses import dataclass

@@ -16,7 +16,9 @@ ima_cs:
 
 dual_suture:
   enabled: true
-  # Jet dual-suture ×0.5 is an explicit hypothesis parameter (hypothesis-generating).
+  # Jet dual-suture commissural factor is an explicit hypothesis parameter
+  # (hypothesis-generating / exploratory only — not a clinical claim).
+  commissural_factor: 0.5
   shortening_pct:
     min: 10
     max: 70

@@ -1,6 +1,7 @@
 """Comparison plots for IMA strategies and paper figures.
 
-All report/paper figures use SciencePlots + Times New Roman at dpi≥300.
+Report/paper figures use SciencePlots at dpi≥300 with a serif stack that
+prefers Times New Roman when installed, else Liberation Serif / STIX / DejaVu.
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ import matplotlib
 # Headless / CI: always write PNGs even without a display.
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties, findfont
 
 # SciencePlots registers styles on import.
 import scienceplots  # noqa: F401
@@ -23,15 +25,45 @@ from .metrics import CaseMetrics
 PAPER_DPI = 300
 REPORT_DPI = 300
 
+# Prefer Times; do not hard-fail CI when absent.
+_SERIF_CANDIDATES = [
+    "Times New Roman",
+    "Times",
+    "Liberation Serif",
+    "STIXGeneral",
+    "STIX",
+    "Nimbus Roman",
+    "DejaVu Serif",
+]
+
+
+def resolve_serif_font() -> str:
+    """Return first available serif family name for SciencePlots figures."""
+    for name in _SERIF_CANDIDATES:
+        try:
+            path = findfont(FontProperties(family=name), fallback_to_default=False)
+        except (ValueError, RuntimeError):
+            continue
+        low = (path or "").lower().replace("\\", "/")
+        token = name.split()[0].lower()
+        if token in low or name.lower().replace(" ", "") in low.replace(" ", ""):
+            return name
+        if name.startswith("Liberation") and "liberation" in low:
+            return name
+        if name.startswith("STIX") and "stix" in low:
+            return name
+    return "DejaVu Serif"
+
 
 @contextmanager
 def _science_style(*, serif: bool = True) -> Iterator[None]:
-    """Apply SciencePlots style with Times New Roman (no LaTeX required)."""
+    """Apply SciencePlots style with Times/Liberation/STIX fallback (no LaTeX)."""
     styles = ["science", "no-latex"]
+    serif_name = resolve_serif_font()
     with plt.style.context(styles):
         rc = {
             "font.family": "serif",
-            "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
+            "font.serif": [serif_name, *_SERIF_CANDIDATES],
             "mathtext.fontset": "stix",
             "font.size": 10,
             "axes.labelsize": 11,

@@ -4,8 +4,8 @@ Mechanism (Galili / clinical):
 - IMA-AP over-shortening bunches the leaflets centrally and opens the
   commissures → commissural (or mixed) residual leak.
 - IMA-CS residual leak remains a central A2–P2 jet (incomplete coaptation).
-- Dual suture (Innovation D) supports the commissures and lowers the
-  commissural fraction at the same AP reduction.
+- Dual suture commissural ×0.5 is an **explicit exploratory hypothesis**
+  parameter (not a clinical claim).
 
 This is a Layer-1 surrogate split of ROA, not Doppler imaging.
 """
