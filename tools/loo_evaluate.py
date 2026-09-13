@@ -12,12 +12,15 @@ Honesty contract
   not a claim of patient-level external validation.
 - Prefer Dryad-derived ``data/processed/galili_cases.csv`` when
   ``source_tier=dryad_derived``; otherwise use published table scalars.
+- Optional ``--refit-scale`` applies a documented linear post-hoc scale on
+  train-fold leakage ratios (not new physics / not chamber-partition SPH).
 
 Usage::
 
     python tools/loo_evaluate.py
     python tools/loo_evaluate.py --mode heldout
     python tools/loo_evaluate.py --mode loo --write
+    python tools/loo_evaluate.py --mode loo --refit-scale --write
 """
 
 from __future__ import annotations
@@ -102,6 +105,13 @@ def load_case_catalog() -> tuple[list[dict[str, Any]], str]:
                 if r.get("regurgitation_pct") not in (None, "")
                 else (by_id.get(cid) or {}).get("regurgitation_pct"),
                 "cardiac_phase": "peak_systole",
+                "contact_fraction": float(r["contact_fraction"])
+                if r.get("contact_fraction") not in (None, "")
+                else None,
+                "n_sph_particles": int(float(r["n_sph_particles"]))
+                if r.get("n_sph_particles") not in (None, "")
+                else None,
+                "source_tier": r.get("source_tier"),
             }
             by_id[cid] = filled
         return list(by_id.values()), note
@@ -243,36 +253,86 @@ def run_heldout() -> dict[str, Any]:
     }
 
 
-def run_loo() -> dict[str, Any]:
+def _loo_scale_alpha(cases: list[dict[str, Any]], train_ids: list[str]) -> Optional[float]:
+    """Linear post-hoc leakage scale from train folds (phenomenological only).
+
+    alpha = mean(published_leak / physics_pred) over train IDs with positive preds.
+    Applied only under ``--refit-scale``; does not invent chamber-partition SPH.
+    """
+    by_id = {c["id"]: c for c in cases}
+    ratios: list[float] = []
+    for tid in train_ids:
+        truth = by_id.get(tid)
+        if truth is None or truth.get("regurgitation_pct") is None:
+            continue
+        pred = _predict_case(truth, blend=False)
+        p = pred.get("pred_regurgitation_pct")
+        if p is None or float(p) <= 0:
+            continue
+        ratios.append(float(truth["regurgitation_pct"]) / float(p))
+    if not ratios:
+        return None
+    return sum(ratios) / len(ratios)
+
+
+def run_loo(*, refit_scale: bool = False) -> dict[str, Any]:
     cases, catalog_note = load_case_catalog()
     splits = split_ids()
     all_ids = [c["id"] for c in cases]
     folds = []
     for held_id in all_ids:
-        # Surrogate has no per-fold retrain; LOO here means: score held-out ID
-        # with blend OFF, and document that remaining IDs are the notional
-        # calibration pool (anchor blend still only applies to configured
-        # calibration_targets that are not the held-out ID).
+        # Surrogate has no per-fold retrain of mechanics; LOO scores held-out ID
+        # with blend OFF. Optional linear leakage scale uses train-fold ratios only.
         row = score_cases(cases, [held_id], blend=False, role="loo_heldout")[0]
-        row["notional_calibration_pool"] = [i for i in all_ids if i != held_id]
+        train_ids = [i for i in all_ids if i != held_id]
+        row["notional_calibration_pool"] = train_ids
         row["anchor_blend_applied"] = False
         row["note"] = (
-            "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports "
-            "physics prediction vs published peak-systole quantities for the "
-            "held-out case_id."
+            "LOO reports physics prediction vs published peak-systole quantities "
+            "for the held-out case_id. Default path does not re-estimate SPH/ROA "
+            "YAML anchors per fold."
         )
+        if refit_scale:
+            alpha = _loo_scale_alpha(cases, train_ids)
+            row["loo_scale_alpha"] = alpha
+            row["refit_scale"] = True
+            if alpha is not None and row.get("pred_regurgitation_pct") is not None:
+                row["pred_regurgitation_pct_unrefit"] = row["pred_regurgitation_pct"]
+                row["pred_regurgitation_pct"] = float(row["pred_regurgitation_pct"]) * alpha
+                # Refresh leakage absolute error after scale.
+                pub = (row.get("published") or {}).get("regurgitation_pct")
+                if pub is not None:
+                    err = float(row["pred_regurgitation_pct"]) - float(pub)
+                    row["err_regurgitation_pct_points"] = err
+                    row["abs_err_regurgitation_pct_points"] = abs(err)
+                row["note"] = (
+                    "Optional per-fold linear leakage scale alpha=mean(pub/pred) on "
+                    "train IDs; phenomenological post-hoc only — not new physics and "
+                    "not Dryad chamber-partition re-simulation."
+                )
+            else:
+                row["refit_scale"] = False
+                row["note"] += " | refit-scale skipped (insufficient train ratios)."
+        else:
+            row["refit_scale"] = False
         folds.append(row)
+    honesty = (
+        "Leave-one-case-out over seven discrete Galili peak-systole cases. "
+        "Not patient-level external validation. Calibration-blend cases must "
+        "not be advertised as validated when blend was used."
+    )
+    if refit_scale:
+        honesty += (
+            " Optional --refit-scale applies train-fold linear leakage ratios only."
+        )
     return {
         "mode": "loo",
         "catalog": catalog_note,
         "splits": splits,
-        "honesty": (
-            "Leave-one-case-out over seven discrete Galili peak-systole cases. "
-            "Not patient-level external validation. Calibration-blend cases must "
-            "not be advertised as validated when blend was used."
-        ),
+        "refit_scale": refit_scale,
+        "honesty": honesty,
         "folds": folds,
-        "summary": _summarize(folds, label="loo_blend_off"),
+        "summary": _summarize(folds, label="loo_blend_off_refit" if refit_scale else "loo_blend_off"),
     }
 
 
@@ -292,15 +352,15 @@ def _summarize(rows: list[dict[str, Any]], *, label: str) -> dict[str, Any]:
     }
 
 
-def run(mode: str = "both") -> dict[str, Any]:
+def run(mode: str = "both", *, refit_scale: bool = False) -> dict[str, Any]:
     out: dict[str, Any] = {
-        "paper_doi": "10.1098/rsos.211726",
+        "paper_doi": "10.1098/rsos.211464",
         "dryad_doi": "10.5061/dryad.bzkh1899d",
     }
     if mode in {"heldout", "both"}:
         out["heldout_evaluation"] = run_heldout()
     if mode in {"loo", "both"}:
-        out["loo_evaluation"] = run_loo()
+        out["loo_evaluation"] = run_loo(refit_scale=refit_scale)
     return out
 
 
@@ -309,8 +369,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--mode", choices=["heldout", "loo", "both"], default="both")
     ap.add_argument("--write", action="store_true", help=f"Write {OUT_DEFAULT}")
     ap.add_argument("--out", type=Path, default=OUT_DEFAULT)
+    ap.add_argument(
+        "--refit-scale",
+        action="store_true",
+        help="Optional per-fold linear leakage scale from train ratios (phenomenological)",
+    )
     args = ap.parse_args(argv)
-    payload = run(args.mode)
+    payload = run(args.mode, refit_scale=args.refit_scale)
     text = json.dumps(payload, indent=2)
     if args.write:
         args.out.parent.mkdir(parents=True, exist_ok=True)

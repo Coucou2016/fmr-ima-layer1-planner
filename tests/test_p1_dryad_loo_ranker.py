@@ -26,10 +26,15 @@ def test_cardiac_phase_fields_in_reference_and_processed(tmp_path, monkeypatch):
         assert c.get("cardiac_phase") == "peak_systole"
     assert ref["geometry_undeformed_diastole"]["cardiac_phase"] == "undeformed_diastole"
 
-    # Fixture import → processed CSV with phase tags
+    # Fixture import → processed CSV with phase tags (tmp dirs — do not clobber Dryad).
     import tools.import_galili_dryad as imp
 
     monkeypatch.chdir(ROOT)
+    monkeypatch.setattr(imp, "PROCESSED", tmp_path / "processed")
+    monkeypatch.setattr(imp, "PROVENANCE", tmp_path / "provenance.yaml")
+    monkeypatch.setattr(imp, "RAW_README", tmp_path / "raw_README.md")
+    monkeypatch.setattr(imp, "FIXTURE", tmp_path / "fixture")
+    monkeypatch.setattr(imp, "RAW", tmp_path / "raw_galili")
     imp.ensure_fixture()
     csv_path = imp.process(from_fixture=True)
     rows = list(csv.DictReader(csv_path.open(encoding="utf-8")))
@@ -50,9 +55,14 @@ def test_dryad_importer_smoke_fixture(tmp_path, monkeypatch):
     import tools.import_galili_dryad as imp
 
     monkeypatch.chdir(ROOT)
+    monkeypatch.setattr(imp, "PROCESSED", tmp_path / "processed")
+    monkeypatch.setattr(imp, "PROVENANCE", tmp_path / "provenance.yaml")
+    monkeypatch.setattr(imp, "RAW_README", tmp_path / "raw_README.md")
+    monkeypatch.setattr(imp, "FIXTURE", tmp_path / "fixture")
+    monkeypatch.setattr(imp, "RAW", tmp_path / "raw_galili")
     out = imp.process(from_fixture=True)
     assert out.is_file()
-    prov = yaml.safe_load((ROOT / "data" / "provenance.yaml").read_text(encoding="utf-8"))
+    prov = yaml.safe_load((tmp_path / "provenance.yaml").read_text(encoding="utf-8"))
     assert prov["galili_rsos_2022"]["dryad_doi"] == "10.5061/dryad.bzkh1899d"
     assert prov["galili_rsos_2022"]["status"] in {
         "fixture_synthetic",

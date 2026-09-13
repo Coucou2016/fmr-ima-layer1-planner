@@ -20,6 +20,15 @@ build/
 credentials.json
 secrets/
 
+# Large Dryad archives (checksums live in data/raw/galili_dryad/MANIFEST.json)
+data/raw/galili_dryad/*.zip
+data/raw/galili_dryad/*_unpacked/
+data/raw/_anubis/
+data/raw/_download_probes/
+data/raw/_dryad_api_probe.json
+data/raw/_datacite.json
+tools/_probe_dryad_layout.py
+
 # OS / editor
 .DS_Store
 Thumbs.db

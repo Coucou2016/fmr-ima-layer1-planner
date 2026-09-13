@@ -427,7 +427,7 @@ physics 泄漏代理由约 0.075% 降至约 0.074%——分类改善更醒目，
 | 项 | 内容 |
 |----|------|
 | GitHub URL | https://github.com/Coucou2016/fmr-ima-layer1-planner（PUBLIC；顾问可读完整代码/文档） |
-| Commit hash | `0451a83af7062a9acc77354a5fa2004b13b2f045` |
+| Commit hash | `e4f5f8b52af4af899a9e841fa102dd34fdbd98cf` |
 | Push status | main; tracking status: ## main...origin/main |
 | ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
 | ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |

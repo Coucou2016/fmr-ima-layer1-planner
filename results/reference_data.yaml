@@ -20,7 +20,7 @@ meta:
     that is not independent external validation.
 
 doi:
-  galili_rsos_2022: "10.1098/rsos.211726"
+  galili_rsos_2022: "10.1098/rsos.211464"
   dryad_supporting: "10.5061/dryad.bzkh1899d"
 
 geometry_undeformed_diastole:
@@ -66,7 +66,7 @@ cases:
     quantity_set: [ap_diameter, roa, leakage_fraction]
     source: "Galili et al. RSOS 2022"
     table_or_figure: "peak-systole disease / untreated FMR"
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
     contact_pattern: "posterior leaflet malcoaptation, broad jet"
     notes: "44% posterior papillary muscle passive; baseline FMR at peak systole"
 
@@ -78,7 +78,7 @@ cases:
     roa_mm2: 56.7
     regurgitation_pct: 0.52
     source: "Galili et al. RSOS 2022"
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
     notes: "Intermediate CS bridge shortening"
 
   - id: ima_cs_18
@@ -89,7 +89,7 @@ cases:
     roa_mm2: 55.3
     regurgitation_pct: 0.41
     source: "Galili et al. RSOS 2022"
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
     notes: "Intermediate CS bridge shortening"
 
   - id: ima_cs_22
@@ -102,7 +102,7 @@ cases:
     regurgitation_pct: 0.29
     niti_engineering_strain_approx: 0.22
     source: "Galili et al. RSOS 2022"
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
     notes: "Annulus circumference reported 118.5 → 115 mm; peak-systolic AP 24.8 mm (not 34.4)"
 
   - id: ima_ap_30
@@ -113,7 +113,7 @@ cases:
     roa_mm2: 51.1
     regurgitation_pct: 0.16
     source: "Galili et al. RSOS 2022"
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
     notes: "IMA-AP has near-direct effect on AP diameter (Galili)"
 
   - id: ima_ap_50
@@ -124,7 +124,7 @@ cases:
     roa_mm2: 27.3
     regurgitation_pct: 0.08
     source: "Galili et al. RSOS 2022"
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
     notes: >
       Published ROA / leakage minimum among reported IMA-AP settings.
       Peak-systolic AP = 15.9 mm — NOT undeformed 34.4 mm and NOT 0% AP reduction.
@@ -137,7 +137,7 @@ cases:
     roa_mm2: 46.1
     regurgitation_pct: 0.13
     source: "Galili et al. RSOS 2022"
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
     contact_pattern: "commissural leak, excessive AP reduction"
     notes: "Leakage and ROA worse than IMA-AP 50%; commissural jet mechanism"
 

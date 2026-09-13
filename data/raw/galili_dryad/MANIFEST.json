@@ -1,0 +1,15 @@
+{
+  "dryad_doi": "10.5061/dryad.bzkh1899d",
+  "paper_doi": "10.1098/rsos.211464",
+  "checksums": {
+    "Deformed_coordinates_and_contact.zip": {
+      "bytes": 314919,
+      "sha256": "921b2d8ecd30aa6f73932b71c7f6a85f7aff17f2b6b7268f19e89ac9ce819efc"
+    },
+    "Blood_leakage_-_SPH_coordinates.zip": {
+      "bytes": 20542725,
+      "sha256": "f2049bc0969d78d8b11fc5edeb5498eabaf9e92e39e8680574fdf5381d0e8378"
+    }
+  },
+  "download_strategy": "anubis_pow_file_stream_or_local_drop"
+}

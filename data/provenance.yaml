@@ -1,22 +1,43 @@
 galili_rsos_2022:
   citation: Galili L. et al. R. Soc. Open Sci. 2022
-  paper_doi: 10.1098/rsos.211726
+  paper_doi: 10.1098/rsos.211464
+  paper_doi_note: Crossref/DataCite article DOI is 10.1098/rsos.211464; earlier drafts
+    incorrectly cited 10.1098/rsos.211726.
   dryad_doi: 10.5061/dryad.bzkh1899d
   dryad_landing: https://doi.org/10.5061/dryad.bzkh1899d
   dryad_api: https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1899d
   dryad_version_id: 156393
   local_path: data/raw/galili_dryad/
   processed_path: data/processed/galili_cases.csv
-  status: fixture_synthetic
-  dryad_archives_present: false
+  status: dryad_derived
+  dryad_archives_present: true
   n_processed_rows: 8
+  download_timestamp_utc: '2026-09-13T16:45:32Z'
+  archive_checksums:
+    Deformed_coordinates_and_contact.zip:
+      bytes: 314919
+      sha256: 921b2d8ecd30aa6f73932b71c7f6a85f7aff17f2b6b7268f19e89ac9ce819efc
+    Blood_leakage_-_SPH_coordinates.zip:
+      bytes: 20542725
+      sha256: f2049bc0969d78d8b11fc5edeb5498eabaf9e92e39e8680574fdf5381d0e8378
+  extraction_notes: "Deformed CSVs \u2192 contact_fraction / bbox extents (peak systole).\
+    \ SPH Coordinates.csv \u2192 n_sph_particles (full-domain cloud). Published AP/ROA/leakage\
+    \ filled from results/reference_data.yaml when absent; not recomputed from unlabeled\
+    \ chamber partitions. Never mix undeformed diastole AP 34.4 mm with peak-systole\
+    \ ROA/leakage."
+  cardiac_phase_tagging: All Dryad-derived deformed/SPH rows tagged cardiac_phase=peak_systole;
+    geometry_undeformed diastole row remains separate when present.
   primary_when_present: dryad_derived features with cardiac_phase
   secondary_fallback: published_table_scalars from results/reference_data.yaml
   used_in_layer1: peak-systole AP / ROA / leakage anchors; LOO scores published quantities
-    without treating calibration-blend cases as independent validation
+    without treating calibration-blend cases as independent validation; contact_fraction
+    is an independent Dryad-derived coaptation descriptor
   not_claimed: full mesh/SPH re-simulation; independent external validation of high
-    anchor-weight blended cases
-  notes: Built from data/fixtures/galili_dryad_mini (CI smoke).
+    anchor-weight blended cases; chamber-partitioned leakage recomputed solely from
+    Dryad particle dumps
+  notes: Extracted from local Dryad archives under data/raw/galili_dryad/ (real Galili
+    deformed contact CSVs + SPH Coordinates.csv). AP/ROA/leakage table-backed where
+    coordinate dumps lack annulus landmarks / chamber partitions.
   expected_layout: "Expected Dryad drop layout\n--------------------------\ndata/raw/galili_dryad/\n\
     \  Deformed_coordinates_and_contact.zip\n  Blood_leakage_-_SPH_coordinates.zip\n\
     \nAfter unpack (importer also accepts already-unpacked folders with the same\n\

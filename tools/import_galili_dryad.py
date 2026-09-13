@@ -70,13 +70,40 @@ REFERENCE = ROOT / "results" / "reference_data.yaml"
 FIXTURE = ROOT / "data" / "fixtures" / "galili_dryad_mini"
 
 DRYAD_DOI = "10.5061/dryad.bzkh1899d"
-PAPER_DOI = "10.1098/rsos.211726"
+# Crossref / DataCite cite the RSOS article as 10.1098/rsos.211464 (not 211726).
+PAPER_DOI = "10.1098/rsos.211464"
 DRYAD_LANDING = f"https://doi.org/{DRYAD_DOI}"
 DRYAD_API = "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1899d"
 DRYAD_VERSION_ID = 156393
 DRYAD_FILES = {
     "Deformed_coordinates_and_contact.zip": 1226888,
     "Blood_leakage_-_SPH_coordinates.zip": 1226889,
+}
+
+# Real Dryad archive basenames → Layer-1 case_id (peak systole deformed / SPH dumps).
+DRYAD_CASE_NAME_MAP = {
+    "fmr disease": "pathology",
+    "fmr_disease": "pathology",
+    "disease": "pathology",
+    "ima-ap 30": "ima_ap_30",
+    "ima-ap 50": "ima_ap_50",
+    "ima-ap 70": "ima_ap_70",
+    "ima-cs 14": "ima_cs_14",
+    "ima-cs 18": "ima_cs_18",
+    "ima-cs 22": "ima_cs_22",
+    "ima-ap 30%": "ima_ap_30",
+    "ima-ap 50%": "ima_ap_50",
+    "ima-ap 70%": "ima_ap_70",
+    "ima-cs 14%": "ima_cs_14",
+    "ima-cs 18%": "ima_cs_18",
+    "ima-cs 22%": "ima_cs_22",
+    "ima_ap_30": "ima_ap_30",
+    "ima_ap_50": "ima_ap_50",
+    "ima_ap_70": "ima_ap_70",
+    "ima_cs_14": "ima_cs_14",
+    "ima_cs_18": "ima_cs_18",
+    "ima_cs_22": "ima_cs_22",
+    "pathology": "pathology",
 }
 
 EXPECTED_LAYOUT = """
@@ -131,9 +158,99 @@ def _ua() -> dict[str, str]:
 
 
 def _norm_case_id(raw: str) -> str:
-    key = re.sub(r"[\s]+", "_", raw.strip().lower().replace("-", "_"))
-    key = key.replace("__", "_")
+    s = raw.strip().lower()
+    # Strip extension and common Dryad punctuation (IMA-AP 50%.csv).
+    s = re.sub(r"\.csv$", "", s)
+    s = s.replace("%", "")
+    if s in DRYAD_CASE_NAME_MAP:
+        return DRYAD_CASE_NAME_MAP[s]
+    # Compact form: "ima-ap 50" / "ima_ap_50"
+    compact = re.sub(r"[\s]+", " ", s).strip()
+    if compact in DRYAD_CASE_NAME_MAP:
+        return DRYAD_CASE_NAME_MAP[compact]
+    key = re.sub(r"[\s]+", "_", s.replace("-", "_"))
+    key = key.replace("__", "_").strip("_")
+    if key in DRYAD_CASE_NAME_MAP:
+        return DRYAD_CASE_NAME_MAP[key]
     return CASE_ID_ALIASES.get(key, key)
+
+
+def _sha256_file(path: Path) -> str:
+    import hashlib
+
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _parse_deformed_contact_csv(path: Path) -> dict[str, Any]:
+    """Parse Galili Dryad deformed leaflet+contact node dump.
+
+    Columns: node#, x (mm), y (mm), z (mm), In contact (Y=1/N=1)
+    Returns contact fraction and bounding-box extents. Does **not** invent
+    published AP/ROA from these nodes (annulus landmarks are not labeled).
+    """
+    text = path.read_text(encoding="utf-8-sig", errors="replace")
+    reader = csv.reader(io.StringIO(text))
+    next(reader, None)  # header
+    xs: list[float] = []
+    ys: list[float] = []
+    zs: list[float] = []
+    n_contact = 0
+    n = 0
+    for row in reader:
+        if len(row) < 5:
+            continue
+        try:
+            x, y, z = float(row[1]), float(row[2]), float(row[3])
+            c = int(float(row[4]))
+        except (TypeError, ValueError):
+            continue
+        xs.append(x)
+        ys.append(y)
+        zs.append(z)
+        n += 1
+        if c:
+            n_contact += 1
+    if n == 0:
+        return {"n_nodes": 0, "n_contact": 0, "contact_fraction": None}
+    return {
+        "n_nodes": n,
+        "n_contact": n_contact,
+        "contact_fraction": n_contact / n,
+        "bbox_dx_mm": max(xs) - min(xs),
+        "bbox_dy_mm": max(ys) - min(ys),
+        "bbox_dz_mm": max(zs) - min(zs),
+    }
+
+
+def _count_sph_coordinate_rows(path: Path) -> int:
+    """Count particle rows in SPH Coordinates.csv (full-domain cloud ≈29k)."""
+    n = 0
+    with path.open(encoding="utf-8-sig", errors="replace") as f:
+        next(f, None)
+        for line in f:
+            if line.strip():
+                n += 1
+    return n
+
+
+def _infer_device_fields(row: dict[str, Any], cid: str) -> None:
+    if cid.startswith("ima_cs"):
+        row["device"] = "IMA-CS"
+        m = re.search(r"(\d+)$", cid)
+        if m:
+            row["shortening_pct"] = float(m.group(1))
+    elif cid.startswith("ima_ap"):
+        row["device"] = "IMA-AP"
+        m = re.search(r"(\d+)$", cid)
+        if m:
+            row["shortening_pct"] = float(m.group(1))
+    elif cid == "pathology":
+        row["device"] = None
+        row["shortening_pct"] = None
 
 
 def _norm_phase(raw: Optional[str], *, default: str = "peak_systole") -> str:
@@ -215,7 +332,13 @@ def _http_get(url: str, timeout: float = 60) -> tuple[bytes, str, str]:
 
 
 def try_download(*, force: bool = False) -> int:
-    """Attempt Dryad metadata + file downloads. Returns 0/2."""
+    """Attempt Dryad metadata + file downloads. Returns 0/2.
+
+    Strategy order:
+      1. Reuse local zips if present (unless ``force``).
+      2. Anubis PoW solver via ``tools/download_dryad_anubis.py`` (file_stream).
+      3. Direct API ``/api/v2/files/{id}/download`` (often 401 without bearer).
+    """
     write_docs()
     RAW.mkdir(parents=True, exist_ok=True)
     marker = RAW / "DOWNLOAD_ATTEMPTED.json"
@@ -225,6 +348,7 @@ def try_download(*, force: bool = False) -> int:
         "version_id": DRYAD_VERSION_ID,
         "files": {},
         "status": "attempted",
+        "strategies": [],
     }
     try:
         meta_bytes, _, final = _http_get(DRYAD_API, timeout=45)
@@ -235,11 +359,9 @@ def try_download(*, force: bool = False) -> int:
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
         info["api_ok"] = False
         info["api_error"] = str(exc)
-        marker.write_text(json.dumps(info, indent=2), encoding="utf-8")
         print("Dryad API metadata failed:", exc, file=sys.stderr)
-        return 2
 
-    # File list
+    # File list (metadata only; downloads often bot-walled).
     try:
         files_bytes, _, _ = _http_get(f"/api/v2/versions/{DRYAD_VERSION_ID}/files", timeout=45)
         files_payload = json.loads(files_bytes.decode("utf-8"))
@@ -256,35 +378,77 @@ def try_download(*, force: bool = False) -> int:
         info["list_error"] = str(exc)
 
     any_ok = False
+    missing: list[str] = []
     for fname, fid in DRYAD_FILES.items():
         dest = RAW / fname
         if dest.is_file() and dest.stat().st_size > 10_000 and not force:
-            info["files"][fname] = {"path": str(dest), "status": "already_present", "bytes": dest.stat().st_size}
-            any_ok = True
-            continue
-        url = f"https://datadryad.org/api/v2/files/{fid}/download"
-        try:
-            data, ctype, final = _http_get(url, timeout=180)
-            if data[:20].lstrip().startswith(b"<!doctype") or data[:15].lstrip().startswith(b"<html"):
-                raise RuntimeError("HTML interstitial (bot wall) instead of zip bytes")
-            if len(data) < 1000:
-                raise ValueError(f"suspiciously small download ({len(data)} bytes)")
-            dest.write_bytes(data)
             info["files"][fname] = {
                 "path": str(dest),
-                "status": "downloaded",
-                "bytes": len(data),
-                "content_type": ctype,
-                "final_url": final,
+                "status": "already_present",
+                "bytes": dest.stat().st_size,
             }
             any_ok = True
-            print("Downloaded", fname, len(data), "bytes")
-        except Exception as exc:  # noqa: BLE001 — honest network report
-            info["files"][fname] = {"status": "blocked", "error": str(exc), "url": url}
-            print("Download blocked for", fname, ":", exc, file=sys.stderr)
+        else:
+            missing.append(fname)
 
-    info["status"] = "partial_or_blocked" if not any_ok else "ok"
-    if not any_ok:
+    if missing or force:
+        # Prefer Anubis PoW path (API bearer download returns 401 for anonymous).
+        anubis = ROOT / "tools" / "download_dryad_anubis.py"
+        if anubis.is_file():
+            import runpy
+
+            info["strategies"].append("anubis_pow_file_stream")
+            print("Attempting Anubis PoW download via tools/download_dryad_anubis.py ...")
+            try:
+                runpy.run_path(str(anubis), run_name="__main__")
+            except SystemExit as exc:
+                info["anubis_exit"] = int(exc.code) if isinstance(exc.code, int) else str(exc.code)
+            except Exception as exc:  # noqa: BLE001
+                info["anubis_error"] = str(exc)
+                print("Anubis downloader failed:", exc, file=sys.stderr)
+            report_path = ROOT / "data" / "raw" / "_anubis" / "download_report.json"
+            if report_path.is_file():
+                try:
+                    info["anubis_report"] = json.loads(report_path.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    pass
+
+        for fname, fid in DRYAD_FILES.items():
+            dest = RAW / fname
+            if dest.is_file() and dest.stat().st_size > 10_000:
+                info["files"][fname] = {
+                    "path": str(dest),
+                    "status": "downloaded_or_present",
+                    "bytes": dest.stat().st_size,
+                }
+                any_ok = True
+                continue
+            url = f"https://datadryad.org/api/v2/files/{fid}/download"
+            info["strategies"].append(f"api_download:{fname}")
+            try:
+                data, ctype, final = _http_get(url, timeout=180)
+                if data[:20].lstrip().startswith(b"<!doctype") or data[:15].lstrip().startswith(b"<html"):
+                    raise RuntimeError("HTML interstitial (bot wall) instead of zip bytes")
+                if len(data) < 1000:
+                    raise ValueError(f"suspiciously small download ({len(data)} bytes)")
+                dest.write_bytes(data)
+                info["files"][fname] = {
+                    "path": str(dest),
+                    "status": "downloaded_api",
+                    "bytes": len(data),
+                    "content_type": ctype,
+                    "final_url": final,
+                }
+                any_ok = True
+                print("Downloaded", fname, len(data), "bytes")
+            except Exception as exc:  # noqa: BLE001 — honest network report
+                info["files"][fname] = {"status": "blocked", "error": str(exc), "url": url}
+                print("Download blocked for", fname, ":", exc, file=sys.stderr)
+
+    info["status"] = "ok" if all(
+        (RAW / fn).is_file() and (RAW / fn).stat().st_size > 10_000 for fn in DRYAD_FILES
+    ) else ("partial" if any_ok else "partial_or_blocked")
+    if info["status"] != "ok":
         info["manual_drop"] = (
             "Download both zips from the Dryad UI and place under data/raw/galili_dryad/, "
             "then re-run: python tools/import_galili_dryad.py --process"
@@ -292,7 +456,7 @@ def try_download(*, force: bool = False) -> int:
         info["note"] = EXPECTED_LAYOUT
     marker.write_text(json.dumps(info, indent=2), encoding="utf-8")
     print("Wrote", marker)
-    return 0 if any_ok else 2
+    return 0 if info["status"] == "ok" else 2
 
 
 def ensure_fixture() -> Path:
@@ -562,8 +726,17 @@ def extract_features(
     drop_dir: Path,
     source_tier: str,
 ) -> list[dict[str, Any]]:
-    """Extract independent AP / ROA-contact / leakage features with cardiac_phase."""
-    roots = _find_archive_roots(drop_dir)
+    """Extract independent AP / ROA-contact / leakage features with cardiac_phase.
+
+    Real Galili Dryad layout (doi:10.5061/dryad.bzkh1899d):
+      - Deformed ``*.csv``: leaflet nodes + binary contact flag (peak systole).
+      - SPH ``*/Coordinates.csv``: full-domain particle cloud (~29k), **not**
+        chamber-partitioned LA vs aorta counts — so regurgitation_pct cannot be
+        recomputed from Dryad alone without fabricating a partition.
+      - Published peak-systole AP / ROA / leakage remain table-backed when
+        filled; contact_fraction / n_sph_particles are Dryad-derived.
+    """
+    roots = _find_archive_roots(drop_dir, force_unzip=True)
     by_id: dict[tuple[str, str], dict[str, Any]] = {}
 
     def _row(cid: str, phase: str) -> dict[str, Any]:
@@ -580,6 +753,8 @@ def extract_features(
                 "annulus_circumference_mm": None,
                 "contact_descriptor": None,
                 "leakage_descriptor": None,
+                "contact_fraction": None,
+                "n_sph_particles": None,
                 "source_tier": source_tier,
                 "source_doi": PAPER_DOI,
                 "dryad_doi": DRYAD_DOI,
@@ -589,7 +764,7 @@ def extract_features(
 
     deformed = roots.get("deformed")
     if deformed is not None:
-        # Prefer summary CSV anywhere under deformed root.
+        # Fixture / curated summary CSV (optional).
         summaries = list(deformed.rglob("cases_summary.csv"))
         for sp in summaries:
             for raw in _read_csv_rows(sp):
@@ -606,19 +781,13 @@ def extract_features(
                 cs = raw.get("contact_score")
                 if cs:
                     row["contact_descriptor"] = f"contact_score={cs}"
+                    try:
+                        row["contact_fraction"] = float(cs)
+                    except (TypeError, ValueError):
+                        pass
                 if raw.get("notes"):
                     row["notes"] = raw["notes"]
-                # Infer device class from case id.
-                if cid.startswith("ima_cs"):
-                    row["device"] = "IMA-CS"
-                    m = re.search(r"(\d+)$", cid)
-                    if m:
-                        row["shortening_pct"] = float(m.group(1))
-                elif cid.startswith("ima_ap"):
-                    row["device"] = "IMA-AP"
-                    m = re.search(r"(\d+)$", cid)
-                    if m:
-                        row["shortening_pct"] = float(m.group(1))
+                _infer_device_fields(row, cid)
 
         for contact in deformed.rglob("contact_nodes.csv"):
             cid = _norm_case_id(contact.parent.name)
@@ -628,6 +797,47 @@ def extract_features(
             n_lines = max(0, sum(1 for _ in contact.open(encoding="utf-8")) - 1)
             prev = row.get("contact_descriptor") or ""
             row["contact_descriptor"] = (prev + f"; n_contact_nodes={n_lines}").strip("; ")
+            _infer_device_fields(row, cid)
+
+        # Real Dryad: per-case deformed coordinate CSVs with contact flag.
+        for csv_path in deformed.rglob("*.csv"):
+            name_l = csv_path.name.lower()
+            if name_l == "cases_summary.csv" or name_l == "contact_nodes.csv":
+                continue
+            if "triangulation" in name_l:
+                continue
+            # Skip if this looks like a coordinates-only SPH file misplaced.
+            head = csv_path.read_text(encoding="utf-8-sig", errors="replace")[:240].lower()
+            if "in contact" not in head and "contact" not in head:
+                continue
+            cid = _norm_case_id(csv_path.stem)
+            if cid in {
+                "deformed_coordinates_and_contact",
+                "mv_atrial_surface_triangulation",
+                "coordinates",
+            }:
+                continue
+            stats = _parse_deformed_contact_csv(csv_path)
+            if not stats.get("n_nodes"):
+                continue
+            row = _row(cid, "peak_systole")
+            _infer_device_fields(row, cid)
+            frac = stats.get("contact_fraction")
+            row["contact_fraction"] = frac
+            parts = [
+                f"n_nodes={stats['n_nodes']}",
+                f"n_contact={stats['n_contact']}",
+                f"contact_fraction={frac:.6f}" if isinstance(frac, float) else "",
+                f"bbox_dx_mm={stats.get('bbox_dx_mm'):.3f}" if stats.get("bbox_dx_mm") is not None else "",
+                f"bbox_dz_mm={stats.get('bbox_dz_mm'):.3f}" if stats.get("bbox_dz_mm") is not None else "",
+                "phase=peak_systole_deformed_coords",
+            ]
+            row["contact_descriptor"] = "; ".join(p for p in parts if p)
+            row["notes"] = (
+                (row.get("notes") or "")
+                + " | Dryad deformed coords: contact flag extracted; "
+                "AP/ROA not invented from unlabeled leaflet nodes"
+            ).strip(" |")
 
     leakage = roots.get("leakage")
     if leakage is not None:
@@ -643,8 +853,30 @@ def extract_features(
                 n_ao = _float_or_none(raw.get("n_particles_aorta"))
                 if n_la is not None and n_ao is not None:
                     row["leakage_descriptor"] = f"n_la={int(n_la)};n_ao={int(n_ao)}"
+                    row["n_sph_particles"] = int(n_la) + int(n_ao)
                 else:
                     row["leakage_descriptor"] = "leakage_summary"
+                _infer_device_fields(row, cid)
+
+        # Real Dryad: SPH Coordinates.csv per case (full-domain particle dump).
+        for coords in leakage.rglob("Coordinates.csv"):
+            cid = _norm_case_id(coords.parent.name)
+            if not cid or cid.startswith("blood_leakage"):
+                continue
+            n_part = _count_sph_coordinate_rows(coords)
+            row = _row(cid, "peak_systole")
+            _infer_device_fields(row, cid)
+            row["n_sph_particles"] = n_part
+            row["leakage_descriptor"] = (
+                f"n_sph_particles={n_part}; "
+                "full_domain_cloud_not_LA_vs_aorta_partition; "
+                "regurgitation_pct not recomputed from coordinates alone"
+            )
+            row["notes"] = (
+                (row.get("notes") or "")
+                + " | Dryad SPH coords counted; leakage % remains table-backed "
+                "(no chamber labels in archive)"
+            ).strip(" |")
 
     rows = list(by_id.values())
     # Phase integrity: clear ROA/leakage on diastole rows if somehow present without phase.
@@ -673,6 +905,8 @@ def write_processed(rows: list[dict[str, Any]]) -> Path:
         "roa_mm2",
         "regurgitation_pct",
         "annulus_circumference_mm",
+        "contact_fraction",
+        "n_sph_particles",
         "contact_descriptor",
         "leakage_descriptor",
         "source_tier",
@@ -702,17 +936,36 @@ def write_processed(rows: list[dict[str, Any]]) -> Path:
     return csv_path
 
 
+def _archive_checksums() -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for fname in DRYAD_FILES:
+        path = RAW / fname
+        if path.is_file() and path.stat().st_size > 0:
+            out[fname] = {
+                "bytes": path.stat().st_size,
+                "sha256": _sha256_file(path),
+            }
+    return out
+
+
 def write_provenance(
     *,
     source_tier: str,
     n_rows: int,
     dryad_present: bool,
     notes: str,
+    extra: Optional[dict[str, Any]] = None,
 ) -> None:
+    from datetime import datetime, timezone
+
     payload = {
         "galili_rsos_2022": {
             "citation": "Galili L. et al. R. Soc. Open Sci. 2022",
             "paper_doi": PAPER_DOI,
+            "paper_doi_note": (
+                "Crossref/DataCite article DOI is 10.1098/rsos.211464; "
+                "earlier drafts incorrectly cited 10.1098/rsos.211726."
+            ),
             "dryad_doi": DRYAD_DOI,
             "dryad_landing": DRYAD_LANDING,
             "dryad_api": DRYAD_API,
@@ -722,21 +975,48 @@ def write_provenance(
             "status": source_tier,
             "dryad_archives_present": dryad_present,
             "n_processed_rows": n_rows,
+            "download_timestamp_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "archive_checksums": _archive_checksums(),
+            "extraction_notes": (
+                "Deformed CSVs → contact_fraction / bbox extents (peak systole). "
+                "SPH Coordinates.csv → n_sph_particles (full-domain cloud). "
+                "Published AP/ROA/leakage filled from results/reference_data.yaml "
+                "when absent; not recomputed from unlabeled chamber partitions. "
+                "Never mix undeformed diastole AP 34.4 mm with peak-systole ROA/leakage."
+            ),
+            "cardiac_phase_tagging": (
+                "All Dryad-derived deformed/SPH rows tagged cardiac_phase=peak_systole; "
+                "geometry_undeformed diastole row remains separate when present."
+            ),
             "primary_when_present": "dryad_derived features with cardiac_phase",
             "secondary_fallback": "published_table_scalars from results/reference_data.yaml",
             "used_in_layer1": (
                 "peak-systole AP / ROA / leakage anchors; LOO scores published quantities "
-                "without treating calibration-blend cases as independent validation"
+                "without treating calibration-blend cases as independent validation; "
+                "contact_fraction is an independent Dryad-derived coaptation descriptor"
             ),
             "not_claimed": (
                 "full mesh/SPH re-simulation; independent external validation of "
-                "high anchor-weight blended cases"
+                "high anchor-weight blended cases; chamber-partitioned leakage "
+                "recomputed solely from Dryad particle dumps"
             ),
             "notes": notes,
             "expected_layout": EXPECTED_LAYOUT,
         }
     }
+    if extra:
+        payload["galili_rsos_2022"].update(extra)
     PROVENANCE.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+
+    # Lightweight manifest next to archives (no binary commit required).
+    if dryad_present:
+        manifest = {
+            "dryad_doi": DRYAD_DOI,
+            "paper_doi": PAPER_DOI,
+            "checksums": _archive_checksums(),
+            "download_strategy": "anubis_pow_file_stream_or_local_drop",
+        }
+        (RAW / "MANIFEST.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
 
 def process(*, from_fixture: bool = False, allow_table_fallback: bool = True) -> Path:
@@ -751,11 +1031,16 @@ def process(*, from_fixture: bool = False, allow_table_fallback: bool = True) ->
         source_tier = "fixture_synthetic"
         notes = "Built from data/fixtures/galili_dryad_mini (CI smoke)."
     else:
-        dryad_roots = _find_archive_roots(RAW)
+        dryad_roots = _find_archive_roots(RAW, force_unzip=True)
         if dryad_roots:
             rows = extract_features(drop_dir=RAW, source_tier="dryad_derived")
             source_tier = "dryad_derived"
-            notes = "Extracted from local Dryad drop under data/raw/galili_dryad/."
+            notes = (
+                "Extracted from local Dryad archives under data/raw/galili_dryad/ "
+                "(real Galili deformed contact CSVs + SPH Coordinates.csv). "
+                "AP/ROA/leakage table-backed where coordinate dumps lack annulus "
+                "landmarks / chamber partitions."
+            )
         elif allow_table_fallback:
             rows = _load_table_scalar_rows()
             source_tier = "published_table_scalars"
@@ -775,13 +1060,27 @@ def process(*, from_fixture: bool = False, allow_table_fallback: bool = True) ->
             t = table.get(key)
             if t is None:
                 continue
-            for field in ("roa_mm2", "regurgitation_pct", "ap_diameter_mm", "device", "shortening_pct"):
+            for field in (
+                "roa_mm2",
+                "regurgitation_pct",
+                "ap_diameter_mm",
+                "device",
+                "shortening_pct",
+                "annulus_circumference_mm",
+            ):
                 if r.get(field) is None and t.get(field) is not None:
                     r[field] = t[field]
                     r["notes"] = (
                         (r.get("notes") or "")
                         + f" | filled {field} from published_table_scalars"
                     ).strip(" |")
+        # Ensure undeformed diastole geometry row present for phase honesty.
+        if ("geometry_undeformed", "undeformed_diastole") not in {
+            (r["case_id"], r["cardiac_phase"]) for r in rows
+        }:
+            geo = table.get(("geometry_undeformed", "undeformed_diastole"))
+            if geo:
+                rows.append(dict(geo))
 
     csv_path = write_processed(rows)
     dryad_present = bool(_find_archive_roots(RAW))

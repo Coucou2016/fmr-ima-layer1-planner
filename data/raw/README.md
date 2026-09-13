@@ -2,7 +2,7 @@
 
 ## Galili et al. RSOS 2022 supporting files
 
-- Paper: https://doi.org/10.1098/rsos.211726
+- Paper: https://doi.org/10.1098/rsos.211464
 - Dryad: https://doi.org/10.5061/dryad.bzkh1899d
 - Dryad API dataset: `https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1899d`
 - Known version id: `156393`
