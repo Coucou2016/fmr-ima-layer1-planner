@@ -14,9 +14,11 @@ heldout_targets:
   case_ids: [ima_cs_14, ima_cs_18, ima_ap_30, ima_ap_70]
   leave_one_out_plan: >
     With only seven discrete Galili cases, rotate each case out of the
-    calibration set and score peak-systolic AP / ROA / leakage reproduction
-    without raising that case's anchor blend. Full Dryad time-series training
-    is P1 (doi:10.5061/dryad.bzkh1899d).
+    calibration set and score peak-systolic AP / ROA / leakage with blend OFF
+    (tools/loo_evaluate.py). Do not advertise calibration-blend cases as
+    independent validation. Prefer Dryad-derived rows in
+    data/processed/galili_cases.csv when source_tier=dryad_derived; otherwise
+    published table scalars are the secondary path (doi:10.5061/dryad.bzkh1899d).
 
 # Published leakage anchors used for reproduction blend at calibration IDs.
 regurgitation_pct_anchors:

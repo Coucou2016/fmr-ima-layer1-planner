@@ -1,0 +1,540 @@
+{
+  "paper_doi": "10.1098/rsos.211726",
+  "dryad_doi": "10.5061/dryad.bzkh1899d",
+  "heldout_evaluation": {
+    "mode": "heldout",
+    "catalog": "processed_galili_cases:fixture_synthetic+reference_fill",
+    "splits": {
+      "calibration_targets": [
+        "pathology",
+        "ima_cs_22",
+        "ima_ap_50"
+      ],
+      "heldout_targets": [
+        "ima_cs_14",
+        "ima_cs_18",
+        "ima_ap_30",
+        "ima_ap_70"
+      ]
+    },
+    "honesty": "Held-out scores use blend=OFF. Calibration IDs with blend=ON are reproduction, not independent validation. Physics-only scores on calibration IDs remain diagnostics because those IDs informed scales.",
+    "heldout": [
+      {
+        "role": "heldout",
+        "published": {
+          "ap_diameter_mm": 25.5,
+          "roa_mm2": 56.7,
+          "regurgitation_pct": 0.52,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_cs_14",
+        "blend": false,
+        "pred_ap_diameter_mm": 25.5,
+        "pred_roa_mm2": 24.023941571792783,
+        "pred_regurgitation_pct": 0.6534828992684382,
+        "pred_physics_regurgitation_pct": 0.6534828992684382,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -32.67605842820722,
+        "err_regurgitation_pct_points": 0.13348289926843815,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 32.67605842820722,
+        "abs_err_regurgitation_pct_points": 0.13348289926843815,
+        "validation_claim_allowed": true
+      },
+      {
+        "role": "heldout",
+        "published": {
+          "ap_diameter_mm": 24.7,
+          "roa_mm2": 55.3,
+          "regurgitation_pct": 0.41,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_cs_18",
+        "blend": false,
+        "pred_ap_diameter_mm": 24.7,
+        "pred_roa_mm2": 17.62116350132216,
+        "pred_regurgitation_pct": 0.33844878486310986,
+        "pred_physics_regurgitation_pct": 0.33844878486310986,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -37.67883649867784,
+        "err_regurgitation_pct_points": -0.07155121513689011,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 37.67883649867784,
+        "abs_err_regurgitation_pct_points": 0.07155121513689011,
+        "validation_claim_allowed": true
+      },
+      {
+        "role": "heldout",
+        "published": {
+          "ap_diameter_mm": 20.7,
+          "roa_mm2": 51.1,
+          "regurgitation_pct": 0.16,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_ap_30",
+        "blend": false,
+        "pred_ap_diameter_mm": 20.7,
+        "pred_roa_mm2": 14.900532167450994,
+        "pred_regurgitation_pct": 0.2805379827293679,
+        "pred_physics_regurgitation_pct": 0.2805379827293679,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -36.199467832549004,
+        "err_regurgitation_pct_points": 0.12053798272936792,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 36.199467832549004,
+        "abs_err_regurgitation_pct_points": 0.12053798272936792,
+        "validation_claim_allowed": true
+      },
+      {
+        "role": "heldout",
+        "published": {
+          "ap_diameter_mm": 12.4,
+          "roa_mm2": 46.1,
+          "regurgitation_pct": 0.13,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_ap_70",
+        "blend": false,
+        "pred_ap_diameter_mm": 12.4,
+        "pred_roa_mm2": 140.2731618638105,
+        "pred_regurgitation_pct": 5.585169706665461,
+        "pred_physics_regurgitation_pct": 5.585169706665461,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": 94.17316186381049,
+        "err_regurgitation_pct_points": 5.455169706665461,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 94.17316186381049,
+        "abs_err_regurgitation_pct_points": 5.455169706665461,
+        "validation_claim_allowed": true
+      }
+    ],
+    "calibration_reproduction": [
+      {
+        "role": "calibration_reproduction",
+        "published": {
+          "ap_diameter_mm": 26.1,
+          "roa_mm2": 172.8,
+          "regurgitation_pct": 5.26,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "pathology",
+        "blend": true,
+        "pred_ap_diameter_mm": 26.1,
+        "pred_roa_mm2": 154.6633247671995,
+        "pred_regurgitation_pct": 5.058620689655172,
+        "pred_physics_regurgitation_pct": 4.546389994566804,
+        "pred_blended_regurgitation_pct": 5.058620689655172,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -18.136675232800513,
+        "err_regurgitation_pct_points": -0.20137931034482737,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 18.136675232800513,
+        "abs_err_regurgitation_pct_points": 0.20137931034482737,
+        "validation_claim_allowed": false
+      },
+      {
+        "role": "calibration_reproduction",
+        "published": {
+          "ap_diameter_mm": 24.8,
+          "roa_mm2": 48.2,
+          "regurgitation_pct": 0.29,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_cs_22",
+        "blend": true,
+        "pred_ap_diameter_mm": 24.8,
+        "pred_roa_mm2": 12.70472882784573,
+        "pred_regurgitation_pct": 0.2655172413793103,
+        "pred_physics_regurgitation_pct": 0.1520689846532393,
+        "pred_blended_regurgitation_pct": 0.2655172413793103,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -35.495271172154276,
+        "err_regurgitation_pct_points": -0.02448275862068966,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 35.495271172154276,
+        "abs_err_regurgitation_pct_points": 0.02448275862068966,
+        "validation_claim_allowed": false
+      },
+      {
+        "role": "calibration_reproduction",
+        "published": {
+          "ap_diameter_mm": 15.9,
+          "roa_mm2": 27.3,
+          "regurgitation_pct": 0.08,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_ap_50",
+        "blend": true,
+        "pred_ap_diameter_mm": 15.9,
+        "pred_roa_mm2": 25.955418219332568,
+        "pred_regurgitation_pct": 0.0793103448275862,
+        "pred_physics_regurgitation_pct": 0.08040957439076453,
+        "pred_blended_regurgitation_pct": 0.0793103448275862,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -1.3445817806674327,
+        "err_regurgitation_pct_points": -0.0006896551724138028,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 1.3445817806674327,
+        "abs_err_regurgitation_pct_points": 0.0006896551724138028,
+        "validation_claim_allowed": false
+      }
+    ],
+    "calibration_physics_diagnostic": [
+      {
+        "role": "calibration_physics_diagnostic",
+        "published": {
+          "ap_diameter_mm": 26.1,
+          "roa_mm2": 172.8,
+          "regurgitation_pct": 5.26,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "pathology",
+        "blend": false,
+        "pred_ap_diameter_mm": 26.1,
+        "pred_roa_mm2": 154.6633247671995,
+        "pred_regurgitation_pct": 4.546389994566804,
+        "pred_physics_regurgitation_pct": 4.546389994566804,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -18.136675232800513,
+        "err_regurgitation_pct_points": -0.7136100054331962,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 18.136675232800513,
+        "abs_err_regurgitation_pct_points": 0.7136100054331962,
+        "validation_claim_allowed": false
+      },
+      {
+        "role": "calibration_physics_diagnostic",
+        "published": {
+          "ap_diameter_mm": 24.8,
+          "roa_mm2": 48.2,
+          "regurgitation_pct": 0.29,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_cs_22",
+        "blend": false,
+        "pred_ap_diameter_mm": 24.8,
+        "pred_roa_mm2": 12.70472882784573,
+        "pred_regurgitation_pct": 0.1520689846532393,
+        "pred_physics_regurgitation_pct": 0.1520689846532393,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -35.495271172154276,
+        "err_regurgitation_pct_points": -0.1379310153467607,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 35.495271172154276,
+        "abs_err_regurgitation_pct_points": 0.1379310153467607,
+        "validation_claim_allowed": false
+      },
+      {
+        "role": "calibration_physics_diagnostic",
+        "published": {
+          "ap_diameter_mm": 15.9,
+          "roa_mm2": 27.3,
+          "regurgitation_pct": 0.08,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_ap_50",
+        "blend": false,
+        "pred_ap_diameter_mm": 15.9,
+        "pred_roa_mm2": 25.955418219332568,
+        "pred_regurgitation_pct": 0.08040957439076453,
+        "pred_physics_regurgitation_pct": 0.08040957439076453,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -1.3445817806674327,
+        "err_regurgitation_pct_points": 0.00040957439076452773,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 1.3445817806674327,
+        "abs_err_regurgitation_pct_points": 0.00040957439076452773,
+        "validation_claim_allowed": false
+      }
+    ],
+    "summary": {
+      "label": "heldout_blend_off",
+      "n": 4,
+      "mae_ap_mm": 0.0,
+      "mae_roa_mm2": 50.18188115581114,
+      "mae_regurgitation_pct_points": 1.4451854509500393
+    }
+  },
+  "loo_evaluation": {
+    "mode": "loo",
+    "catalog": "processed_galili_cases:fixture_synthetic+reference_fill",
+    "splits": {
+      "calibration_targets": [
+        "pathology",
+        "ima_cs_22",
+        "ima_ap_50"
+      ],
+      "heldout_targets": [
+        "ima_cs_14",
+        "ima_cs_18",
+        "ima_ap_30",
+        "ima_ap_70"
+      ]
+    },
+    "honesty": "Leave-one-case-out over seven discrete Galili peak-systole cases. Not patient-level external validation. Calibration-blend cases must not be advertised as validated when blend was used.",
+    "folds": [
+      {
+        "role": "loo_heldout",
+        "published": {
+          "ap_diameter_mm": 26.1,
+          "roa_mm2": 172.8,
+          "regurgitation_pct": 5.26,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "pathology",
+        "blend": false,
+        "pred_ap_diameter_mm": 26.1,
+        "pred_roa_mm2": 154.6633247671995,
+        "pred_regurgitation_pct": 4.546389994566804,
+        "pred_physics_regurgitation_pct": 4.546389994566804,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -18.136675232800513,
+        "err_regurgitation_pct_points": -0.7136100054331962,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 18.136675232800513,
+        "abs_err_regurgitation_pct_points": 0.7136100054331962,
+        "validation_claim_allowed": true,
+        "notional_calibration_pool": [
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "anchor_blend_applied": false,
+        "note": "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports physics prediction vs published peak-systole quantities for the held-out case_id."
+      },
+      {
+        "role": "loo_heldout",
+        "published": {
+          "ap_diameter_mm": 25.5,
+          "roa_mm2": 56.7,
+          "regurgitation_pct": 0.52,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_cs_14",
+        "blend": false,
+        "pred_ap_diameter_mm": 25.5,
+        "pred_roa_mm2": 24.023941571792783,
+        "pred_regurgitation_pct": 0.6534828992684382,
+        "pred_physics_regurgitation_pct": 0.6534828992684382,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -32.67605842820722,
+        "err_regurgitation_pct_points": 0.13348289926843815,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 32.67605842820722,
+        "abs_err_regurgitation_pct_points": 0.13348289926843815,
+        "validation_claim_allowed": true,
+        "notional_calibration_pool": [
+          "pathology",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "anchor_blend_applied": false,
+        "note": "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports physics prediction vs published peak-systole quantities for the held-out case_id."
+      },
+      {
+        "role": "loo_heldout",
+        "published": {
+          "ap_diameter_mm": 24.7,
+          "roa_mm2": 55.3,
+          "regurgitation_pct": 0.41,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_cs_18",
+        "blend": false,
+        "pred_ap_diameter_mm": 24.7,
+        "pred_roa_mm2": 17.62116350132216,
+        "pred_regurgitation_pct": 0.33844878486310986,
+        "pred_physics_regurgitation_pct": 0.33844878486310986,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -37.67883649867784,
+        "err_regurgitation_pct_points": -0.07155121513689011,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 37.67883649867784,
+        "abs_err_regurgitation_pct_points": 0.07155121513689011,
+        "validation_claim_allowed": true,
+        "notional_calibration_pool": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "anchor_blend_applied": false,
+        "note": "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports physics prediction vs published peak-systole quantities for the held-out case_id."
+      },
+      {
+        "role": "loo_heldout",
+        "published": {
+          "ap_diameter_mm": 24.8,
+          "roa_mm2": 48.2,
+          "regurgitation_pct": 0.29,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_cs_22",
+        "blend": false,
+        "pred_ap_diameter_mm": 24.8,
+        "pred_roa_mm2": 12.70472882784573,
+        "pred_regurgitation_pct": 0.1520689846532393,
+        "pred_physics_regurgitation_pct": 0.1520689846532393,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -35.495271172154276,
+        "err_regurgitation_pct_points": -0.1379310153467607,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 35.495271172154276,
+        "abs_err_regurgitation_pct_points": 0.1379310153467607,
+        "validation_claim_allowed": true,
+        "notional_calibration_pool": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "anchor_blend_applied": false,
+        "note": "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports physics prediction vs published peak-systole quantities for the held-out case_id."
+      },
+      {
+        "role": "loo_heldout",
+        "published": {
+          "ap_diameter_mm": 20.7,
+          "roa_mm2": 51.1,
+          "regurgitation_pct": 0.16,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_ap_30",
+        "blend": false,
+        "pred_ap_diameter_mm": 20.7,
+        "pred_roa_mm2": 14.900532167450994,
+        "pred_regurgitation_pct": 0.2805379827293679,
+        "pred_physics_regurgitation_pct": 0.2805379827293679,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -36.199467832549004,
+        "err_regurgitation_pct_points": 0.12053798272936792,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 36.199467832549004,
+        "abs_err_regurgitation_pct_points": 0.12053798272936792,
+        "validation_claim_allowed": true,
+        "notional_calibration_pool": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "anchor_blend_applied": false,
+        "note": "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports physics prediction vs published peak-systole quantities for the held-out case_id."
+      },
+      {
+        "role": "loo_heldout",
+        "published": {
+          "ap_diameter_mm": 15.9,
+          "roa_mm2": 27.3,
+          "regurgitation_pct": 0.08,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_ap_50",
+        "blend": false,
+        "pred_ap_diameter_mm": 15.9,
+        "pred_roa_mm2": 25.955418219332568,
+        "pred_regurgitation_pct": 0.08040957439076453,
+        "pred_physics_regurgitation_pct": 0.08040957439076453,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": -1.3445817806674327,
+        "err_regurgitation_pct_points": 0.00040957439076452773,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 1.3445817806674327,
+        "abs_err_regurgitation_pct_points": 0.00040957439076452773,
+        "validation_claim_allowed": true,
+        "notional_calibration_pool": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_70"
+        ],
+        "anchor_blend_applied": false,
+        "note": "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports physics prediction vs published peak-systole quantities for the held-out case_id."
+      },
+      {
+        "role": "loo_heldout",
+        "published": {
+          "ap_diameter_mm": 12.4,
+          "roa_mm2": 46.1,
+          "regurgitation_pct": 0.13,
+          "cardiac_phase": "peak_systole"
+        },
+        "case_id": "ima_ap_70",
+        "blend": false,
+        "pred_ap_diameter_mm": 12.4,
+        "pred_roa_mm2": 140.2731618638105,
+        "pred_regurgitation_pct": 5.585169706665461,
+        "pred_physics_regurgitation_pct": 5.585169706665461,
+        "pred_blended_regurgitation_pct": null,
+        "cardiac_phase": "peak_systole",
+        "err_ap_mm": 0.0,
+        "err_roa_mm2": 94.17316186381049,
+        "err_regurgitation_pct_points": 5.455169706665461,
+        "abs_err_ap_mm": 0.0,
+        "abs_err_roa_mm2": 94.17316186381049,
+        "abs_err_regurgitation_pct_points": 5.455169706665461,
+        "validation_claim_allowed": true,
+        "notional_calibration_pool": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50"
+        ],
+        "anchor_blend_applied": false,
+        "note": "No per-fold re-estimation of SPH/ROA scales in Layer-1; LOO reports physics prediction vs published peak-systole quantities for the held-out case_id."
+      }
+    ],
+    "summary": {
+      "label": "loo_blend_off",
+      "n": 7,
+      "mae_ap_mm": 0.0,
+      "mae_roa_mm2": 36.52915040126668,
+      "mae_regurgitation_pct_points": 0.9475274855672683
+    }
+  }
+}

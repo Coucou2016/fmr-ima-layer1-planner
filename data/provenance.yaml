@@ -1,11 +1,31 @@
-# Dataset provenance for FMR IMA Layer-1
-
 galili_rsos_2022:
-  citation: "Galili L. et al. R. Soc. Open Sci. 2022"
-  paper_doi: "10.1098/rsos.211726"
-  dryad_doi: "10.5061/dryad.bzkh1899d"
-  dryad_landing: "https://doi.org/10.5061/dryad.bzkh1899d"
-  local_path: "data/raw/galili_dryad/"
-  status: "stub — download with tools/import_galili_dryad.py --download when network allows"
-  used_in_layer1: "published peak-systole table scalars only (reference_data.yaml)"
-  not_yet_used: "full Dryad trajectories / meshes for leave-one-out training"
+  citation: Galili L. et al. R. Soc. Open Sci. 2022
+  paper_doi: 10.1098/rsos.211726
+  dryad_doi: 10.5061/dryad.bzkh1899d
+  dryad_landing: https://doi.org/10.5061/dryad.bzkh1899d
+  dryad_api: https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1899d
+  dryad_version_id: 156393
+  local_path: data/raw/galili_dryad/
+  processed_path: data/processed/galili_cases.csv
+  status: fixture_synthetic
+  dryad_archives_present: false
+  n_processed_rows: 8
+  primary_when_present: dryad_derived features with cardiac_phase
+  secondary_fallback: published_table_scalars from results/reference_data.yaml
+  used_in_layer1: peak-systole AP / ROA / leakage anchors; LOO scores published quantities
+    without treating calibration-blend cases as independent validation
+  not_claimed: full mesh/SPH re-simulation; independent external validation of high
+    anchor-weight blended cases
+  notes: Built from data/fixtures/galili_dryad_mini (CI smoke).
+  expected_layout: "Expected Dryad drop layout\n--------------------------\ndata/raw/galili_dryad/\n\
+    \  Deformed_coordinates_and_contact.zip\n  Blood_leakage_-_SPH_coordinates.zip\n\
+    \nAfter unpack (importer also accepts already-unpacked folders with the same\n\
+    basenames, with or without the .zip suffix):\n\n  Deformed_coordinates_and_contact/\n\
+    \    cases_summary.csv\n      required columns (case-insensitive):\n        case_id,\
+    \ cardiac_phase, ap_diameter_mm\n      optional: roa_mm2, contact_score, annulus_circumference_mm,\
+    \ notes\n    <case_id>/contact_nodes.csv   # visualization / contact descriptors\
+    \ only\n      columns: x,y,z[,force_n]\n\n  Blood_leakage_-_SPH_coordinates/\n\
+    \    <case_id>/leakage_summary.csv\n      columns: case_id, cardiac_phase, regurgitation_pct\n\
+    \      optional: n_particles_la, n_particles_aorta\n\nCardiac phase MUST be explicit.\
+    \ Rows with cardiac_phase containing\n'undformed'/'diastole' are stored separately\
+    \ and never merged into\npeak-systole ROA/leakage features without the phase tag."

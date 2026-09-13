@@ -36,5 +36,6 @@ results/output/**
 !results/output/paper_tables/**
 !results/output/planner/
 !results/output/planner/**
+!results/output/loo_evaluation.json
 
 # Optional: keep recommendation JSON only under planner; ignore other planner noise if added later

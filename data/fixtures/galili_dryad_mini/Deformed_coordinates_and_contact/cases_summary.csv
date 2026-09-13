@@ -1,0 +1,9 @@
+case_id,cardiac_phase,ap_diameter_mm,roa_mm2,annulus_circumference_mm,contact_score,notes
+pathology,peak_systole,26.1,172.8,118.5,0.82,fixture mirrors published peak-systole anchors
+ima_cs_14,peak_systole,25.5,56.7,117.0,0.55,fixture held-out
+ima_cs_18,peak_systole,24.7,55.3,116.0,0.48,fixture held-out
+ima_cs_22,peak_systole,24.8,48.2,115.0,0.41,fixture
+ima_ap_30,peak_systole,20.7,51.1,112.0,0.3,fixture held-out
+ima_ap_50,peak_systole,15.9,27.3,110.0,0.22,fixture — NOT undeformed 34.4
+ima_ap_70,peak_systole,12.4,46.1,108.0,0.35,commissural leak fixture
+geometry_undeformed,undeformed_diastole,34.4,,118.5,,diastole geometry only

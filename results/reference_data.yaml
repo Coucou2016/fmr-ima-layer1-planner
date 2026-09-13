@@ -148,7 +148,9 @@ calibration_targets:
 
 heldout_targets:
   description: >
-    Reserved for leave-one-out / held-out checks once Dryad time-series are imported (P1).
+    Reserved for leave-one-out / held-out checks (tools/loo_evaluate.py).
+    Blend OFF vs published peak-systole quantities. Prefer Dryad-derived
+    data/processed/galili_cases.csv when present; table scalars are secondary.
     With only seven discrete Galili cases, full independent validation is not claimed.
   case_ids: [ima_cs_14, ima_cs_18, ima_ap_30, ima_ap_70]
   leave_one_out_plan: >
