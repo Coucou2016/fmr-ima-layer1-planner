@@ -18,7 +18,7 @@
 
 **Methods.** We implement a reproducible Python Layer-1 surrogate: phenomenological mechanics plus a literature-calibrated leakage proxy. Provenance prefers Dryad doi:10.5061/dryad.bzkh1899d when local archives are present, with published table scalars as a documented secondary path. Calibration vs held-out splits and leave-one-case-out scoring are explicit. A discrete scenario ranker minimizes physics leakage-proxy regurgitation subject to an AP ceiling, an illustrative NiTi engineering screen, and a Rottländer CS–LCx risk-screening threshold, reporting P(feasible), η ranking stability, and a Pareto frontier (leakage vs AP reduction vs LCx vs strain). Dual-suture commissural ×0.5 is an exploratory hypothesis parameter. Prefer patient-measured CS–LCx; the cinch slope is a labeled assumption.
 
-**Results (seed=42).** Under the planning map the ranker evaluates 36 points and retains 30 feasible designs (P(feasible)=0.833 on the device grid). Best candidate under stated assumptions: **IMA-AP dual suture 60%** (assumption η_ap=0.30 → AP reduction **18.0%**, physics leakage-proxy **~0.074%**, jet=`central`). Best feasible IMA-CS: bridge **20%** (CS–LCx **8.6 mm** at the risk-screen edge). η assumption-prior sensitivity shifts the top-ranked setting; this is not FEA UQ. Held-out / LOO metrics score blend-off predictions against published peak-systole quantities without advertising calibration-blend cases as validated.
+**Results (seed=42).** Under the planning map the ranker evaluates 36 points and retains 30 feasible designs (P(feasible)≈0.86 on the device grid). Best candidate under stated assumptions: **IMA-AP dual suture 60%** (assumption η_ap=0.30 → AP reduction **18.0%**, physics leakage-proxy **~0.074%**, jet=`central`). Best feasible IMA-CS: bridge **20%** (CS–LCx **8.6 mm** at the risk-screen edge). η assumption-prior sensitivity shifts the top-ranked setting (top-1 stability ~0.33 under ±20% η sampling); this is not FEA UQ. Held-out / LOO metrics score blend-off predictions against published peak-systole quantities without advertising calibration-blend cases as validated.
 
 **Conclusions.** A literature-anchored low-order surrogate can support **exploratory screening** of IMA strategy settings with inspectable assumptions and uncertainty language. It is not a preoperative clinical decision system and must not equate physics % with clinical regurgitant volume.
 
@@ -77,7 +77,7 @@ Runnable entry points: `run_pipeline.py`, `python -m analysis.planner`, `python 
 
 ### 5.2 Exploratory scenario ranking (planning map, seed=42)
 
-- Evaluated **36** / feasible **30** (P(feasible)≈0.83)
+- Evaluated **36** / feasible **30** (P(feasible)≈0.86 on the device grid)
 - **Best candidate under assumptions:** IMA-AP dual **60%**, AP **18.0%**, physics **~0.074%**, jet=`central`
 - Best IMA-CS: **20%** bridge, CS–LCx **8.6 mm** at risk-screen edge
 - Dual-suture jet rule: exploratory hypothesis only
