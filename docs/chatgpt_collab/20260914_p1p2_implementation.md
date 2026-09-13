@@ -63,6 +63,19 @@ python run_pipeline.py --seed 42 --paper --no-export
 python tools/package_reports.py
 ```
 
+- Pytest: **49 passed**
+- Seed-42 best under assumptions: IMA-AP dual 60%, AP 18.0%, physics ~0.074%, jet=central
+- P(feasible)≈0.86; η top-1 stability ≈0.33; Pareto size=2
+- Held-out MAE (blend OFF): AP=0.0 mm, ROA≈50.2 mm², leak≈1.45 pp
+- LOO MAE (blend OFF): AP=0.0 mm, ROA≈36.5 mm², leak≈0.95 pp
+
+## Commits
+
+- `e9bbb83` Dryad import + LOO
+- `ec3449b` Uncertainty ranker + terminology
+- `ff9e1c5` P2 packaging + manuscript
+- Prior tip: `17237bc` P0
+
 ## Remaining gaps
 
 - Real Dryad zip unpack on this host (requires manual browser download past Anubis).
