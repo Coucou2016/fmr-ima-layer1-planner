@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fmr-ima-layer1-planner"
+version = "0.2.0"
+description = "Literature-anchored Layer-1 exploratory surrogate for IMA-CS / IMA-AP screening"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "FMR IMA Layer-1 planner contributors" }]
+keywords = [
+  "functional-mitral-regurgitation",
+  "indirect-mitral-annuloplasty",
+  "surrogate",
+  "exploratory-screening",
+]
+dependencies = [
+  "numpy>=1.24,<3",
+  "scipy>=1.10,<2",
+  "matplotlib>=3.7,<4",
+  "SciencePlots>=2.1,<3",
+  "Pillow>=9.0,<12",
+  "PyYAML>=6.0,<7",
+  "pandas>=2.0,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0,<9", "pytest-cov>=4.0,<7", "ruff>=0.4"]
+packaging = ["playwright>=1.40,<2"]
+
+[project.urls]
+Homepage = "https://github.com/Coucou2016/fmr-ima-layer1-planner"
+Repository = "https://github.com/Coucou2016/fmr-ima-layer1-planner"
+
+[project.scripts]
+fmr-ima-pipeline = "run_pipeline:main"
+
+[tool.setuptools]
+py-modules = ["run_pipeline"]
+
+[tool.setuptools.packages.find]
+include = ["analysis*", "models*", "simulation*", "sph*", "tools*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

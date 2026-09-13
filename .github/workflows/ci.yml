@@ -7,13 +7,27 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -U pip
+          pip install -r requirements.txt
+          pip install pytest-cov ruff
+      - name: Ruff (non-blocking style)
+        continue-on-error: true
+        run: ruff check analysis models simulation sph tools tests run_pipeline.py
+      - name: Dryad fixture process + LOO
+        run: |
+          python tools/import_galili_dryad.py --from-fixture --process
+          python tools/loo_evaluate.py --mode both --write
       - name: Run pipeline + paper bundle
         run: python run_pipeline.py --seed 42 --paper --no-export
       - name: Assert paper figures exist
@@ -29,8 +43,11 @@ jobs:
           test -f results/output/paper_tables/dual_vs_single_matched_ap.csv
           test -f results/output/paper_tables/eta_sensitivity.json
           test -f results/output/paper_tables/eta_sensitivity.csv
+          test -f results/output/planner/scenario_ranking.json
+          test -f results/output/loo_evaluation.json
+          test -f data/processed/galili_cases.csv
           ls -la "$FIG"
-      - name: Pytest
+      - name: Pytest + coverage
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
-        run: python -m pytest tests/ -q
+        run: python -m pytest tests/ -q --cov=analysis --cov=models --cov=simulation --cov=sph --cov-report=term-missing

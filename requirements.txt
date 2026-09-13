@@ -6,5 +6,6 @@ Pillow>=9.0,<12
 PyYAML>=6.0,<7
 pandas>=2.0,<3
 pytest>=7.0,<9
+pytest-cov>=4.0,<7
 # Optional: HTML→PDF packaging (tools/package_reports.py)
 playwright>=1.40,<2

@@ -26,11 +26,14 @@ Tests:
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 ```
 
-Sweep / scenario ranker:
+Sweep / scenario ranker / Dryad / LOO:
 
 ```powershell
 python -m analysis.design_sweep --seed 42
 python -m analysis.planner --seed 42
+python tools/import_galili_dryad.py --from-fixture --process
+python tools/loo_evaluate.py --write
+python tools/package_reports.py
 ```
 
 ## Critical literature facts (Galili RSOS 2022)
@@ -48,15 +51,16 @@ IMA-AP has a near-direct effect on AP diameter. Claiming IMA-AP 50% → AP 34.4 
 
 **Device classes:** MAVERIC = **ARTO** (≈ IMA-AP), **not** Carillon / IMA-CS. Carillon context: TITAN II ~15% AP; REDUCE-FMR directional only. η values are **assumption priors**, not clinically calibrated constants.
 
-## Seed-42 exploratory ranking (after P0)
+## Seed-42 exploratory ranking
 
 Under clinical/planning map, assumption η_ap=0.30, η_cs=0.55 (assumption), AP ceiling 20%, LCx risk screen:
 
-- Evaluated **36** / feasible **30**
+- Evaluated **36** / feasible **30** (P(feasible)≈0.83)
 - **Best candidate under assumptions:** IMA-AP dual suture **60%**, AP reduction **18.0%**, physics leakage-proxy **~0.074%**, jet=`central`
 - Best IMA-CS: bridge **20%**, AP **11.0%**, CS–LCx **8.6 mm** (risk-screen edge), physics **~0.156%**
+- Ranker also emits η ranking stability + Pareto frontier in `results/output/planner/scenario_ranking.json`
 
-Physics % ≠ clinical regurgitant volume. Dual-suture ×0.5 jet factor is a **hypothesis parameter**.
+Physics % ≠ clinical regurgitant volume. Dual-suture ×0.5 jet factor is an **exploratory hypothesis** parameter.
 
 ## Project structure
 
@@ -66,7 +70,9 @@ models/           Geometry, pathology, devices (Galili peak-systole + planning m
 simulation/       Algebraic mechanics proxy (aliases: run_fea_surrogate)
 sph/              Literature-calibrated leakage proxy (SPH-inspired)
 analysis/         ROA, jet, sweep, scenario_ranker, paper tables/plots
-docs/             manuscript_draft.md, chatgpt_collab/, P0 review note
+tools/            Dryad import, LOO evaluate, package_reports
+data/             raw/, fixtures/, processed/galili_cases.csv
+docs/             manuscript_draft.md, chatgpt_collab/
 results/          reference_data.yaml, clinical_references.yaml, outputs
 tests/            literature facts + invariants (not locked dual-AP60 “truth”)
 ```
@@ -76,19 +82,20 @@ tests/            literature facts + invariants (not locked dual-AP60 “truth�
 | Term | Meaning here |
 |------|----------------|
 | Calibration / reproduction | Anchor blend at `pathology`, `ima_cs_22`, `ima_ap_50` |
-| Held-out (planned) | `ima_cs_14/18`, `ima_ap_30/70` + leave-one-out (P1 Dryad) |
+| Held-out / LOO | `ima_cs_14/18`, `ima_ap_30/70` + leave-one-case-out (`tools/loo_evaluate.py`) |
 | External validation | **Not claimed** for high-anchor-weight cases |
 
-See `configs/surrogate_calibration.yaml` and `docs/chatgpt_collab/20260913_p0_review_response.md`.
+Dryad (doi:10.5061/dryad.bzkh1899d) is the preferred feature source when local zips are present; published table scalars are secondary. See `DATA_PROVENANCE.md`.
 
 ## Honesty checklist
 
 - Prefer `contact_score` / `strain_risk_score` language; N/% outputs are uncalibrated proxies
+- Synthetic contact-cluster ROA is visualization-only
 - LCx ≥ 8.6 mm = Rottländer **risk-screening** threshold, not safety; prefer patient CT CS–LCx
 - NiTi 0.4% = illustrative engineering screen only
 - `11 − 0.12×shortening` CS–LCx slope = assumption
 - Do not cite as deployable preoperative clinical software
 
-## License
+## Citation / license
 
-Research / educational surrogate scaffold — not for clinical use.
+MIT (`LICENSE`). See `CITATION.cff`, `references.bib`, `MODEL_CARD.md`.

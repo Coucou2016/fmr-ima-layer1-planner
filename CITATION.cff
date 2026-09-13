@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+title: "FMR IMA Layer-1 planner — literature-anchored exploratory surrogate"
+message: "If you use this software, please cite it and the Galili RSOS 2022 source data."
+type: software
+authors:
+  - name: "FMR IMA Layer-1 planner contributors"
+repository-code: "https://github.com/Coucou2016/fmr-ima-layer1-planner"
+url: "https://github.com/Coucou2016/fmr-ima-layer1-planner"
+abstract: >
+  Transparent Layer-1 Python surrogate for exploratory screening of indirect
+  mitral annuloplasty (IMA-CS / IMA-AP) strategies under stated geometric and
+  risk-screening assumptions. Phenomenological mechanics plus a
+  literature-calibrated leakage proxy — not production FEA/FSI and not a
+  clinical decision aid.
+keywords:
+  - functional mitral regurgitation
+  - indirect mitral annuloplasty
+  - surrogate model
+  - exploratory screening
+  - coronary sinus
+license: MIT
+version: "0.2.0"
+date-released: "2026-09-14"
+references:
+  - type: article
+    title: "Numerical biomechanics modelling of indirect mitral annuloplasty techniques"
+    authors:
+      - family-names: Galili
+        given-names: L.
+    year: 2022
+    doi: "10.1098/rsos.211726"
+  - type: data
+    title: "Data from: Numerical biomechanics modelling of indirect mitral annuloplasty techniques"
+    year: 2022
+    doi: "10.5061/dryad.bzkh1899d"

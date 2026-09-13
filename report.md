@@ -4,7 +4,7 @@
 
 **工作短题：** Clinical-dose IMA planner (Layer-1)
 
-**生成日期：** 2026-09-13  
+**生成日期：** 2026-09-14  
 **数据来源：** `python run_pipeline.py --seed 42 --paper`（可复现；非新 Abaqus/LHHM FSI）  
 **验证层级：** Level 0（Galili 锚点）+ Level 1（临床剂量映射 + 扫掠/规划器）；Level 2 超出范围  
 
@@ -417,7 +417,7 @@ physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度
 
 ### 打包脚本状态附记
 
-- PDF：report.pdf: PASS → report.pdf (1505701 bytes); paper.pdf: PASS → docs/paper.pdf (1313988 bytes)
+- PDF：report.pdf: PASS → report.pdf (1505701 bytes); paper.pdf: PASS → docs/paper.pdf (1297892 bytes)
 - report.html size：1281388 bytes
 - data:image count：5
 
@@ -426,8 +426,8 @@ physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度
 | 项 | 内容 |
 |----|------|
 | GitHub URL | https://github.com/Coucou2016/fmr-ima-layer1-planner（PUBLIC；顾问可读完整代码/文档） |
-| Commit hash | `4e3cc69c0f35de2014c948b687181bb8b0f6fe52` |
-| Push status | main; tracking status: ## main...origin/main |
+| Commit hash | `17237bc38af8b2fd66bbaf1326a66673c56409fd` |
+| Push status | main; tracking status: ## main...origin/main [ahead 1] |
 | ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
 | ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
 | ChatGPT browser | BLOCKED — no usable browser MCP this turn; five local maturation rounds used archived literature reply + WebSearch + nature-skills. Ready briefs in docs/chatgpt_collab/rounds/round_01.md … round_05.md (no invented ChatGPT replies). |
@@ -437,6 +437,6 @@ physics 反流由约 0.160% 降至约 0.152%——分类改善更醒目，幅度
 | Rejected | Layer-1=LHHM；first CS-vs-AP；≥8.6 mm=safe；η±20%=FEA UQ；旗舰 Nature |
 | Files | docs/manuscript_draft.md, docs/paper_framework_nature.md, docs/paper.html, docs/paper.md, docs/paper.pdf, report.html, report.md, report.pdf, docs/report.html, docs/report.md, tools/package_reports.py, docs/chatgpt_collab/rounds/round_01.md, docs/chatgpt_collab/rounds/round_02.md, docs/chatgpt_collab/rounds/round_03.md, docs/chatgpt_collab/rounds/round_04.md, docs/chatgpt_collab/rounds/round_05.md, docs/chatgpt_collab/20260816_five_round_final.md |
 | Tests | PASS — PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -q (40 passed); PASS — python run_pipeline.py --seed 42 --paper --no-export (planner: IMA-AP dual 60%, AP 18.0%, physics (see JSON), jet=central) |
-| PDF | report.pdf: PASS → report.pdf (1505701 bytes); paper.pdf: PASS → docs/paper.pdf (1313988 bytes) |
+| PDF | report.pdf: PASS → report.pdf (1505701 bytes); paper.pdf: PASS → docs/paper.pdf (1297892 bytes) |
 | Risks | base64 HTML 体积大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待补档 |
 | Scope | 公开 push 已完成；无 PR；无 deploy |
