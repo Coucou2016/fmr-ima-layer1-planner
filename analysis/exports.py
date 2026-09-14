@@ -11,7 +11,7 @@ from analysis.metrics import CaseMetrics
 from analysis.roa import ContactNode
 from models.devices import IMA_CS
 from simulation.roa_surrogate import contacts_from_fea, niti_bridge_strain, stable_case_seed
-from simulation.run_case import FEASurrogateResult, run_fea_surrogate
+from simulation.run_case import FEASurrogateResult
 
 
 def export_contact_map_csv(

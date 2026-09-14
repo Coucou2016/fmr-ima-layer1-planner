@@ -9,10 +9,10 @@ from typing import Any, List, Optional
 import numpy as np
 
 from analysis.roa import ContactNode, compute_roa_from_contacts
-from models.devices import IMA_AP, IMA_CS
+from models.devices import IMA_AP
 from models.heart_geometry import HeartGeometry
 from simulation.calibration import load_surrogate_calibration
-from simulation.run_case import FEASurrogateResult, MechanicsProxyResult
+from simulation.run_case import FEASurrogateResult
 
 
 def stable_case_seed(base_seed: int, case_id: str) -> int:
@@ -77,7 +77,7 @@ def estimate_roa_mm2(
             # Captures qualitative non-monotonic ROA rebound without pathology-scale
             # overshoot (Galili AP50→AP70: 27.3→46.1 mm²).
             ap_deficit = max(0.0, (26.1 - geometry.ap_diameter_mm) / 14.0)
-            jet_minor = 0.35 + 0.40 * ap_deficit
+            jet_minor = 0.22 + 0.28 * ap_deficit
             if n_sutures >= 2:
                 jet_minor *= 0.55
             jet_major = jet_minor * 1.25

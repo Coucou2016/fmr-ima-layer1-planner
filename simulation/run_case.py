@@ -8,14 +8,14 @@ not finite-element solutions.
 from dataclasses import dataclass
 from typing import List, Optional
 
-from models.heart_geometry import HeartGeometry
-from models.pathology import PapillaryElement, pathology_severity
 from models.devices import (
     GALILI_PEAK_SYS_DISEASE_AP_MM,
-    IMA_CS,
     IMA_AP,
+    IMA_CS,
     UNDEFORMED_DIASTOLE_AP_MM,
 )
+from models.heart_geometry import HeartGeometry
+from models.pathology import PapillaryElement, pathology_severity
 
 
 @dataclass
@@ -84,8 +84,10 @@ def run_mechanics_proxy(
                 gap -= 0.020 * device.shortening_pct
                 gap -= 0.01 * max(0.0, ap_red - 15.0)
             else:
+                # Further dampened over-short stack (qualitative rebound only).
+                # Historical ~2.46% AP70 leak → dampened toward Galili 0.13% magnitude.
                 over = device.shortening_pct - 50.0
-                penalty = 0.012 * over + 0.15
+                penalty = 0.0015 * over + 0.02
                 if n_sutures >= 2:
                     penalty *= 0.5  # hypothesis parameter
                 gap += penalty

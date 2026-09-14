@@ -1,6 +1,7 @@
 """LV/LA pressure loading with phase offset."""
 
 from dataclasses import dataclass
+
 import numpy as np
 
 

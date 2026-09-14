@@ -1,9 +1,9 @@
 """Aggregate case metrics for tables and validation."""
 
-from dataclasses import dataclass, asdict
-from typing import Optional
 import json
+from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Optional
 
 
 @dataclass
@@ -34,7 +34,14 @@ class CaseMetrics:
         return abs(self.regurgitation_pct - self.reference_regurgitation_pct)
 
     def to_dict(self):
-        return asdict(self)
+        d = asdict(self)
+        # Official aliases (legacy keys retained).
+        if self.physics_regurgitation_pct is not None:
+            d["leakage_proxy_pct"] = self.physics_regurgitation_pct
+        else:
+            d["leakage_proxy_pct"] = self.regurgitation_pct
+        d["strain_risk_score"] = self.max_principal_strain
+        return d
 
 
 def load_reference_targets(path: Path) -> dict:

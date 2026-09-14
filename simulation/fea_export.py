@@ -1,6 +1,7 @@
 """Export hooks for commercial FEA (Abaqus INP, VTK)."""
 
 from pathlib import Path
+
 from models.heart_geometry import HeartGeometry
 
 

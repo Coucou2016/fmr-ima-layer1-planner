@@ -1,7 +1,7 @@
-from .roa import compute_roa_from_contacts, ContactNode
+from .jet import JetBreakdown, classify_jet
 from .metrics import CaseMetrics, collect_metrics
 from .plots import plot_comparison, plot_regurgitation_bars
-from .jet import classify_jet, JetBreakdown
+from .roa import ContactNode, compute_roa_from_contacts
 
 __all__ = [
     "compute_roa_from_contacts",

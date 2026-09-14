@@ -190,9 +190,19 @@ clinical_window:
     clinically_attainable: false
 
 exploratory_planning_range:
+  # Official name (clinical_window is deprecated alias above).
+  ap_reduction_pct_min: 14.0
+  ap_reduction_pct_max: 20.0
   ap_reduction_pct_anchor: [14.0, 15.0]
   ap_reduction_pct_ceiling: 20.0
+  default_planner_ceiling_pct: 20.0
+  context_arto_maveric_pct: [14.0, 15.0]
+  context_carillon_titan_ii_pct_approx: 15.0
+  role: clinically_contextualized_exploratory_planning_range
   label: clinically_contextualized_exploratory_planning_range
+  note: >
+    ~14–15% AP reduction is the ARTO/MAVERIC (IMA-AP) attested anchor context;
+    20% is an exploratory planning ceiling — not a clinical efficacy window.
   numerical_extreme_example:
     label: "Galili IMA-AP 70% peak systole"
     ap_mm: 12.4

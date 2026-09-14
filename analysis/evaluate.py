@@ -27,8 +27,8 @@ from models.heart_geometry import HeartGeometry
 from models.pathology import apply_papillary_pathology, make_papillary_mesh
 from simulation.calibration import load_surrogate_calibration
 from simulation.roa_surrogate import estimate_roa_mm2, niti_bridge_strain
-from simulation.run_case import run_mechanics_proxy, run_fea_surrogate
-from sph.hemodynamics import regurgitation_fraction_from_physics, SPHSurrogate
+from simulation.run_case import run_mechanics_proxy
+from sph.hemodynamics import SPHSurrogate, regurgitation_fraction_from_physics
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -94,6 +94,10 @@ class DesignPoint:
     niti_engineering_strain: Optional[float]
     cs_lcx_mm: Optional[float]
     contact_score: Optional[float] = None  # mechanics contact proxy (alias)
+    contact_fraction: Optional[float] = None  # Dryad-aux feature (fitted path)
+    response_path: str = "rule_based_proxy"
+    rule_based_roa_mm2: Optional[float] = None
+    rule_based_leakage_proxy_pct: Optional[float] = None
     constraint_violations: list[str] = field(default_factory=list)
 
     @property
@@ -104,10 +108,12 @@ class DesignPoint:
         d = asdict(self)
         d["feasible"] = self.feasible
         d["constraint_violations"] = ",".join(self.constraint_violations)
-        # Preferred aliases (legacy keys retained).
+        # Preferred official aliases (legacy keys retained for compat).
         d["leakage_proxy_pct"] = self.physics_regurgitation_pct
         d["strain_risk_score"] = self.max_principal_strain
-        # contact_score already on the dataclass (mechanics contact_force_max_n).
+        # Deprecated aliases kept explicit for exporters/readers.
+        d["physics_regurgitation_pct"] = self.physics_regurgitation_pct
+        d["max_principal_strain"] = self.max_principal_strain
         return d
 
 
@@ -158,11 +164,30 @@ def evaluate_design_point(
     design_space: Optional[dict[str, Any]] = None,
     seed: int = 42,
     blend: bool = False,
+    response_path: Optional[str] = None,
+    response_params=None,
 ) -> DesignPoint:
-    """Physics evaluation of one (device, shortening, mapping) point."""
+    """Evaluate one (device, shortening, mapping) point.
+
+    ``response_path`` (from design_space when omitted):
+      - ``fitted_response`` (paper/seed-42 default): full-train f_ROA/f_leak
+      - ``rule_based_proxy``: legacy algebraic + SPH-inspired leak
+      - ``hybrid_ap_extreme``: rule-based unless IMA-AP shortening > 50%
+    """
     _ = seed
     cfg = design_space or load_design_space()
     cal = calibration or load_surrogate_calibration()
+    from models.response_runtime import (
+        case_dict_from_design,
+        default_response_path,
+        estimate_contact_fraction,
+        load_full_train_params,
+        predict_design,
+    )
+
+    path_mode = response_path or default_response_path(cfg)
+    dual_factor = float(cfg.get("dual_suture", {}).get("commissural_factor", 0.5))
+
     if elements is None:
         elements = apply_papillary_pathology(
             make_papillary_mesh(200), posterior_fraction_passive=0.44
@@ -195,17 +220,48 @@ def evaluate_design_point(
             niti_bridge_strain(device.bridge_shortening_pct) * 0.85,
         )
 
-    roa = estimate_roa_mm2(geom, fea, device, case_id=cid, calibration=cal)
-    jet = classify_jet(device, geom, roa_mm2=roa)
+    rule_roa = estimate_roa_mm2(geom, fea, device, case_id=cid, calibration=cal)
+    jet = classify_jet(
+        device, geom, roa_mm2=rule_roa, dual_commissural_factor=dual_factor
+    )
     comm_leak = bool(getattr(device, "commissural_leak_risk", lambda: False)())
-    physics_frac = regurgitation_fraction_from_physics(
+    rule_frac = regurgitation_fraction_from_physics(
         geom,
-        roa,
+        rule_roa,
         fea.coaptation_gap_mm,
         commissural_leak=comm_leak,
         commissural_fraction=jet.commissural_fraction,
         calibration=cal,
     )
+    rule_leak_pct = rule_frac * 100.0
+
+    contact_frac = estimate_contact_fraction(label, shortening_pct)
+    use_fitted = path_mode == "fitted_response" or (
+        path_mode == "hybrid_ap_extreme"
+        and label == "IMA-AP"
+        and shortening_pct is not None
+        and float(shortening_pct) > 50.0
+    )
+
+    roa = rule_roa
+    physics_pct = rule_leak_pct
+    if use_fitted:
+        params = response_params or load_full_train_params()
+        case = case_dict_from_design(
+            device=label,
+            shortening_pct=shortening_pct,
+            ap_diameter_mm=geom.ap_diameter_mm,
+            annulus_circumference_mm=geom.annulus_circumference_mm,
+            contact_fraction=contact_frac,
+        )
+        pred = predict_design(params, case)
+        roa = float(pred["pred_roa_mm2"])
+        physics_pct = float(pred["pred_regurgitation_pct"])
+        # Re-split jet with fitted ROA magnitude (fraction from mechanics/hypothesis).
+        jet = classify_jet(
+            device, geom, roa_mm2=roa, dual_commissural_factor=dual_factor
+        )
+        path_mode = "fitted_response" if path_mode == "fitted_response" else "hybrid_ap_extreme"
 
     blended_pct = None
     if blend:
@@ -213,7 +269,7 @@ def evaluate_design_point(
         blended_pct = sph.run(
             cid,
             geom,
-            roa,
+            rule_roa,
             coaptation_gap_mm=fea.coaptation_gap_mm,
             commissural_leak=comm_leak,
             commissural_fraction=jet.commissural_fraction,
@@ -243,7 +299,11 @@ def evaluate_design_point(
 
     maveric_ap = maveric_scale_ap_mm(
         ap_red_pct,
-        baseline_mm=float(cfg.get("clinical_mapping", {}).get("maveric_baseline_ap_mm", MAVERIC_BASELINE_AP_MM)),
+        baseline_mm=float(
+            cfg.get("clinical_mapping", {}).get(
+                "maveric_baseline_ap_mm", MAVERIC_BASELINE_AP_MM
+            )
+        ),
     )
 
     return DesignPoint(
@@ -262,7 +322,7 @@ def evaluate_design_point(
         commissural_roa_mm2=jet.commissural_roa_mm2,
         jet_location=jet.location,
         commissural_fraction=jet.commissural_fraction,
-        physics_regurgitation_pct=physics_frac * 100.0,
+        physics_regurgitation_pct=physics_pct,
         blended_regurgitation_pct=blended_pct,
         coaptation_gap_mm=fea.coaptation_gap_mm,
         max_principal_strain=fea.max_principal_strain,
@@ -270,6 +330,14 @@ def evaluate_design_point(
         niti_engineering_strain=niti_eng,
         cs_lcx_mm=cs_lcx,
         contact_score=float(fea.contact_force_max_n),
+        contact_fraction=contact_frac,
+        response_path=(
+            "fitted_response"
+            if use_fitted and path_mode == "fitted_response"
+            else ("hybrid_ap_extreme" if use_fitted else "rule_based_proxy")
+        ),
+        rule_based_roa_mm2=rule_roa,
+        rule_based_leakage_proxy_pct=rule_leak_pct,
     )
 
 

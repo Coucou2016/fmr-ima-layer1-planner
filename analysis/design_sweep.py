@@ -152,8 +152,8 @@ def main(argv: Optional[list[str]] = None) -> list[DesignPoint]:
     print(f"Wrote: {ROOT / 'results' / 'output' / 'sweep'}")
 
     if args.paper:
-        from analysis.planner import run_planner
         from analysis.paper_tables import export_paper_bundle
+        from analysis.planner import run_planner
 
         rec = run_planner(points=points, seed=args.seed)
         export_paper_bundle(sweep_points=points, recommendation=rec, seed=args.seed)

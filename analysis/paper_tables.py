@@ -21,7 +21,7 @@ from simulation.calibration import load_surrogate_calibration
 ROOT = Path(__file__).resolve().parents[1]
 
 PAPER_FIGURE_NAMES = (
-    "fig1_ima_ap_nonmonotonic_clinical_window.png",
+    "fig1_ima_ap_nonmonotonic_exploratory_planning_range.png",
     "fig2_suture_vs_ap_reduction.png",
     "fig3_jet_location.png",
     "fig4_pareto_lcx_strain.png",
@@ -81,9 +81,9 @@ def table_galili_vs_surrogate(
     return rows
 
 
-def table_clinical_window_vs_extreme(sweep_points: list[DesignPoint]) -> list[dict[str, Any]]:
+def table_exploratory_planning_range_vs_extreme(sweep_points: list[DesignPoint]) -> list[dict[str, Any]]:
     refs = load_clinical_references()
-    window = refs["clinical_window"]
+    window = refs.get("exploratory_planning_range") or refs["clinical_window"]
     rows: list[dict[str, Any]] = [
         {
             "scenario": "MAVERIC/ARTO pair 41.4→35.3 mm",
@@ -236,7 +236,7 @@ def table_maveric_reduce_fmr_alignment(
     Honest: magnitudes are *not* equated — only AP↓ / regurg↓ sign agreement.
     """
     refs = load_clinical_references()
-    window = refs["clinical_window"]
+    window = refs.get("exploratory_planning_range") or refs["clinical_window"]
     lo = float(window["ap_reduction_pct_min"])
     hi = float(window["ap_reduction_pct_max"])
     patho = next(
@@ -590,21 +590,26 @@ def export_paper_bundle(
     if not t1 or all(r["surrogate_blended_pct"] == "" for r in t1):
         t1 = _galili_table_from_evaluate(seed=seed)
 
-    t2 = table_clinical_window_vs_extreme(sweep_points)
+    t2 = table_exploratory_planning_range_vs_extreme(sweep_points)
     t3 = table_pareto(sweep_points)
     t4 = table_maveric_reduce_fmr_alignment(sweep_points, recommendation)
     t5 = table_dual_vs_single_matched_ap(sweep_points, mapping_mode="clinical")
 
     paths: dict[str, Path] = {
         "galili_vs_surrogate": tables_dir / "galili_vs_surrogate.csv",
-        "clinical_window_vs_numerical_extreme": tables_dir / "clinical_window_vs_numerical_extreme.csv",
-        "pareto_regurg_vs_safety": tables_dir / "pareto_regurg_vs_safety.csv",
+        "exploratory_planning_range_vs_numerical_extreme": tables_dir
+        / "exploratory_planning_range_vs_numerical_extreme.csv",
+        # Deprecated alias path written for one release of compat readers.
+        "clinical_window_vs_numerical_extreme": tables_dir
+        / "exploratory_planning_range_vs_numerical_extreme.csv",
+        "pareto_regurg_vs_risk_screens": tables_dir / "pareto_regurg_vs_risk_screens.csv",
+        "pareto_regurg_vs_safety": tables_dir / "pareto_regurg_vs_risk_screens.csv",
         "maveric_reduce_fmr_alignment": tables_dir / "maveric_reduce_fmr_alignment.csv",
         "dual_vs_single_matched_ap": tables_dir / "dual_vs_single_matched_ap.csv",
     }
     _write_csv(paths["galili_vs_surrogate"], t1)
-    _write_csv(paths["clinical_window_vs_numerical_extreme"], t2)
-    _write_csv(paths["pareto_regurg_vs_safety"], t3)
+    _write_csv(paths["exploratory_planning_range_vs_numerical_extreme"], t2)
+    _write_csv(paths["pareto_regurg_vs_risk_screens"], t3)
     _write_csv(paths["maveric_reduce_fmr_alignment"], t4)
     _write_csv(paths["dual_vs_single_matched_ap"], t5)
 

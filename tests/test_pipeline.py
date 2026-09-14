@@ -1,23 +1,11 @@
 """Tests for FMR Layer-1 surrogate pipeline."""
 
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
+import sysfrom pathlib import PathROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import pytest
+
 
-from models.devices import IMA_CS, IMA_AP
-from models.pathology import make_papillary_mesh, apply_papillary_pathology, pathology_severity
-from analysis.roa import compute_roa_from_contacts
-from sph.hemodynamics import SPHSurrogate, regurgitation_fraction_from_physics
-from models.heart_geometry import HeartGeometry
-from simulation.run_case import run_mechanics_proxy
-from simulation.roa_surrogate import pipeline_roa_mm2, contacts_from_fea, stable_case_seed
-
-
-def test_papillary_pathology_fraction():
+from analysis.roa import compute_roa_from_contactsfrom models.devices import IMA_AP, IMA_CSfrom models.heart_geometry import HeartGeometryfrom models.pathology import apply_papillary_pathology, make_papillary_mesh, pathology_severityfrom simulation.roa_surrogate import contacts_from_fea, pipeline_roa_mm2, stable_case_seedfrom simulation.run_case import run_mechanics_proxyfrom sph.hemodynamics import SPHSurrogate, regurgitation_fraction_from_physicsdef test_papillary_pathology_fraction():
     elems = make_papillary_mesh(200)
     path = apply_papillary_pathology(elems, posterior_fraction_passive=0.44)
     assert 0.40 <= pathology_severity(path) <= 0.48

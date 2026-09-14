@@ -1,63 +1,79 @@
-name: ci
-
-on:
-  push:
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install -r requirements.txt
-          pip install pytest-cov ruff
-      - name: Ruff (non-blocking; repo still has legacy style debt)
-        continue-on-error: true
-        run: ruff check analysis models simulation sph tools tests run_pipeline.py
-      - name: DOI hygiene (ban wrong Galili DOI fragment)
-        run: |
-          BAD=$(python -c "print('211'+'726')")
-          if grep -RIn --exclude-dir=__pycache__ --exclude-dir=.git --exclude-dir=.pytest_cache --exclude=ci.yml --exclude=test_round2_scientific_review.py "$BAD" . ; then
-            echo "Incorrect Galili DOI fragment found" >&2
-            exit 1
-          fi
-          echo "DOI hygiene OK"
-      - name: Dryad fixture process + diagnostics + fold-wise CV
-        run: |
-          python tools/import_galili_dryad.py --from-fixture --process
-          python tools/loo_evaluate.py --mode both --write
-          python -m analysis.fit_response_model --write
-      - name: Run pipeline + paper bundle
-        run: python run_pipeline.py --seed 42 --paper --no-export
-      - name: Assert paper figures / CV artifacts exist
-        run: |
-          set -e
-          FIG=results/output/paper_figures
-          test -f "$FIG/fig1_ima_ap_nonmonotonic_clinical_window.png"
-          test -f "$FIG/fig2_suture_vs_ap_reduction.png"
-          test -f "$FIG/fig3_jet_location.png"
-          test -f "$FIG/fig4_pareto_lcx_strain.png"
-          test -f "$FIG/fig5_dual_vs_single_suture.png"
-          test -f results/output/paper_tables/maveric_reduce_fmr_alignment.csv
-          test -f results/output/paper_tables/dual_vs_single_matched_ap.csv
-          test -f results/output/paper_tables/eta_sensitivity.json
-          test -f results/output/paper_tables/eta_sensitivity.csv
-          test -f results/output/planner/scenario_ranking.json
-          test -f results/output/loo_evaluation.json
-          test -f results/output/cross_validation/loo_response_model.json
-          test -f data/processed/galili_cases.csv
-          ls -la "$FIG"
-      - name: Pytest + coverage
-        env:
-          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
-        run: python -m pytest tests/ -q --cov=analysis --cov=models --cov=simulation --cov=sph --cov-report=term-missing
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -U pip
+          pip install -r requirements.txt
+          pip install pytest-cov ruff
+      - name: Ruff (blocking)
+        run: ruff check analysis models simulation sph tools tests run_pipeline.py
+      - name: DOI hygiene (ban wrong Galili DOI fragment)
+        run: |
+          BAD=$(python -c "print('211'+'726')")
+          if grep -RIn --exclude-dir=__pycache__ --exclude-dir=.git --exclude-dir=.pytest_cache --exclude=ci.yml --exclude=test_round2_scientific_review.py "$BAD" . ; then
+            echo "Incorrect Galili DOI fragment found" >&2
+            exit 1
+          fi
+          echo "DOI hygiene OK"
+      - name: Dryad fixture process + diagnostics + fold-wise CV + full-train params
+        run: |
+          python tools/import_galili_dryad.py --from-fixture --process
+          python tools/loo_evaluate.py --mode both --write
+          python -m analysis.fit_response_model --write
+          python -c "from models.response_runtime import write_full_train_params; print(write_full_train_params())"
+      - name: Run pipeline + paper bundle
+        run: python run_pipeline.py --seed 42 --paper --no-export
+      - name: Assert paper figures / CV artifacts exist
+        run: |
+          set -e
+          FIG=results/output/paper_figures
+          test -f "$FIG/fig1_ima_ap_nonmonotonic_exploratory_planning_range.png"
+          test -f "$FIG/fig2_suture_vs_ap_reduction.png"
+          test -f "$FIG/fig3_jet_location.png"
+          test -f "$FIG/fig4_pareto_lcx_strain.png"
+          test -f "$FIG/fig5_dual_vs_single_suture.png"
+          test -f results/output/paper_tables/maveric_reduce_fmr_alignment.csv
+          test -f results/output/paper_tables/dual_vs_single_matched_ap.csv
+          test -f results/output/paper_tables/eta_sensitivity.json
+          test -f results/output/paper_tables/eta_sensitivity.csv
+          test -f results/output/paper_tables/exploratory_planning_range_vs_numerical_extreme.csv
+          test -f results/output/planner/scenario_ranking.json
+          test -f results/output/loo_evaluation.json
+          test -f results/output/cross_validation/loo_response_model.json
+          test -f results/output/response_model/full_train_params.json
+          test -f data/processed/galili_cases.csv
+          ls -la "$FIG"
+      - name: Pytest + coverage gate
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+        run: >
+          python -m pytest tests/ -q
+          -p pytest_cov
+          --cov=analysis --cov=models --cov=simulation --cov=sph
+          --cov-report=term-missing
+          --cov-fail-under=70
+      - name: Package reports + SHA consistency (3.12 only)
+        if: matrix.python-version == '3.12'
+        run: |
+          python tools/package_reports.py
+          HEAD=$(git rev-parse HEAD)
+          grep -F "$HEAD" report.md docs/report.md || {
+            echo "Packaged reports missing HEAD SHA $HEAD" >&2
+            exit 1
+          }

@@ -9,8 +9,9 @@ contact descriptors.
 """
 
 from dataclasses import dataclass
-import numpy as np
 from typing import List, Tuple
+
+import numpy as np
 
 
 @dataclass

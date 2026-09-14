@@ -31,15 +31,15 @@ FIGURES = [
         "fig1",
         "图 1",
         "IMA-AP 物理反流随缝线缩短百分比的变化：Galili 映射 vs 临床映射",
-        "fig1_ima_ap_nonmonotonic_clinical_window.png",
+        "fig1_ima_ap_nonmonotonic_exploratory_planning_range.png",
         """
 来龙去脉与读图说明：本图回答“计算缝线缩短百分比能否直接当作临床前后径（AP）剂量？”横轴为 IMA-AP 缝线缩短 %；
-纵轴为 Layer-1 泄漏代理 physics_regurgitation_pct（代数力学代理 + 文献校准泄漏代理；不是超声反流容积分数）。
+纵轴为 Layer-1 泄漏代理 leakage_proxy_pct（代数力学代理或 fitted_response；不是超声反流容积分数）。
 
 如何读：（1）Galili 映射复现发表峰缩期 AP：IMA-AP 50% → 峰缩期 AP=15.9 mm（相对疾病 26.1 mm 约 39% AP 缩减），
 并非未变形舒张期 34.4 mm / 0% AP；70% → 12.4 mm 并交界区泄漏升高。（2）规划映射采用假设先验
 AP_reduction% = η × shortening%，默认 η_ap=0.30（假设，非临床标定），使 50% 缝线对应约 15% AP，落入
-ARTO/MAVERIC（IMA-AP 类，不是 Carillon）约 14–15% 对话窗口。绿色带为约 14–20% AP 窗口。
+ARTO/MAVERIC（IMA-AP 类，不是 Carillon）约 14–15% 对话窗口。绿色带为 exploratory planning range 约 14–20% AP。
 
 结论（仅限本代理）：规划映射下窗口内总体可筛查；Galili 峰缩期映射下 70% 非单调恶化。勿将纵轴等同临床试验反流容积。
 """,
@@ -336,7 +336,13 @@ def load_artifacts():
     rec = json.loads(resolve_planner_json().read_text(encoding="utf-8"))
     tables = {
         "galili": read_csv(TABLE_DIR / "galili_vs_surrogate.csv"),
-        "window": read_csv(TABLE_DIR / "clinical_window_vs_numerical_extreme.csv"),
+        "window": (
+            read_csv(TABLE_DIR / "exploratory_planning_range_vs_numerical_extreme.csv")
+            if (TABLE_DIR / "exploratory_planning_range_vs_numerical_extreme.csv").is_file()
+            else read_csv(TABLE_DIR / "clinical_window_vs_numerical_extreme.csv")
+            if (TABLE_DIR / "clinical_window_vs_numerical_extreme.csv").is_file()
+            else []
+        ),
         "pareto": read_csv(TABLE_DIR / "pareto_regurg_vs_safety.csv"),
         "align": read_csv(TABLE_DIR / "maveric_reduce_fmr_alignment.csv"),
         "dual": read_csv(TABLE_DIR / "dual_vs_single_matched_ap.csv"),
@@ -533,9 +539,9 @@ def build_report_md(rec: dict, tables: dict, figs: list[dict]) -> str:
 
 **工作短题：** Literature-anchored IMA exploratory screening (Layer-1)
 
-**生成日期：** {today}  
-**数据来源：** `python run_pipeline.py --seed 42 --paper`（可复现；非新 Abaqus/LHHM FSI）  
-**证据层级：** Level 0（Galili 校准/复现）+ Level 1（假设映射 + 扫掠/情景排序）；Level 2 超出范围  
+**生成日期：** {today}
+**数据来源：** `python run_pipeline.py --seed 42 --paper`（可复现；非新 Abaqus/LHHM FSI）
+**证据层级：** Level 0（Galili 校准/复现）+ Level 1（假设映射 + 扫掠/情景排序）；Level 2 超出范围
 
 ---
 
@@ -776,9 +782,9 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 见同目录 HTML 终报章节或下方「打包时写入」的终报正文（生成脚本在 HTML 中展开完整第十九节）。
 
-**GitHub（公开）：** https://github.com/Coucou2016/fmr-ima-layer1-planner  
-**ChatGPT URL：** https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65  
-**本轮性质：** 公开仓库推送 + 报告/论文打包；顾问可读完整公开代码/文档；ChatGPT 浏览器 MCP 本轮受阻（见完整第十九节）。  
+**GitHub（公开）：** https://github.com/Coucou2016/fmr-ima-layer1-planner
+**ChatGPT URL：** https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65
+**本轮性质：** 公开仓库推送 + 报告/论文打包；顾问可读完整公开代码/文档；ChatGPT 浏览器 MCP 本轮受阻（见完整第十九节）。
 **推送：** 已 push `main`（PUBLIC）；无 PR。
 """
     )
@@ -1099,8 +1105,8 @@ def try_pdf(html_path: Path, pdf_path: Path) -> str:
     except Exception as exc:  # noqa: BLE001
         # fallback: matplotlib PdfPages with note page only
         try:
-            from matplotlib.backends.backend_pdf import PdfPages
             import matplotlib.pyplot as plt
+            from matplotlib.backends.backend_pdf import PdfPages
 
             with PdfPages(pdf_path) as pdf:
                 fig = plt.figure(figsize=(8.27, 11.69))

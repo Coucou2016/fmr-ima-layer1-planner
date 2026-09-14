@@ -4,9 +4,9 @@
 
 **工作短题：** Literature-anchored IMA exploratory screening (Layer-1)
 
-**生成日期：** 2026-09-15  
-**数据来源：** `python run_pipeline.py --seed 42 --paper`（可复现；非新 Abaqus/LHHM FSI）  
-**证据层级：** Level 0（Galili 校准/复现）+ Level 1（假设映射 + 扫掠/情景排序）；Level 2 超出范围  
+**生成日期：** 2026-09-15
+**数据来源：** `python run_pipeline.py --seed 42 --paper`（可复现；非新 Abaqus/LHHM FSI）
+**证据层级：** Level 0（Galili 校准/复现）+ Level 1（假设映射 + 扫掠/情景排序）；Level 2 超出范围
 
 ---
 
@@ -135,17 +135,17 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 规则基 blend-off 诊断 ≠ 真折内 LOO。AP 为文献几何输入（`ap_prediction_metric_applicable=false`）。
 
-- 历史规则基留出 MAE（pre-dampen baseline）：ROA≈50.18 mm²，leak≈1.445 pp；当前 dampened 留出 MAE：ROA=28.58，leak_pp=0.662
+- 历史规则基留出 MAE（pre-dampen baseline）：ROA≈50.18 mm²，leak≈1.445 pp；当前 dampened 留出 MAE：ROA=5.24，leak_pp=0.043
 - 折内响应模型留出子集 MAE：ROA=6.37 mm²，leak_pp=0.245
 - IMA-AP70（折内）：pred ROA=39.50（发表 46.1），abs_err=6.60；pred leak=0.328（发表 0.13%），abs_err=0.198 pp
 - **AP70 诚实表述：** 规则基捕捉到定性非单调倾向，但**显著高估泄漏幅度**（非“复现 Galili 非单调行为”的无限定表述）。
 
 | Case | Pub ROA | Rule ROA (abs err) | Fold ROA (abs err) | Pub leak % | Rule leak (abs err pp) | Fold leak (abs err pp) |
 |------|---------|--------------------|--------------------|------------|------------------------|------------------------|
-| ima_cs_14 | 56.7 | 24.0 (32.7) | 69.6 (12.9) | 0.52 | 0.65 (0.13) | 0.60 (0.08) |
-| ima_cs_18 | 55.3 | 17.6 (37.7) | 53.4 (1.9) | 0.41 | 0.34 (0.07) | 0.42 (0.01) |
-| ima_ap_30 | 51.1 | 14.9 (36.2) | 47.0 (4.1) | 0.16 | 0.28 (0.12) | 0.86 (0.70) |
-| **ima_ap_70** | 46.1 | 53.9 (7.8) | 39.5 (6.6) | 0.13 | 2.46 (2.33) | 0.33 (0.20) |
+| ima_cs_14 | 56.7 | 59.6 (2.9) | 69.6 (12.9) | 0.52 | 0.51 (0.01) | 0.60 (0.08) |
+| ima_cs_18 | 55.3 | 54.9 (0.4) | 53.4 (1.9) | 0.41 | 0.42 (0.01) | 0.42 (0.01) |
+| ima_ap_30 | 51.1 | 42.4 (8.7) | 47.0 (4.1) | 0.16 | 0.25 (0.09) | 0.86 (0.70) |
+| **ima_ap_70** | 46.1 | 37.2 (8.9) | 39.5 (6.6) | 0.13 | 0.07 (0.06) | 0.33 (0.20) |
 
 可行性分母（排序节）：n_total_points=36，n_device_candidates=35，n_feasible_device_candidates=30，p_feasible_device_candidates≈0.8571。
 
@@ -158,17 +158,17 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 | 指标 | 数值 |
 |------|------|
 | 评估点数 / 可行点数 | 36 / 30 |
-| 假设下最优候选 | IMA-AP，n_sutures=2 |
-| 缩短 % | 60.0 |
-| AP 直径 / 缩减 | 28.208 mm / 18.0% |
-| MAVERIC 标尺 AP | 33.948 mm |
-| ROA | 8.992 mm² |
-| physics 反流 | 0.0735%  |
-| jet / 交界分数 | central / 0.165 |
+| 假设下最优候选 | IMA-CS，n_sutures=0 |
+| 缩短 % | 20.0 |
+| AP 直径 / 缩减 | 30.616 mm / 11.0% |
+| MAVERIC 标尺 AP | 36.846 mm |
+| ROA | 46.052 mm² |
+| physics 反流 | 0.3912%  |
+| jet / 交界分数 | central / 0.100 |
 
-**备选单缝线 60%：** physics ≈ 0.0754% ，jet=`mixed`，交界分数 0.330。
+**备选单缝线 60%：** physics ≈ 0.7931% ，jet=`mixed`，交界分数 0.390。
 
-**备选 IMA-CS 20%：** AP 缩减 ≈ 11.000% ，physics ≈ 0.1562% ，CS–LCx=8.6 mm，NiTi 交变应变=0.33999999999999997%。
+**备选 IMA-CS 20%：** AP 缩减 ≈ 11.000% ，physics ≈ 0.3912% ，CS–LCx=8.6 mm，NiTi 交变应变=0.33999999999999997%。
 
 ### 6.2 Galili 锚点（Level 0）
 
@@ -187,10 +187,10 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 | MAVERIC/ARTO pair 45.0→38.7 mm | ARTO (IMA-AP class) |  | clinical_literature | 38.7 | 14.0 |  |  | true | second ARTO/MAVERIC AP pair |
 | Carillon TITAN II AP context ~15% | Carillon (IMA-CS class) |  | clinical_literature |  | 15.0 |  |  | true | ~15% AP reduction is directional clinical context for Carillon, not a fitted η_CS from bridge-shortening % and not derived from MAVERIC/ARTO.
  |
-| Galili IMA-AP 50% suture (peak-systolic AP 15.9 mm) | IMA-AP | 50.0 | galili | 15.9 | 39.08 | 0.0354 | central | false | Near-direct AP effect; not undeformed 34.4 mm / not 0% AP reduction |
-| Galili IMA-AP 70% suture (peak-systolic AP 12.4 mm) | IMA-AP | 70.0 | galili | 12.4 | 52.49 | 2.4552 | commissural | false | Excessive AP reduction; commissural leak in LHHM |
-| Planning map IMA-AP 50% suture (~15% AP; assumption η_ap=0.30) | IMA-AP | 50.0 | clinical | 29.24 | 15.0 | 0.1467 | central | true | assumption prior → ARTO/MAVERIC-like AP talk track (not FEA-identified) |
-| Planning map IMA-CS 22% bridge (assumption η_cs; not MAVERIC-fit) | IMA-CS | 22.0 | clinical | 30.238 | 12.1 | 0.0826 | central | true | η_cs is assumption prior only; CS–LCx may fail on default 11 mm anatomy |
+| Galili IMA-AP 50% suture (peak-systolic AP 15.9 mm) | IMA-AP | 50.0 | galili | 15.9 | 39.08 | 0.0042 | central | false | Near-direct AP effect; not undeformed 34.4 mm / not 0% AP reduction |
+| Galili IMA-AP 70% suture (peak-systolic AP 12.4 mm) | IMA-AP | 70.0 | galili | 12.4 | 52.49 | 0.0704 | commissural | false | Excessive AP reduction; commissural leak in LHHM |
+| Planning map IMA-AP 50% suture (~15% AP; assumption η_ap=0.30) | IMA-AP | 50.0 | clinical | 29.24 | 15.0 | 0.8401 | central | true | assumption prior → ARTO/MAVERIC-like AP talk track (not FEA-identified) |
+| Planning map IMA-CS 22% bridge (assumption η_cs; not MAVERIC-fit) | IMA-CS | 22.0 | clinical | 30.238 | 12.1 | 0.3535 | central | true | η_cs is assumption prior only; CS–LCx may fail on default 11 mm anatomy |
 | Planner AP-reduction ceiling | constraint |  | clinical |  | 20.0 |  |  | true | window 14.0-20.0% |
 
 
@@ -198,37 +198,37 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 | scenario | eta_ap | eta_cs | recommended_device | recommended_shortening_pct | n_sutures | ap_reduction_pct | physics_regurgitation_pct | jet_location | n_feasible | n_evaluated |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| eta_nominal | 0.3 | 0.55 | IMA-AP | 60.0 | 2 | 18.0 | 0.0735 | central | 30 | 36 |
-| eta_minus_20pct | 0.24 | 0.44 | IMA-AP | 70.0 | 2 | 16.8 | 0.0435 | central | 32 | 36 |
-| eta_plus_20pct | 0.36 | 0.66 | IMA-AP | 50.0 | 2 | 18.0 | 0.1119 | central | 26 | 36 |
+| eta_nominal | 0.3 | 0.55 | IMA-CS | 20.0 | 0 | 11.0 | 0.3912 | central | 30 | 36 |
+| eta_minus_20pct | 0.24 | 0.44 | IMA-CS | 20.0 | 0 | 8.8 | 0.3912 | central | 32 | 36 |
+| eta_plus_20pct | 0.36 | 0.66 | IMA-CS | 20.0 | 0 | 13.2 | 0.3912 | central | 26 | 36 |
 
 
 ### 6.5 双缝线关键行（50/60/70%）
 
 | mapping_mode | suture_shortening_pct | ap_reduction_pct | ap_matched | single_physics_regurgitation_pct | dual_physics_regurgitation_pct | delta_physics_regurg_pct_points | single_jet_location | dual_jet_location | single_commissural_fraction | dual_commissural_fraction | within_planner_ap_cap_20 | note |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| clinical | 50.0 | 15.0 | True | 0.1467 | 0.1465 | -0.0002 | central | central | 0.21 | 0.105 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 60.0 | 18.0 | True | 0.0754 | 0.0735 | -0.0018 | mixed | central | 0.33 | 0.165 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 70.0 | 21.0 | True | 0.3911 | 0.1663 | -0.2247 | mixed | central | 0.47 | 0.235 | False | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 50.0 | 15.0 | True | 0.8401 | 0.8401 | 0.0 | central | central | 0.21 | 0.105 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 60.0 | 18.0 | True | 0.8086 | 0.8086 | 0.0 | mixed | central | 0.33 | 0.165 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 70.0 | 21.0 | True | 0.7778 | 0.7778 | 0.0 | mixed | central | 0.47 | 0.235 | False | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
 
 
 ### 6.6 图 1–5
 
 ### 图 1. IMA-AP 物理反流随缝线缩短百分比的变化：Galili 映射 vs 临床映射
 
-![图 1](results/output/paper_figures/fig1_ima_ap_nonmonotonic_clinical_window.png)
+![图 1](results/output/paper_figures/fig1_ima_ap_nonmonotonic_exploratory_planning_range.png)
 
-**文件：** `fig1_ima_ap_nonmonotonic_clinical_window.png`（SciencePlots；轴标签英文，释义见下）
+**文件：** `fig1_ima_ap_nonmonotonic_exploratory_planning_range.png`（SciencePlots；轴标签英文，释义见下）
 
 **来龙去脉：**
 
 来龙去脉与读图说明：本图回答“计算缝线缩短百分比能否直接当作临床前后径（AP）剂量？”横轴为 IMA-AP 缝线缩短 %；
-纵轴为 Layer-1 泄漏代理 physics_regurgitation_pct（代数力学代理 + 文献校准泄漏代理；不是超声反流容积分数）。
+纵轴为 Layer-1 泄漏代理 leakage_proxy_pct（代数力学代理或 fitted_response；不是超声反流容积分数）。
 
 如何读：（1）Galili 映射复现发表峰缩期 AP：IMA-AP 50% → 峰缩期 AP=15.9 mm（相对疾病 26.1 mm 约 39% AP 缩减），
 并非未变形舒张期 34.4 mm / 0% AP；70% → 12.4 mm 并交界区泄漏升高。（2）规划映射采用假设先验
 AP_reduction% = η × shortening%，默认 η_ap=0.30（假设，非临床标定），使 50% 缝线对应约 15% AP，落入
-ARTO/MAVERIC（IMA-AP 类，不是 Carillon）约 14–15% 对话窗口。绿色带为约 14–20% AP 窗口。
+ARTO/MAVERIC（IMA-AP 类，不是 Carillon）约 14–15% 对话窗口。绿色带为 exploratory planning range 约 14–20% AP。
 
 结论（仅限本代理）：规划映射下窗口内总体可筛查；Galili 峰缩期映射下 70% 非单调恶化。勿将纵轴等同临床试验反流容积。
 
@@ -304,8 +304,8 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 | MAVERIC literature (ARTO) | ARTO (IMA-AP class) | 45.0→38.7 mm | 14.0 | (not used as surrogate target) | AP↓ |  |  | false | second ARTO/MAVERIC AP pair — not Carillon |
 | Carillon TITAN II context | Carillon (IMA-CS class) | ~15% AP context | 15.0 | (not used as η_CS fit) | AP↓ |  |  | false | Carillon clinical context; do not calibrate η_CS from MAVERIC/ARTO |
 | REDUCE-FMR literature | Carillon (IMA-CS class) | device vs sham |  | regurgitant volume ↓ (trial direction) | regurg↓ |  |  | false | Witte KK et al. A Randomized Sham-Controlled Study of Percutaneous Mitral Annuloplasty in Functional Mitral Regurgitation: The REDUCE FMR Trial. JACC Heart Fail. 2019;7(11):945-955. |
-| Layer-1 clinical mapping | IMA-AP | IMA-AP 50.0% n_sutures=1 | 15.0 | physics regurg 0.1467% (jet=central) | AP↓, regurg↓ | AP↓, regurg↓ | yes | false | planning IMA-AP 50% single (assumption η_ap=0.30 → 15% AP); magnitude not equated to trial % |
-| Layer-1 clinical mapping | IMA-AP | IMA-AP 60.0% n_sutures=2 | 18.0 | physics regurg 0.0735% (jet=central) | AP↓, regurg↓ | AP↓, regurg↓ | yes | false | planner best_candidate (seed run); magnitude not equated to trial % |
+| Layer-1 clinical mapping | IMA-AP | IMA-AP 50.0% n_sutures=1 | 15.0 | physics regurg 0.8401% (jet=central) | AP↓, regurg↓ | AP↓, regurg↓ | yes | false | planning IMA-AP 50% single (assumption η_ap=0.30 → 15% AP); magnitude not equated to trial % |
+| Layer-1 clinical mapping | IMA-CS | IMA-CS 20.0% | 11.0 | physics regurg 0.3912% (jet=central) | AP↓, regurg↓ | AP↓, regurg↓ | yes | false | planner best_candidate (seed run); magnitude not equated to trial % |
 | alignment policy | — | directionality only |  | — | AP↓ (ARTO/MAVERIC; Carillon TITAN II context); regurg↓ (REDUCE-FMR) | AP↓ and physics regurg↓ inside 14–20% window | yes | false | Do not equate Layer-1 physics % with trial regurgitant-volume %; MAVERIC≠Carillon |
 
 
@@ -346,15 +346,15 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 
 ### A. case_metrics（离散 Galili 病例）
 
-| case_id | device | shortening_pct | annulus_circumference_mm | ap_diameter_mm | roa_mm2 | regurgitation_pct | pathology_severity | max_principal_strain | reference_regurgitation_pct | jet_location | central_roa_mm2 | commissural_roa_mm2 | ap_reduction_mm | ap_reduction_pct | physics_regurgitation_pct | cs_lcx_mm | niti_alternating_strain_pct | mapping_mode |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| pathology |  |  | 118.5 | 26.1 | 154.6633247671995 | 5.179310344827586 | 0.44 | 0.1328 | 5.26 | central | 126.8239263091036 | 27.839398458095907 | 0.0 | 0.0 | 4.971022489027973 |  |  | galili |
-| ima_cs_14 | IMA-CS | 14.0 | 116.27272727272727 | 25.5 | 24.023941571792783 | 0.6517241379310345 | 0.44 | 0.12360000000000002 | 0.52 | central | 21.621547414613506 | 2.4023941571792786 | 0.6000000000000014 | 2.298850574712649 | 0.6523598954999554 | 9.32 | 0.268 | galili |
-| ima_cs_18 | IMA-CS | 18.0 | 115.63636363636364 | 24.7 | 17.62116350132216 | 0.33793103448275863 | 0.44 | 0.153 | 0.41 | central | 15.859047151189946 | 1.7621163501322163 | 1.4000000000000021 | 5.363984674329511 | 0.3370745358802697 | 8.84 | 0.316 | galili |
-| ima_cs_22 | IMA-CS | 22.0 | 115.0 | 24.8 | 12.70472882784573 | 0.2655172413793103 | 0.44 | 0.187 | 0.29 | central | 11.434255945061158 | 1.2704728827845733 | 1.3000000000000007 | 4.980842911877397 | 0.15149589325877197 | 8.36 | 0.364 | galili |
-| ima_ap_30 | IMA-AP | 30.0 | 117.0 | 20.7 | 14.900532167450994 | 0.27586206896551724 | 0.44 | 0.1169 | 0.16 | central | 12.814457664007854 | 2.086074503443139 | 5.400000000000002 | 20.6896551724138 | 0.2745406688267307 |  |  | galili |
-| ima_ap_50 | IMA-AP | 50.0 | 116.0 | 15.9 | 25.955418219332568 | 0.0793103448275862 | 0.44 | 0.1159 | 0.08 | central | 21.28344293985271 | 4.671975279479862 | 10.200000000000001 | 39.08045977011494 | 0.07633196491141649 |  |  | galili |
-| ima_ap_70 | IMA-AP | 70.0 | 115.0 | 12.4 | 53.863049225719735 | 2.510344827586207 | 0.44 | 0.1399 | 0.13 | commissural | 6.463565907086374 | 47.39948331863336 | 13.700000000000001 | 52.490421455938694 | 2.509264128091196 |  |  | galili |
+| case_id | device | shortening_pct | annulus_circumference_mm | ap_diameter_mm | roa_mm2 | regurgitation_pct | pathology_severity | max_principal_strain | reference_regurgitation_pct | jet_location | central_roa_mm2 | commissural_roa_mm2 | ap_reduction_mm | ap_reduction_pct | physics_regurgitation_pct | cs_lcx_mm | niti_alternating_strain_pct | mapping_mode | leakage_proxy_pct | strain_risk_score |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| pathology |  |  | 118.5 | 26.1 | 154.6633247671995 | 5.179310344827586 | 0.44 | 0.1328 | 5.26 | central | 126.8239263091036 | 27.839398458095907 | 0.0 | 0.0 | 4.971022489027973 |  |  | galili | 4.971022489027973 | 0.1328 |
+| ima_cs_14 | IMA-CS | 14.0 | 116.27272727272727 | 25.5 | 24.023941571792783 | 0.6517241379310345 | 0.44 | 0.12360000000000002 | 0.52 | central | 21.621547414613506 | 2.4023941571792786 | 0.6000000000000014 | 2.298850574712649 | 0.6523598954999554 | 9.32 | 0.268 | galili | 0.6523598954999554 | 0.12360000000000002 |
+| ima_cs_18 | IMA-CS | 18.0 | 115.63636363636364 | 24.7 | 17.62116350132216 | 0.33793103448275863 | 0.44 | 0.153 | 0.41 | central | 15.859047151189946 | 1.7621163501322163 | 1.4000000000000021 | 5.363984674329511 | 0.3370745358802697 | 8.84 | 0.316 | galili | 0.3370745358802697 | 0.153 |
+| ima_cs_22 | IMA-CS | 22.0 | 115.0 | 24.8 | 12.70472882784573 | 0.2655172413793103 | 0.44 | 0.187 | 0.29 | central | 11.434255945061158 | 1.2704728827845733 | 1.3000000000000007 | 4.980842911877397 | 0.15149589325877197 | 8.36 | 0.364 | galili | 0.15149589325877197 | 0.187 |
+| ima_ap_30 | IMA-AP | 30.0 | 117.0 | 20.7 | 14.900532167450994 | 0.27586206896551724 | 0.44 | 0.1169 | 0.16 | central | 12.814457664007854 | 2.086074503443139 | 5.400000000000002 | 20.6896551724138 | 0.2745406688267307 |  |  | galili | 0.2745406688267307 | 0.1169 |
+| ima_ap_50 | IMA-AP | 50.0 | 116.0 | 15.9 | 25.955418219332568 | 0.0793103448275862 | 0.44 | 0.1159 | 0.08 | central | 21.28344293985271 | 4.671975279479862 | 10.200000000000001 | 39.08045977011494 | 0.07633196491141649 |  |  | galili | 0.07633196491141649 | 0.1159 |
+| ima_ap_70 | IMA-AP | 70.0 | 115.0 | 12.4 | 35.58595105131964 | 1.2241379310344829 | 0.44 | 0.1399 | 0.13 | commissural | 4.27031412615836 | 31.31563692516128 | 13.700000000000001 | 52.490421455938694 | 1.2258054123638438 |  |  | galili | 1.2258054123638438 | 0.1399 |
 
 
 ### B. Pareto / 可行域表（节选完整导出）
@@ -402,19 +402,19 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 
 | mapping_mode | suture_shortening_pct | ap_reduction_pct | ap_matched | single_physics_regurgitation_pct | dual_physics_regurgitation_pct | delta_physics_regurg_pct_points | single_jet_location | dual_jet_location | single_commissural_fraction | dual_commissural_fraction | within_planner_ap_cap_20 | note |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| clinical | 10.0 | 3.0 | True | 1.9077 | 1.9127 | 0.005 | central | central | 0.115 | 0.0575 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 15.0 | 4.5 | True | 1.5404 | 1.5446 | 0.0042 | central | central | 0.1225 | 0.0612 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 20.0 | 6.0 | True | 1.2221 | 1.2255 | 0.0034 | central | central | 0.13 | 0.065 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 25.0 | 7.5 | True | 0.9493 | 0.9518 | 0.0025 | central | central | 0.1375 | 0.0688 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 30.0 | 9.0 | True | 0.7182 | 0.7201 | 0.0019 | central | central | 0.145 | 0.0725 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 35.0 | 10.5 | True | 0.5255 | 0.5268 | 0.0013 | central | central | 0.1525 | 0.0762 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 40.0 | 12.0 | True | 0.368 | 0.3688 | 0.0009 | central | central | 0.16 | 0.08 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 45.0 | 13.5 | True | 0.2424 | 0.2429 | 0.0005 | central | central | 0.1675 | 0.0838 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 50.0 | 15.0 | True | 0.1467 | 0.1465 | -0.0002 | central | central | 0.21 | 0.105 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 55.0 | 16.5 | True | 0.0927 | 0.0913 | -0.0014 | central | central | 0.27 | 0.135 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 60.0 | 18.0 | True | 0.0754 | 0.0735 | -0.0018 | mixed | central | 0.33 | 0.165 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 65.0 | 19.5 | True | 0.2023 | 0.116 | -0.0863 | mixed | central | 0.39 | 0.195 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
-| clinical | 70.0 | 21.0 | True | 0.3911 | 0.1663 | -0.2247 | mixed | central | 0.47 | 0.235 | False | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 10.0 | 3.0 | True | 1.0085 | 1.0085 | 0.0 | central | central | 0.115 | 0.0575 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 15.0 | 4.5 | True | 0.9834 | 0.9834 | 0.0 | central | central | 0.1225 | 0.0612 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 20.0 | 6.0 | True | 0.9586 | 0.9586 | 0.0 | central | central | 0.13 | 0.065 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 25.0 | 7.5 | True | 0.9341 | 0.9341 | 0.0 | central | central | 0.1375 | 0.0688 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 30.0 | 9.0 | True | 0.91 | 0.91 | 0.0 | central | central | 0.145 | 0.0725 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 35.0 | 10.5 | True | 0.8922 | 0.8922 | 0.0 | central | central | 0.1525 | 0.0762 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 40.0 | 12.0 | True | 0.8747 | 0.8747 | 0.0 | central | central | 0.16 | 0.08 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 45.0 | 13.5 | True | 0.8573 | 0.8573 | 0.0 | central | central | 0.1675 | 0.0838 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 50.0 | 15.0 | True | 0.8401 | 0.8401 | 0.0 | central | central | 0.21 | 0.105 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 55.0 | 16.5 | True | 0.8243 | 0.8243 | 0.0 | central | central | 0.27 | 0.135 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 60.0 | 18.0 | True | 0.8086 | 0.8086 | 0.0 | mixed | central | 0.33 | 0.165 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 65.0 | 19.5 | True | 0.7931 | 0.7931 | 0.0 | mixed | central | 0.39 | 0.195 | True | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
+| clinical | 70.0 | 21.0 | True | 0.7778 | 0.7778 | 0.0 | mixed | central | 0.47 | 0.235 | False | Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis) |
 
 
 ---
@@ -423,16 +423,16 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 
 见同目录 HTML 终报章节或下方「打包时写入」的终报正文（生成脚本在 HTML 中展开完整第十九节）。
 
-**GitHub（公开）：** https://github.com/Coucou2016/fmr-ima-layer1-planner  
-**ChatGPT URL：** https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65  
-**本轮性质：** 公开仓库推送 + 报告/论文打包；顾问可读完整公开代码/文档；ChatGPT 浏览器 MCP 本轮受阻（见完整第十九节）。  
+**GitHub（公开）：** https://github.com/Coucou2016/fmr-ima-layer1-planner
+**ChatGPT URL：** https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65
+**本轮性质：** 公开仓库推送 + 报告/论文打包；顾问可读完整公开代码/文档；ChatGPT 浏览器 MCP 本轮受阻（见完整第十九节）。
 **推送：** 已 push `main`（PUBLIC）；无 PR。
 
 
 ### 打包脚本状态附记
 
-- PDF：report.pdf: PASS → report.pdf (1589974 bytes); paper.pdf: PASS → docs/paper.pdf (1355321 bytes)
-- report.html size：1341619 bytes
+- PDF：report.pdf: PASS → report.pdf (1571947 bytes); paper.pdf: PASS → docs/paper.pdf (1350703 bytes)
+- report.html size：1317495 bytes
 - data:image count：5
 
 ## 第十九节（完整）：双代理协作终报
@@ -440,7 +440,7 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 | 项 | 内容 |
 |----|------|
 | GitHub URL | https://github.com/Coucou2016/fmr-ima-layer1-planner（PUBLIC；顾问可读完整代码/文档） |
-| Commit hash | `6b6e5057934c4c8409e676909ea63399a363ede9` |
+| Commit hash | `2dc65205d62ab5f3565cdf11e7de8e642394d28b` |
 | Push status | main; tracking status: ## main...origin/main |
 | ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
 | ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
@@ -451,6 +451,6 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 | Rejected | Layer-1=LHHM；first CS-vs-AP；≥8.6 mm=safe；η±20%=FEA UQ；旗舰 Nature |
 | Files | docs/manuscript_draft.md, docs/paper_framework_nature.md, docs/paper.html, docs/paper.md, docs/paper.pdf, report.html, report.md, report.pdf, docs/report.html, docs/report.md, tools/package_reports.py, docs/chatgpt_collab/rounds/round_01.md, docs/chatgpt_collab/rounds/round_02.md, docs/chatgpt_collab/rounds/round_03.md, docs/chatgpt_collab/rounds/round_04.md, docs/chatgpt_collab/rounds/round_05.md, docs/chatgpt_collab/20260816_five_round_final.md |
 | Tests | PASS — PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -q (40 passed); PASS — python run_pipeline.py --seed 42 --paper --no-export (planner: IMA-AP dual 60%, AP 18.0%, physics (see JSON), jet=central) |
-| PDF | report.pdf: PASS → report.pdf (1589974 bytes); paper.pdf: PASS → docs/paper.pdf (1355321 bytes) |
+| PDF | report.pdf: PASS → report.pdf (1571947 bytes); paper.pdf: PASS → docs/paper.pdf (1350703 bytes) |
 | Risks | base64 HTML 体积大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待补档 |
 | Scope | 公开 push 已完成；无 PR；无 deploy |

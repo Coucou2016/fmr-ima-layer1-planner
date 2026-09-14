@@ -12,13 +12,8 @@ They do NOT lock a particular seed-42 'recommendation' as scientific truth.
 
 from __future__ import annotations
 
-
-
 import sys
-
 from pathlib import Path
-
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -27,32 +22,17 @@ sys.path.insert(0, str(ROOT))
 
 
 from analysis.evaluate import evaluate_design_point
-
 from analysis.paper_tables import eta_sensitivity, table_maveric_reduce_fmr_alignment
-
 from analysis.planner import run_scenario_ranker
-
 from models.devices import (
-
     CS_LCX_COMPRESSION_THRESHOLD_MM,
-
     GALILI_IMA_AP_50_AP_MM,
-
     GALILI_PEAK_SYS_DISEASE_AP_MM,
-
     IMA_AP,
-
     IMA_CS,
-
     UNDEFORMED_DIASTOLE_AP_MM,
-
     cs_lcx_distance_mm,
-
 )
-
-
-
-
 
 GOLDEN_SEED = 42
 
@@ -368,7 +348,7 @@ def test_scienceplots_available_and_paper_figures_high_dpi():
 
     required = [
 
-        "fig1_ima_ap_nonmonotonic_clinical_window.png",
+        "fig1_ima_ap_nonmonotonic_exploratory_planning_range.png",
 
         "fig2_suture_vs_ap_reduction.png",
 

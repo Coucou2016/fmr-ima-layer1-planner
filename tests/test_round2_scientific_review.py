@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -191,3 +190,104 @@ def test_design_point_leakage_proxy_alias():
     assert "strain_risk_score" in d
     assert "contact_score" in d
     assert d["contact_score"] is not None
+    assert d.get("contact_fraction") is not None
+    assert d.get("response_path") in {
+        "fitted_response",
+        "rule_based_proxy",
+        "hybrid_ap_extreme",
+    }
+
+
+def test_roa_pipeline_weights_scientific_default():
+    cal = yaml.safe_load(
+        (ROOT / "configs" / "surrogate_calibration.yaml").read_text(encoding="utf-8")
+    )
+    for key in ("default", "ima_ap_50", "pathology"):
+        block = cal["roa_pipeline"][key]
+        assert abs(float(block["model_weight"]) - 1.0) < 1e-12
+        assert abs(float(block["cluster_weight"]) - 0.0) < 1e-12
+
+
+def test_sph_scale_is_pathology_fraction_identity():
+    from simulation.calibration import load_surrogate_calibration
+    from sph.hemodynamics import _sph_scale
+
+    cfg = load_surrogate_calibration()
+    assert abs(_sph_scale(cfg) - float(cfg["sph"]["pathology_regurgitation_pct"]) / 100.0) < 1e-12
+
+
+def test_fitted_response_default_and_contact_fraction_feature():
+    from analysis.evaluate import evaluate_design_point, load_design_space
+    from models.response_runtime import estimate_contact_fraction
+
+    cfg = load_design_space()
+    assert cfg.get("response_path") == "fitted_response"
+    cf = estimate_contact_fraction("IMA-AP", 70.0)
+    assert abs(cf - 0.225696) < 1e-5
+    pt = evaluate_design_point(
+        device_type="IMA-AP",
+        shortening_pct=70,
+        mapping_mode="galili",
+        n_sutures=1,
+        blend=False,
+        response_path="fitted_response",
+        design_space=cfg,
+    )
+    assert pt.response_path == "fitted_response"
+    assert pt.contact_fraction is not None
+    assert pt.contact_fraction > 0.1
+
+
+def test_rule_based_proxy_path_still_available():
+    import copy
+
+    from analysis.evaluate import evaluate_design_point, load_design_space
+
+    cfg = copy.deepcopy(load_design_space())
+    cfg["response_path"] = "rule_based_proxy"
+    pt = evaluate_design_point(
+        device_type="IMA-AP",
+        shortening_pct=70,
+        mapping_mode="galili",
+        n_sutures=1,
+        blend=False,
+        design_space=cfg,
+    )
+    assert pt.response_path == "rule_based_proxy"
+    assert pt.rule_based_leakage_proxy_pct is not None
+    # Dampened AP70: historical catastrophe ~2.46% → post-dampen <1.5%
+    # (Galili published 0.13%; residual overestimate remains — fitted_response
+    # is the paper ranking path for AP-class extremes).
+    assert pt.physics_regurgitation_pct < 1.5
+    assert pt.physics_regurgitation_pct > 0.05
+
+
+def test_exploratory_planning_range_config_keys():
+    ds = yaml.safe_load((ROOT / "configs" / "design_space.yaml").read_text(encoding="utf-8"))
+    cons = ds["constraints"]
+    assert "exploratory_planning_range_ap_reduction_pct" in cons
+    assert cons["exploratory_planning_range_ap_reduction_pct"] == [14.0, 20.0]
+
+
+def test_lhs_uncertainty_emits_p_top1(tmp_path):
+    import copy
+
+    from analysis.evaluate import load_design_space
+    from analysis.planner import run_scenario_ranker
+
+    cfg = copy.deepcopy(load_design_space())
+    cfg["uncertainty"]["n_samples"] = 12
+    rec = run_scenario_ranker(
+        seed=42,
+        mapping_mode="clinical",
+        output_dir=tmp_path,
+        design_space=cfg,
+        n_eta_samples=12,
+    )
+    unc = rec["uncertainty"]
+    assert unc.get("sampling_mode") == "latin_hypercube_multiparam"
+    assert unc["n_samples"] == 12
+    assert "p_top1" in unc
+    assert "P(top-1)" in unc
+    assert "first_order_sensitivity_ranks" in unc
+    assert rec["response_path"] == "fitted_response"

@@ -2,6 +2,12 @@
 # Algebraic / phenomenological surrogate — not LHHM/Abaqus FSI.
 # See results/clinical_references.yaml.
 
+# Ranking / ROA–leak path for paper & seed-42 scenario_ranker:
+#   fitted_response  — primary (full-train f_ROA/f_leak; Dryad contact feature)
+#   rule_based_proxy — legacy exploratory algebraic + SPH-inspired leak
+#   hybrid_ap_extreme — rule-based except AP-class over-short routed to fitted
+response_path: fitted_response
+
 ima_ap:
   shortening_pct:
     min: 10
@@ -38,13 +44,27 @@ clinical_mapping:
 
 constraints:
   clinical_max_ap_reduction_pct: 20.0
-  clinical_window_ap_reduction_pct: [14.0, 20.0]
+  # Official name; legacy clinical_window_* retained as alias in code.
+  exploratory_planning_range_ap_reduction_pct: [14.0, 20.0]
+  clinical_window_ap_reduction_pct: [14.0, 20.0]  # deprecated alias
   niti_alternating_strain_pct_max: 0.4  # illustrative engineering screen
   cs_lcx_min_mm: 8.6  # Rottländer risk-screening threshold — not safety
   # Prefer patient-measured CS–LCx; default is illustrative.
   baseline_cs_lcx_mm: 11.0
   # Assumption: cs_lcx ≈ 11 − 0.12×shortening
   cs_lcx_cinch_mm_per_pct: 0.12
+
+# Multi-parameter assumption-prior sensitivity (Latin Hypercube).
+uncertainty:
+  sampling: latin_hypercube
+  n_samples: 120
+  eta_ap_range: [0.24, 0.36]
+  eta_cs_range: [0.44, 0.66]
+  dual_commissural_factor_range: [0.25, 1.0]
+  baseline_cs_lcx_mm_range: [10.0, 12.0]
+  cs_lcx_cinch_mm_per_pct_range: [0.08, 0.16]
+  # Optional ± relative jitter on fitted leak coefficients (0 = off).
+  fitted_leak_coef_rel_span: 0.10
 
 sweep:
   mappings: ["galili", "clinical"]

@@ -15,10 +15,10 @@ import matplotlib
 # Headless / CI: always write PNGs even without a display.
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties, findfont
 
 # SciencePlots registers styles on import.
 import scienceplots  # noqa: F401
+from matplotlib.font_manager import FontProperties, findfont
 
 from .metrics import CaseMetrics
 
@@ -188,7 +188,7 @@ def plot_paper_figures(
     out_dir.mkdir(parents=True, exist_ok=True)
     written: dict[str, Path] = {}
 
-    written["fig1"] = out_dir / "fig1_ima_ap_nonmonotonic_clinical_window.png"
+    written["fig1"] = out_dir / "fig1_ima_ap_nonmonotonic_exploratory_planning_range.png"
     _fig1_nonmonotonic(points, written["fig1"])
 
     written["fig2"] = out_dir / "fig2_suture_vs_ap_reduction.png"
@@ -206,6 +206,19 @@ def plot_paper_figures(
 
 
 def _fig1_nonmonotonic(points, path: Path) -> None:
+    from analysis.evaluate import load_design_space
+
+    cfg = load_design_space()
+    eta_ap = float(cfg.get("clinical_mapping", {}).get("ap_transfer_eta_ima_ap", 0.30))
+    cons = cfg.get("constraints", {})
+    plan = cons.get("exploratory_planning_range_ap_reduction_pct") or cons.get(
+        "clinical_window_ap_reduction_pct", [14.0, 20.0]
+    )
+    lo_ap, hi_ap = float(plan[0]), float(plan[1])
+    # Suture % ≈ AP% / η for clinical IMA-AP mapping band overlay.
+    lo_s = lo_ap / max(eta_ap, 1e-9)
+    hi_s = hi_ap / max(eta_ap, 1e-9)
+
     galili = _ap_single(points, "galili")
     clinical = _ap_single(points, "clinical")
     with _science_style():
@@ -226,9 +239,15 @@ def _fig1_nonmonotonic(points, path: Path) -> None:
                 color="C0",
                 label="IMA-AP physics (clinical AP mapping)",
             )
-        ax.axvspan(46.7, 66.7, color="C2", alpha=0.12, label="Exploratory planning range ~14–20% AP (η=0.30)")
+        ax.axvspan(
+            lo_s,
+            hi_s,
+            color="C2",
+            alpha=0.12,
+            label=f"Exploratory planning range ~{lo_ap:g}–{hi_ap:g}% AP (η={eta_ap:g})",
+        )
         ax.set_xlabel("Suture shortening (%)")
-        ax.set_ylabel("Physics regurgitation (%)")
+        ax.set_ylabel("Leakage proxy (%)")
         ax.set_title("IMA-AP: non-monotonic Galili curve vs clinical AP dose")
         ax.grid(True, alpha=0.3)
         ax.legend(loc="best", frameon=False, fontsize=8)
@@ -271,6 +290,7 @@ def _fig2_dose_map(points, path: Path) -> None:
         ax.set_xlabel("Device shortening (%)")
         ax.set_ylabel("AP diameter reduction (%)")
         ax.set_title("Map shortening % onto AP-mm / AP-% space")
+        # η labels come from design_space (0.30 / 0.55), not a hard-coded 0.67.
         ax.grid(True, alpha=0.3)
         ax.legend(loc="best", frameon=False, fontsize=8)
         fig.tight_layout()

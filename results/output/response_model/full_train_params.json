@@ -1,0 +1,57 @@
+{
+  "role": "full_train_response_model_for_ranking",
+  "honesty": "Fitted on all available Galili peak-systole cases for exploratory ranking when response_path=fitted_response. Not a substitute for fold-wise LOO CV honesty metrics.",
+  "params": {
+    "roa_coef": [
+      4.8704783698365155,
+      0.07461498296127139,
+      -0.4002623680666807,
+      -0.33458503711251647,
+      -0.11269559668629126,
+      0.11857228587907158,
+      -0.1785184025356523,
+      -0.11269559668628941
+    ],
+    "leak_coef": [
+      0.9935240485347075,
+      0.4462826948432501,
+      0.928058951937585,
+      0.11328158561062912,
+      -0.8288333254962243,
+      -0.9485042795447904,
+      -0.0229557680088745
+    ],
+    "train_ids": [
+      "pathology",
+      "ima_cs_14",
+      "ima_cs_18",
+      "ima_cs_22",
+      "ima_ap_30",
+      "ima_ap_50",
+      "ima_ap_70"
+    ],
+    "ridge_roa": 0.05,
+    "ridge_leak": 0.05,
+    "kappa_overshort": 1.85,
+    "feature_names_roa": [
+      "intercept",
+      "delta_ap_mm",
+      "is_ima_ap",
+      "is_ima_cs",
+      "annular_reduction_mm",
+      "contact_fraction",
+      "is_ap_x_delta",
+      "is_cs_x_annular"
+    ],
+    "feature_names_leak": [
+      "intercept",
+      "log_roa_ratio",
+      "coaptation_proxy",
+      "contact_fraction",
+      "is_ima_ap",
+      "is_ima_cs",
+      "overshort_sq"
+    ],
+    "roa_space": "log_plus_overshort_prior"
+  }
+}

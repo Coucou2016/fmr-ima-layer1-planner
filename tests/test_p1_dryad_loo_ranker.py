@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import json
 import sys
 from pathlib import Path
 
@@ -116,7 +115,7 @@ def test_scenario_ranker_uncertainty_and_pareto(tmp_path):
     assert "assumption" in (unc.get("honesty") or "").lower()
     assert isinstance(rec.get("pareto_frontier"), list)
     assert isinstance(rec.get("pareto_global_common_objectives"), list)
-    assert rec["hypotheses"]["dual_suture_role"] == "exploratory_hypothesis_parameter"
+    assert rec["hypotheses"]["dual_suture_role"] == "exploratory_hypothesis_parameter_sensitivity_not_discovery"
     assert rec["constraints"]["cs_lcx_cinch_role"] == "labeled_assumption_slope"
     assert rec["framing"] == "exploratory_screening_best_under_assumptions"
     # Compat shim present but framing is not clinical recommendation

@@ -13,17 +13,10 @@ Compares IMA-CS vs IMA-AP for functional mitral regurgitation
 
 from __future__ import annotations
 
-
-
 import argparse
-
 import json
-
 import sys
-
 from pathlib import Path
-
-
 
 ROOT = Path(__file__).resolve().parent
 
@@ -34,42 +27,25 @@ if str(ROOT) not in sys.path:
 
 
 import numpy as np
-
 import yaml
 
-
-
+from analysis.exports import export_case_artifacts, export_paper_comparison_table
+from analysis.jet import classify_jet
+from analysis.metrics import CaseMetrics, collect_metrics, load_reference_targets
+from analysis.plots import plot_comparison, plot_regurgitation_bars
+from models.devices import IMA_AP, IMA_CS
 from models.heart_geometry import HeartGeometry
-
-from models.pathology import make_papillary_mesh, apply_papillary_pathology
-
-from models.devices import IMA_CS, IMA_AP
-
-from simulation.loading import PressureLoading
-
-from simulation.run_case import run_mechanics_proxy, run_fea_surrogate
-
-from simulation.fea_export import export_inp_stub, export_vtk_annulus
-
-from simulation.roa_surrogate import pipeline_roa_mm2, niti_bridge_strain
-
+from models.pathology import apply_papillary_pathology, make_papillary_mesh
 from simulation.calibration import (
     load_surrogate_calibration,
     physics_regurgitation_by_case,
     write_calibration_report,
 )
-from analysis.exports import export_case_artifacts, export_paper_comparison_table
-
+from simulation.fea_export import export_inp_stub, export_vtk_annulus
+from simulation.loading import PressureLoading
+from simulation.roa_surrogate import niti_bridge_strain, pipeline_roa_mm2
+from simulation.run_case import run_mechanics_proxy
 from sph.hemodynamics import SPHSurrogate
-
-from analysis.metrics import CaseMetrics, collect_metrics, load_reference_targets
-
-from analysis.plots import plot_regurgitation_bars, plot_comparison
-
-from analysis.jet import classify_jet
-
-
-
 
 
 def _load_yaml(path: Path) -> dict:
@@ -460,9 +436,11 @@ def main():
 
     if args.sweep or args.plan or args.paper:
         from analysis.design_sweep import run_sweep
-        from analysis.planner import run_planner
         from analysis.paper_tables import export_paper_bundle
+        from analysis.planner import run_planner
+        from models.response_runtime import write_full_train_params
 
+        write_full_train_params()
         points = run_sweep(seed=args.seed)
         rec = None
         if args.plan or args.paper:
@@ -470,7 +448,7 @@ def main():
             rec_pt = rec.get("best_candidate") or rec.get("recommended") or {}
             if rec_pt:
                 ns = rec_pt.get("n_sutures") or 0
-                suture_note = f" dual" if rec_pt.get("device") == "IMA-AP" and ns >= 2 else ""
+                suture_note = " dual" if rec_pt.get("device") == "IMA-AP" and ns >= 2 else ""
                 print(
                     "\nBest candidate under assumptions: "
                     f"{rec_pt.get('device')}{suture_note} {rec_pt.get('shortening_pct')}%  "
@@ -488,8 +466,8 @@ def main():
                 seed=args.seed,
             )
             # Blend-off diagnostic + true fold-wise response-model CV
-            from tools.loo_evaluate import run as run_loo_diag
             from analysis.fit_response_model import run_loo_cv, write_outputs
+            from tools.loo_evaluate import run as run_loo_diag
 
             loo_payload = run_loo_diag("both")
             loo_out = ROOT / "results" / "output" / "loo_evaluation.json"
@@ -499,6 +477,7 @@ def main():
             write_outputs(cv_payload)
             print(f"Blend-off diagnostic: {loo_out}")
             print(f"Fold-wise CV: {ROOT / 'results' / 'output' / 'cross_validation'}")
+            print(f"Full-train response params: {ROOT / 'results' / 'output' / 'response_model'}")
             print(f"Paper tables: {ROOT / 'results' / 'output' / 'paper_tables'}")
             print(f"Paper figures: {ROOT / 'results' / 'output' / 'paper_figures'}")
 

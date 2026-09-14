@@ -204,6 +204,22 @@ def _apply_patient_cs_lcx(
         p.cs_lcx_mm = float(patient_cs_lcx_mm) - slope * float(p.shortening_pct)
 
 
+def _lhs_unit_sample(n: int, d: int, seed: int) -> np.ndarray:
+    """Latin Hypercube in [0,1]^d (SciPy if available; else stratified RNG)."""
+    try:
+        from scipy.stats.qmc import LatinHypercube
+
+        return LatinHypercube(d=d, seed=seed).random(n=n)
+    except Exception:
+        rng = np.random.default_rng(seed)
+        out = np.zeros((n, d))
+        for j in range(d):
+            cut = (np.arange(n) + rng.random(n)) / n
+            rng.shuffle(cut)
+            out[:, j] = cut
+        return out
+
+
 def run_uncertainty_analysis(
     *,
     seed: int,
@@ -212,63 +228,125 @@ def run_uncertainty_analysis(
     clinical_max_ap_reduction_pct: float,
     enforce_lcx: bool,
     patient_cs_lcx_mm: Optional[float],
-    n_eta_samples: int = 9,
+    n_eta_samples: Optional[int] = None,
     eta_relative_span: float = 0.20,
     independent_eta: bool = True,
 ) -> dict[str, Any]:
-    """Sweep η and summarize feasibility / ranking stability.
+    """Multi-parameter assumption-prior sensitivity (LHS by default).
 
-    Default: independent η_AP ~ U(0.24, 0.36) and η_CS ~ U(0.44, 0.66)
-    (nominal ±20%). Legacy common-factor sampling kept when independent_eta=False.
-    η are assumption priors — not clinically calibrated constants.
+    Parameters sampled (Latin Hypercube, N from design_space.uncertainty):
+      η_AP, η_CS, dual commissural factor, CS–LCx baseline, CS–LCx cinch slope.
+    Outputs: P(top-1), P(feasible), ranking stability, first-order Spearman/PRCC ranks.
+    η / dual / LCx slopes are assumption priors — not clinically calibrated.
     """
-    rng = np.random.default_rng(seed)
+    unc = design_space.get("uncertainty") or {}
     cmap = design_space.get("clinical_mapping", {})
+    cons0 = design_space.get("constraints", {})
+    dual0 = float(design_space.get("dual_suture", {}).get("commissural_factor", 0.5))
     eta_ap0 = float(cmap.get("ap_transfer_eta_ima_ap", 0.30))
     eta_cs0 = float(cmap.get("ap_transfer_eta_ima_cs", 0.55))
-    eta_ap_lo, eta_ap_hi = eta_ap0 * (1.0 - eta_relative_span), eta_ap0 * (1.0 + eta_relative_span)
-    eta_cs_lo, eta_cs_hi = eta_cs0 * (1.0 - eta_relative_span), eta_cs0 * (1.0 + eta_relative_span)
+
+    eta_ap_lo, eta_ap_hi = [
+        float(x) for x in unc.get("eta_ap_range", [eta_ap0 * 0.8, eta_ap0 * 1.2])
+    ]
+    eta_cs_lo, eta_cs_hi = [
+        float(x) for x in unc.get("eta_cs_range", [eta_cs0 * 0.8, eta_cs0 * 1.2])
+    ]
+    dual_lo, dual_hi = [
+        float(x) for x in unc.get("dual_commissural_factor_range", [0.25, 1.0])
+    ]
+    lcx_lo, lcx_hi = [
+        float(x) for x in unc.get("baseline_cs_lcx_mm_range", [10.0, 12.0])
+    ]
+    slope_lo, slope_hi = [
+        float(x) for x in unc.get("cs_lcx_cinch_mm_per_pct_range", [0.08, 0.16])
+    ]
+
+    n_default = int(unc.get("n_samples", 200))
+    n_samp = int(n_eta_samples) if n_eta_samples is not None else n_default
+    n_samp = max(n_samp, 9)
+    sampling = str(unc.get("sampling", "latin_hypercube")).lower()
+
+    # Sample matrix columns: eta_ap, eta_cs, dual, baseline_lcx, slope
+    bounds = np.array(
+        [
+            [eta_ap_lo, eta_ap_hi],
+            [eta_cs_lo, eta_cs_hi],
+            [dual_lo, dual_hi],
+            [lcx_lo, lcx_hi],
+            [slope_lo, slope_hi],
+        ],
+        dtype=float,
+    )
+    param_names = [
+        "eta_ap",
+        "eta_cs",
+        "dual_commissural_factor",
+        "baseline_cs_lcx_mm",
+        "cs_lcx_cinch_mm_per_pct",
+    ]
+
+    if sampling in {"latin_hypercube", "lhs", "sobol"} and independent_eta:
+        unit = _lhs_unit_sample(n_samp, bounds.shape[0], seed)
+        samples = bounds[:, 0] + unit * (bounds[:, 1] - bounds[:, 0])
+        sampling_mode = "latin_hypercube_multiparam"
+    elif independent_eta:
+        rng = np.random.default_rng(seed)
+        # Legacy 3×3 η corners + extras; dual/LCx fixed at nominal.
+        pairs_eta: list[tuple[float, float]] = []
+        grid_ap = np.linspace(eta_ap_lo, eta_ap_hi, 3)
+        grid_cs = np.linspace(eta_cs_lo, eta_cs_hi, 3)
+        for ea in grid_ap:
+            for ec in grid_cs:
+                pairs_eta.append((float(ea), float(ec)))
+        n_extra = max(0, n_samp - len(pairs_eta))
+        for _ in range(n_extra):
+            pairs_eta.append(
+                (float(rng.uniform(eta_ap_lo, eta_ap_hi)), float(rng.uniform(eta_cs_lo, eta_cs_hi)))
+            )
+        samples = np.array(
+            [
+                [ea, ec, dual0, float(cons0.get("baseline_cs_lcx_mm", 11.0)), float(cons0.get("cs_lcx_cinch_mm_per_pct", 0.12))]
+                for ea, ec in pairs_eta
+            ],
+            dtype=float,
+        )
+        sampling_mode = "independent_eta_ap_cs"
+    else:
+        rng = np.random.default_rng(seed)
+        grid = np.linspace(1.0 - eta_relative_span, 1.0 + eta_relative_span, max(3, n_samp // 2))
+        extras = rng.uniform(1.0 - eta_relative_span, 1.0 + eta_relative_span, size=max(0, n_samp - len(grid)))
+        factors = np.unique(np.round(np.concatenate([grid, extras]), 5))
+        samples = np.array(
+            [
+                [
+                    eta_ap0 * float(fac),
+                    eta_cs0 * float(fac),
+                    dual0,
+                    float(cons0.get("baseline_cs_lcx_mm", 11.0)),
+                    float(cons0.get("cs_lcx_cinch_mm_per_pct", 0.12)),
+                ]
+                for fac in factors
+            ],
+            dtype=float,
+        )
+        sampling_mode = "common_relative_factor_sensitivity"
 
     wins: dict[str, int] = {}
     feasible_counts: list[int] = []
     evaluated = 0
     best_keys: list[str] = []
-    pairs: list[tuple[float, float]] = []
+    best_leaks: list[float] = []
+    sample_rows: list[dict[str, float]] = []
 
-    if independent_eta:
-        # Deterministic corners + RNG samples for stability.
-        grid_ap = np.linspace(eta_ap_lo, eta_ap_hi, 3)
-        grid_cs = np.linspace(eta_cs_lo, eta_cs_hi, 3)
-        for ea in grid_ap:
-            for ec in grid_cs:
-                pairs.append((float(ea), float(ec)))
-        n_extra = max(0, n_eta_samples - len(pairs))
-        for _ in range(n_extra):
-            pairs.append(
-                (
-                    float(rng.uniform(eta_ap_lo, eta_ap_hi)),
-                    float(rng.uniform(eta_cs_lo, eta_cs_hi)),
-                )
-            )
-        sampling_mode = "independent_eta_ap_cs"
-    else:
-        grid = np.linspace(
-            1.0 - eta_relative_span, 1.0 + eta_relative_span, max(3, n_eta_samples // 2)
-        )
-        extras = rng.uniform(
-            1.0 - eta_relative_span,
-            1.0 + eta_relative_span,
-            size=max(0, n_eta_samples - len(grid)),
-        )
-        factors = np.unique(np.round(np.concatenate([grid, extras]), 5))
-        for fac in factors:
-            pairs.append((eta_ap0 * float(fac), eta_cs0 * float(fac)))
-        sampling_mode = "common_relative_factor_sensitivity"
-
-    for eta_ap, eta_cs in pairs:
+    for row in samples:
+        eta_ap, eta_cs, dual, base_lcx, slope = (float(x) for x in row)
         cfg = copy.deepcopy(design_space)
         cfg["clinical_mapping"]["ap_transfer_eta_ima_ap"] = eta_ap
         cfg["clinical_mapping"]["ap_transfer_eta_ima_cs"] = eta_cs
+        cfg.setdefault("dual_suture", {})["commissural_factor"] = dual
+        cfg.setdefault("constraints", {})["baseline_cs_lcx_mm"] = base_lcx
+        cfg["constraints"]["cs_lcx_cinch_mm_per_pct"] = slope
         points = run_sweep(
             mappings=[mapping_mode],
             seed=seed,
@@ -276,7 +354,9 @@ def run_uncertainty_analysis(
             apply_planner_constraints=False,
             write_outputs=False,
         )
-        _apply_patient_cs_lcx(points, patient_cs_lcx_mm=patient_cs_lcx_mm, design_space=cfg)
+        # Prefer explicit patient baseline when provided; else use sampled baseline.
+        patient = patient_cs_lcx_mm if patient_cs_lcx_mm is not None else base_lcx
+        _apply_patient_cs_lcx(points, patient_cs_lcx_mm=patient, design_space=cfg)
         clinical = [p for p in points if p.mapping_mode == mapping_mode]
         for p in clinical:
             apply_constraints(
@@ -290,39 +370,82 @@ def run_uncertainty_analysis(
         evaluated = device_n
         feasible_counts.append(len(feas))
         best = _best(feas)
+        sample_rows.append(
+            {
+                "eta_ap": eta_ap,
+                "eta_cs": eta_cs,
+                "dual_commissural_factor": dual,
+                "baseline_cs_lcx_mm": base_lcx,
+                "cs_lcx_cinch_mm_per_pct": slope,
+                "n_feasible": float(len(feas)),
+                "best_leak_pct": float(best.physics_regurgitation_pct) if best else float("nan"),
+            }
+        )
         if best is not None:
             key = _point_key(best)
             wins[key] = wins.get(key, 0) + 1
             best_keys.append(key)
+            best_leaks.append(float(best.physics_regurgitation_pct))
 
-    n = max(len(pairs), 1)
+    n = max(len(samples), 1)
     p_feasible_mean = (
         float(np.mean([c / max(evaluated, 1) for c in feasible_counts]))
         if feasible_counts
         else 0.0
     )
     top = sorted(wins.items(), key=lambda kv: (-kv[1], kv[0]))
+    p_top1 = round(top[0][1] / n, 4) if top else 0.0
+
+    # First-order sensitivity: |Spearman| of each param vs best-candidate leak.
+    sensitivity_ranks: list[dict[str, Any]] = []
+    if len(sample_rows) >= 5 and any(np.isfinite(r["best_leak_pct"]) for r in sample_rows):
+        y = np.array([r["best_leak_pct"] for r in sample_rows], dtype=float)
+        mask = np.isfinite(y)
+        for name in param_names:
+            x = np.array([r[name] for r in sample_rows], dtype=float)
+            if mask.sum() < 5:
+                continue
+            rho = float(np.corrcoef(np.argsort(np.argsort(x[mask])), np.argsort(np.argsort(y[mask])))[0, 1])
+            sensitivity_ranks.append(
+                {
+                    "parameter": name,
+                    "spearman_vs_best_leak": round(rho, 4),
+                    "abs_spearman": round(abs(rho), 4),
+                    "method": "spearman_rank_approx_prcc",
+                }
+            )
+        sensitivity_ranks.sort(key=lambda d: (-d["abs_spearman"], d["parameter"]))
+
     stability = {
-        "n_eta_samples": int(len(pairs)),
-        "n_eta_factors": int(len(pairs)),  # legacy key
+        "n_eta_samples": int(len(samples)),
+        "n_samples": int(len(samples)),
+        "n_eta_factors": int(len(samples)),  # legacy key
         "eta_relative_span": eta_relative_span,
         "eta_ap_nominal": eta_ap0,
         "eta_cs_nominal": eta_cs0,
         "eta_ap_range": [round(eta_ap_lo, 5), round(eta_ap_hi, 5)],
         "eta_cs_range": [round(eta_cs_lo, 5), round(eta_cs_hi, 5)],
+        "dual_commissural_factor_range": [round(dual_lo, 5), round(dual_hi, 5)],
+        "baseline_cs_lcx_mm_range": [round(lcx_lo, 5), round(lcx_hi, 5)],
+        "cs_lcx_cinch_mm_per_pct_range": [round(slope_lo, 5), round(slope_hi, 5)],
         "eta_sampling_mode": sampling_mode,
+        "sampling_mode": sampling_mode,
         "eta_role": "assumption_prior_distribution",
         "mean_fraction_feasible": round(p_feasible_mean, 4),
+        "p_feasible": round(p_feasible_mean, 4),
         "p_feasible_at_nominal_grid": None,  # filled by caller
+        "p_top1": p_top1,
+        "P(top-1)": p_top1,
         "best_candidate_win_counts": [
             {"design_key": k, "n_wins": v, "win_fraction": round(v / n, 4)} for k, v in top
         ],
-        "ranking_stability_top1_fraction": round(top[0][1] / n, 4) if top else 0.0,
+        "ranking_stability_top1_fraction": p_top1,
+        "first_order_sensitivity_ranks": sensitivity_ranks,
         "honesty": (
-            "η sampling is assumption-prior sensitivity for exploratory ranking; "
+            "Multi-parameter assumption-prior sensitivity (LHS when configured); "
             "not imaging–FEA identification, Abaqus/LHHM UQ, or clinical calibration. "
             "η_CS is not from MAVERIC/ARTO. "
-            f"Sampling mode: {sampling_mode}."
+            f"Sampling mode: {sampling_mode}; N={len(samples)}."
         ),
     }
     return stability
@@ -338,7 +461,7 @@ def run_scenario_ranker(
     output_dir: Optional[Path] = None,
     design_space: Optional[dict[str, Any]] = None,
     patient_cs_lcx_mm: Optional[float] = None,
-    n_eta_samples: int = 9,
+    n_eta_samples: Optional[int] = None,
     skip_uncertainty: bool = False,
 ) -> dict[str, Any]:
     """Rank exploratory IMA scenarios under surrogate assumptions + η uncertainty."""
@@ -351,6 +474,10 @@ def run_scenario_ranker(
     )
     dual_hyp = cfg.get("dual_suture", {})
     dual_factor = float(dual_hyp.get("commissural_factor", 0.5))
+    plan_range = cons.get("exploratory_planning_range_ap_reduction_pct") or cons.get(
+        "clinical_window_ap_reduction_pct", [14.0, 20.0]
+    )
+    response_path = str(cfg.get("response_path", "fitted_response"))
 
     if points is None:
         points = run_sweep(
@@ -408,6 +535,8 @@ def run_scenario_ranker(
             "skipped": True,
             "mean_fraction_feasible": None,
             "ranking_stability_top1_fraction": None,
+            "p_top1": None,
+            "p_feasible": None,
             "best_candidate_win_counts": [],
             "honesty": "Uncertainty sweep skipped for this call.",
         }
@@ -427,17 +556,22 @@ def run_scenario_ranker(
     notes = [
         "Layer-1 exploratory scenario ranker — phenomenological mechanics + literature-calibrated leakage proxy.",
         "Not full FSI / LHHM / Abaqus; not a clinical recommendation engine.",
-        "Objective is physics leakage-proxy regurgitation (no YAML anchor blend).",
+        f"response_path={response_path} (fitted_response preferred for paper ranking; "
+        "rule_based_proxy remains available for diagnostics).",
+        "Objective is leakage_proxy_pct (alias physics_regurgitation_pct; no YAML anchor blend).",
         "best_candidate = best feasible grid point under stated surrogate assumptions "
         "(exploratory ranking / best under assumptions).",
         f"AP reduction ceiling = {cap:.1f}% (ARTO/MAVERIC ~14–15% IMA-AP context; "
         "Carillon TITAN II ~15% IMA-CS context; default planning max 20%).",
+        f"Exploratory planning range AP↓ = {list(plan_range)} "
+        "(legacy key clinical_window retained as alias).",
         "Prefer ΔAP / target_ap_reduction_pct as planning variable; η values are "
         "assumption-prior distribution means — not clinically calibrated constants; "
         "η_CS is NOT from MAVERIC/ARTO.",
-        f"Dual-suture commissural factor ×{dual_factor:g} is an explicit hypothesis parameter.",
+        f"Dual-suture commissural factor ×{dual_factor:g} is an explicit hypothesis parameter "
+        "(Fig.5 = factor sensitivity, not Innovation D discovery).",
         "LCx: prefer optional patient-measured CS–LCx baseline; "
-        "cinch model `baseline − 0.12×shortening` is a labeled assumption "
+        "cinch model `baseline − slope×shortening` is a labeled assumption "
         "(default baseline 11 mm from design_space.yaml).",
         "NiTi 0.4% = illustrative engineering screen only.",
         "Pareto: global common objectives = min leakage + max AP↓; "
@@ -468,13 +602,16 @@ def run_scenario_ranker(
         )
 
     result = {
-        "objective": "minimize physics_regurgitation_pct",
+        "objective": "minimize leakage_proxy_pct",
+        "objective_alias": "minimize physics_regurgitation_pct",
         "ranker": "scenario_ranker",
         "mapping_mode": mapping_mode,
+        "response_path": response_path,
         "framing": "exploratory_screening_best_under_assumptions",
         "constraints": {
             "clinical_max_ap_reduction_pct": cap,
-            "exploratory_planning_range_ap_reduction_pct": [14.0, 20.0],
+            "exploratory_planning_range_ap_reduction_pct": list(plan_range),
+            "clinical_window_ap_reduction_pct": list(plan_range),  # deprecated alias
             "niti_alternating_strain_pct_max": cons.get("niti_alternating_strain_pct_max", 0.4),
             "cs_lcx_min_mm": cons.get("cs_lcx_min_mm", 8.6) if enforce_lcx else None,
             "enforce_lcx": enforce_lcx,
@@ -490,7 +627,7 @@ def run_scenario_ranker(
         },
         "hypotheses": {
             "dual_suture_commissural_factor": dual_factor,
-            "dual_suture_role": "exploratory_hypothesis_parameter",
+            "dual_suture_role": "exploratory_hypothesis_parameter_sensitivity_not_discovery",
         },
         "n_total_points": n_total_points,
         "n_device_candidates": n_device_candidates,
@@ -540,7 +677,12 @@ def main(argv: Optional[list[str]] = None) -> dict[str, Any]:
         default=None,
         help="Optional patient-measured baseline CS–LCx (mm); slope remains assumption",
     )
-    parser.add_argument("--n-eta-samples", type=int, default=9)
+    parser.add_argument(
+        "--n-eta-samples",
+        type=int,
+        default=None,
+        help="LHS / η sample count (default: design_space.uncertainty.n_samples)",
+    )
     parser.add_argument("--skip-uncertainty", action="store_true")
     args = parser.parse_args(argv)
 

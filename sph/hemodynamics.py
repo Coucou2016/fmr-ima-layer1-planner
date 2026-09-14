@@ -13,22 +13,11 @@ This is not a full Lagrangian SPH solver.
 
 from __future__ import annotations
 
-
-
-import math
-
 from dataclasses import dataclass
-
 from typing import Any
 
-
-
 from models.heart_geometry import HeartGeometry
-
 from simulation.calibration import load_surrogate_calibration
-
-
-
 
 
 @dataclass
@@ -162,15 +151,16 @@ def regurgitation_fraction_from_physics(
     ap_ratio = geometry.ap_diameter_mm / max(ref_ap, 1e-9)
     frac_central *= max(ap_ratio, 0.5) ** 0.2
 
-    comm = 1.0 + 1.2 * max(0.0, 1.0 - ap_ratio) ** 1.05
-    comm *= 1.0 + 0.12 * max(coaptation_gap_mm - 0.9, 0.0)
-    roa_eff = min(max(roa_mm2, 12.0) * comm**0.25, 60.0)
+    # Soft commissural amplifier — avoid stacked AP70 pathology-scale leaks.
+    comm = 1.0 + 0.35 * max(0.0, 1.0 - ap_ratio) ** 1.2
+    comm *= 1.0 + 0.04 * max(coaptation_gap_mm - 0.9, 0.0)
+    roa_eff = min(max(roa_mm2, 12.0) * comm**0.15, 45.0)
     leak_eff = _leak_index(roa_eff, coaptation_gap_mm, sph)
     f_leak_comm = (leak_eff / ref_leak) ** float(sph["roa_exponent"])
     frac_comm = k * f_leak_comm * f_ann
     # Cap commissural branch so over-shortening captures qualitative rebound
     # (Galili 0.08→0.13%) without pathology-scale leaks.
-    frac_comm = min(frac_comm, max(frac_central * 8.0, 0.004))
+    frac_comm = min(frac_comm, max(frac_central * 2.2, 0.0018))
 
     if commissural_fraction is None:
         cf = 1.0 if commissural_leak else 0.0

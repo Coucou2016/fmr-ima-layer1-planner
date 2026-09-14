@@ -54,26 +54,36 @@ IMA-AP has a near-direct effect on AP diameter. Claiming IMA-AP 50% → AP 34.4 
 
 ## Seed-42 exploratory ranking
 
-Under clinical/planning map, assumption η_ap=0.30, η_cs=0.55 (assumption), AP ceiling 20%, LCx risk screen:
+Under clinical/planning map, `response_path=fitted_response` (default), assumption η_ap=0.30, η_cs=0.55, AP ceiling 20%, LCx risk screen, LHS UQ N=120:
 
 - **n_total_points=36**, **n_device_candidates=35**, **n_feasible_device_candidates=30**, **p_feasible_device_candidates≈0.857** (pathology is not a candidate)
-- Under the **nominal dual-suture hypothesis**, best candidate: IMA-AP dual suture **60%**, AP reduction **18.0%**, leakage proxy **~0.074%**, jet=`central` (Δleak vs matched single ~0.0018 pp; ranking assumption-sensitive)
-- Best IMA-CS: bridge **20%**, AP **11.0%**, CS–LCx **8.6 mm** (risk-screen edge)
-- Ranker emits independent η ranking stability + family-separated Pareto frontiers in `results/output/planner/scenario_ranking.json`
+- Best candidate under fitted path: **IMA-CS bridge 20%**, AP reduction **11.0%**, leakage proxy **≈0.39%**, jet=`central`, CS–LCx **8.6 mm** (risk-screen edge)
+- Dual-suture AP60 remains an assumption-sensitive alternative (Fig. 5 = factor sensitivity, **not** discovery); Δleak vs matched single is tiny under the rule path and ranking is assumption-driven
+- Ranker emits `P(top-1)` / ranking stability + family-separated Pareto frontiers in `results/output/planner/scenario_ranking.json`
 
-Physics % ≠ clinical regurgitant volume. Dual-suture commissural factor is an **exploratory hypothesis** parameter (Fig. 5 = sensitivity, not discovery).
+Switch paths in `configs/design_space.yaml`: `fitted_response` | `rule_based_proxy` | `hybrid_ap_extreme`.
+
+Physics % ≠ clinical regurgitant volume. Official fields: `leakage_proxy_pct`, `strain_risk_score`, `contact_score` (legacy aliases retained).
 
 ## Held-out / CV honesty
 
 - `tools/loo_evaluate.py` = **anchor-free / leave-one-case blend-off diagnostic** on the fixed rule-based surrogate (not fold-wise refit; AP MAE N/A)
 - `analysis/fit_response_model.py` = **true fold-wise** `f_ROA` / `f_leak` CV with Dryad `contact_fraction` as a feature → `results/output/cross_validation/`
+- Full-train params for ranking → `results/output/response_model/full_train_params.json`
+- Rule-based AP70 leak dampened ≈2.46% → ≈1.21% (still overestimates Galili 0.13%); paper ranking uses fitted path
 - Report held-out / CV **before** planner ranking in manuscript and packaged reports
+
+## Irreducible limits
+
+- n=7 Galili peak-systole cases ≠ patient-level external validation
+- No patient CT / chamber-labeled SPH leakage recompute
+- Algebraic proxies; η and dual factor are assumption priors
 
 ## Project structure
 
 ```
 configs/          Case YAML + surrogate_calibration.yaml + design_space.yaml
-models/           Geometry, pathology, devices, response_model
+models/           Geometry, pathology, devices, response_model, response_runtime
 simulation/       Algebraic mechanics proxy (aliases: run_fea_surrogate)
 sph/              Literature-calibrated leakage proxy (SPH-inspired)
 analysis/         ROA, jet, sweep, scenario_ranker, fit_response_model, paper tables/plots

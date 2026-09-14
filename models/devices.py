@@ -26,7 +26,7 @@ See ``results/clinical_references.yaml``. This module does **not** claim FEA.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Optional, Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 from .heart_geometry import HeartGeometry
 

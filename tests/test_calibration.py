@@ -3,17 +3,13 @@
 import sys
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from simulation.roa_surrogate import stable_case_seed, pipeline_roa_mm2
-from models.heart_geometry import HeartGeometry
-from models.pathology import make_papillary_mesh, apply_papillary_pathology
-from simulation.run_case import run_fea_surrogate
-from simulation.calibration import load_surrogate_calibration
+from models.pathology import apply_papillary_pathology, make_papillary_mesh
 from run_pipeline import run_all
+from simulation.roa_surrogate import pipeline_roa_mm2, stable_case_seed
+from simulation.run_case import run_fea_surrogate
 
 
 def test_stable_case_seed_independent_of_python_hash():

@@ -38,7 +38,12 @@ def _location_from_fraction(frac: float) -> str:
     return JET_CENTRAL
 
 
-def commissural_fraction(device: Optional[object], geometry=None) -> float:
+def commissural_fraction(
+    device: Optional[object],
+    geometry=None,
+    *,
+    dual_commissural_factor: float = 0.5,
+) -> float:
     """Continuous commissural share of the regurgitant orifice (0–1)."""
     _ = geometry
     if device is None:
@@ -64,7 +69,8 @@ def commissural_fraction(device: Optional[object], geometry=None) -> float:
                 t = (s - 50.0) / 20.0
                 frac = 0.18 + 0.70 * (t ** 1.2)
         if n_sutures >= 2:
-            frac *= 0.50
+            # Explicit hypothesis parameter from design_space.dual_suture.
+            frac *= float(dual_commissural_factor)
         return min(max(frac, 0.0), 0.95)
     return 0.18
 
@@ -74,8 +80,11 @@ def classify_jet(
     geometry=None,
     *,
     roa_mm2: float = 0.0,
+    dual_commissural_factor: float = 0.5,
 ) -> JetBreakdown:
-    frac = commissural_fraction(device, geometry)
+    frac = commissural_fraction(
+        device, geometry, dual_commissural_factor=dual_commissural_factor
+    )
     central = max(roa_mm2, 0.0) * (1.0 - frac)
     commissural = max(roa_mm2, 0.0) * frac
     return JetBreakdown(
