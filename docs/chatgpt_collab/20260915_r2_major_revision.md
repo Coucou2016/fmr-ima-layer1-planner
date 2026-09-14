@@ -47,7 +47,9 @@ python tools/package_reports.py
 
 ## Git
 
-- Follow-up commit: `1fc0646a8568d07e6846242f1969da70ba651bbd`
-- Prior Round-2 core: `dfa7b34efbeb2bc99d1c869c7204cb6843d368bf`
-- Push: pending → `origin/main` after this note.
+- Follow-through commit: `1fc0646a8568d07e6846242f1969da70ba651bbd`
+- Tip after log note: `2a09a8e95612869d8526ad711f3af6afac6b6119`
+- Prior Round-2 core: `dfa7b34efbeb2bc99d1c869c7204cb6843d368bf` (from `0d08fd5`)
+- Push: `origin/main` succeeded (`6b6e505..2a09a8e`)
+- Tests: **57 passed**
 - No invented ChatGPT replies; no clinical-recommendation framing restored.
