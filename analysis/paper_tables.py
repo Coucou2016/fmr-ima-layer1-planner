@@ -460,7 +460,7 @@ def table_dual_vs_single_matched_ap(
                 "single_commissural_fraction": round(s.commissural_fraction, 4),
                 "dual_commissural_fraction": round(d.commissural_fraction, 4),
                 "within_planner_ap_cap_20": s.ap_reduction_pct <= 20.0 + 1e-9,
-                "note": "Matched AP via same suture % under clinical η; mechanism sketch (Innovation D)",
+                "note": "Matched AP via same suture % under clinical η; dual-factor sensitivity (hypothesis)",
             }
         )
     return rows

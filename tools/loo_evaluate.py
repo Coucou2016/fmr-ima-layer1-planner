@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
-"""Leave-one-case-out / held-out scoring for Galili peak-systole anchors.
+"""Anchor-free / blend-off casewise diagnostic for Galili peak-systole anchors.
 
 Honesty contract
 ----------------
+- This script does **NOT** retrain the rule-based surrogate per fold.
+  It scores a fixed surrogate with blend OFF against published quantities.
+  Prefer the name **leave-one-case blend-off diagnostic** / **anchor-free
+  casewise diagnostic** — not ``LOO validation``.
+- For true fold-wise response-model cross-validation, use
+  ``python -m analysis.fit_response_model --write``.
 - Cases listed under ``calibration_targets`` may use regurgitation/ROA anchor
   blend for *reproduction*. Scoring those same IDs with blend ON must NOT be
   reported as independent validation.
-- Cases listed under ``heldout_targets`` (and each LOO fold's held-out ID) are
-  scored with blend OFF (physics / surrogate prediction vs published quantities).
-- With only seven discrete Galili table cases, LOO is a transparency check —
-  not a claim of patient-level external validation.
+- AP diameter is literature mapping input (table lookup); ``ap_prediction_metric_applicable``
+  is False — do not report AP MAE as predictive accuracy.
 - Prefer Dryad-derived ``data/processed/galili_cases.csv`` when
   ``source_tier=dryad_derived``; otherwise use published table scalars.
-- Optional ``--refit-scale`` applies a documented linear post-hoc scale on
-  train-fold leakage ratios (not new physics / not chamber-partition SPH).
 
 Usage::
 
     python tools/loo_evaluate.py
     python tools/loo_evaluate.py --mode heldout
-    python tools/loo_evaluate.py --mode loo --write
-    python tools/loo_evaluate.py --mode loo --refit-scale --write
+    python tools/loo_evaluate.py --mode diagnostic --write
 """
 
 from __future__ import annotations
@@ -64,6 +65,7 @@ def load_case_catalog() -> tuple[list[dict[str, Any]], str]:
                 "ap_diameter_mm": c.get("ap_diameter_mm"),
                 "roa_mm2": c.get("roa_mm2"),
                 "regurgitation_pct": c.get("regurgitation_pct"),
+                "annulus_circumference_mm": c.get("annulus_circumference_mm"),
                 "cardiac_phase": c.get("cardiac_phase", "peak_systole"),
             }
         )
@@ -104,6 +106,9 @@ def load_case_catalog() -> tuple[list[dict[str, Any]], str]:
                 "regurgitation_pct": float(r["regurgitation_pct"])
                 if r.get("regurgitation_pct") not in (None, "")
                 else (by_id.get(cid) or {}).get("regurgitation_pct"),
+                "annulus_circumference_mm": float(r["annulus_circumference_mm"])
+                if r.get("annulus_circumference_mm") not in (None, "")
+                else (by_id.get(cid) or {}).get("annulus_circumference_mm"),
                 "cardiac_phase": "peak_systole",
                 "contact_fraction": float(r["contact_fraction"])
                 if r.get("contact_fraction") not in (None, "")
@@ -165,6 +170,8 @@ def _predict_case(case: dict[str, Any], *, blend: bool) -> dict[str, Any]:
         "pred_regurgitation_pct": pred_leak,
         "pred_physics_regurgitation_pct": pt.physics_regurgitation_pct,
         "pred_blended_regurgitation_pct": pt.blended_regurgitation_pct,
+        "ap_role": "literature_mapping_input",
+        "ap_prediction_metric_applicable": False,
         "cardiac_phase": "peak_systole",
     }
 
@@ -176,10 +183,10 @@ def _errors(pred: dict[str, Any], truth: dict[str, Any]) -> dict[str, Any]:
         return float(pred[key_pred]) - float(truth[key_truth])
 
     return {
-        "err_ap_mm": err("pred_ap_diameter_mm", "ap_diameter_mm"),
+        "err_ap_mm_passthrough": err("pred_ap_diameter_mm", "ap_diameter_mm"),
         "err_roa_mm2": err("pred_roa_mm2", "roa_mm2"),
         "err_regurgitation_pct_points": err("pred_regurgitation_pct", "regurgitation_pct"),
-        "abs_err_ap_mm": None
+        "abs_err_ap_mm_passthrough": None
         if err("pred_ap_diameter_mm", "ap_diameter_mm") is None
         else abs(err("pred_ap_diameter_mm", "ap_diameter_mm")),  # type: ignore[arg-type]
         "abs_err_roa_mm2": None
@@ -188,6 +195,8 @@ def _errors(pred: dict[str, Any], truth: dict[str, Any]) -> dict[str, Any]:
         "abs_err_regurgitation_pct_points": None
         if err("pred_regurgitation_pct", "regurgitation_pct") is None
         else abs(err("pred_regurgitation_pct", "regurgitation_pct")),  # type: ignore[arg-type]
+        "ap_role": "literature_mapping_input",
+        "ap_prediction_metric_applicable": False,
     }
 
 
@@ -216,7 +225,6 @@ def score_cases(
             },
             **pred,
             **_errors(pred, truth),
-            "validation_claim_allowed": (not blend) and role in {"heldout", "loo_heldout"},
         }
         rows.append(row)
     return rows
@@ -226,39 +234,37 @@ def run_heldout() -> dict[str, Any]:
     cases, catalog_note = load_case_catalog()
     splits = split_ids()
     held = score_cases(
-        cases, splits["heldout_targets"], blend=False, role="heldout"
+        cases, splits["heldout_targets"], blend=False, role="heldout_blend_off_diagnostic"
     )
-    # Calibration IDs scored with blend ON = reproduction only.
     calib_repro = score_cases(
         cases, splits["calibration_targets"], blend=True, role="calibration_reproduction"
     )
-    # Same calibration IDs with blend OFF = physics-only diagnostic (still not
-    # "validation" if those IDs informed scale setting).
     calib_physics = score_cases(
-        cases, splits["calibration_targets"], blend=False, role="calibration_physics_diagnostic"
+        cases,
+        splits["calibration_targets"],
+        blend=False,
+        role="calibration_physics_diagnostic",
     )
     return {
-        "mode": "heldout",
+        "mode": "heldout_blend_off_diagnostic",
         "catalog": catalog_note,
         "splits": splits,
         "honesty": (
-            "Held-out scores use blend=OFF. Calibration IDs with blend=ON are "
-            "reproduction, not independent validation. Physics-only scores on "
-            "calibration IDs remain diagnostics because those IDs informed scales."
+            "Held-out scores use blend=OFF on the fixed rule-based surrogate. "
+            "This is an anchor-free casewise diagnostic, not fold-wise LOO "
+            "validation. Calibration IDs with blend=ON are reproduction only. "
+            "AP MAE is not a predictive metric (literature mapping input). "
+            "For true fold-wise CV see analysis/fit_response_model.py."
         ),
         "heldout": held,
         "calibration_reproduction": calib_repro,
         "calibration_physics_diagnostic": calib_physics,
-        "summary": _summarize(held, label="heldout_blend_off"),
+        "summary": _summarize(held, label="heldout_blend_off_diagnostic"),
     }
 
 
 def _loo_scale_alpha(cases: list[dict[str, Any]], train_ids: list[str]) -> Optional[float]:
-    """Linear post-hoc leakage scale from train folds (phenomenological only).
-
-    alpha = mean(published_leak / physics_pred) over train IDs with positive preds.
-    Applied only under ``--refit-scale``; does not invent chamber-partition SPH.
-    """
+    """Linear post-hoc leakage scale from train folds (phenomenological only)."""
     by_id = {c["id"]: c for c in cases}
     ratios: list[float] = []
     for tid in train_ids:
@@ -275,40 +281,41 @@ def _loo_scale_alpha(cases: list[dict[str, Any]], train_ids: list[str]) -> Optio
     return sum(ratios) / len(ratios)
 
 
-def run_loo(*, refit_scale: bool = False) -> dict[str, Any]:
+def run_casewise_diagnostic(*, refit_scale: bool = False) -> dict[str, Any]:
+    """Per-case blend-off diagnostic (fixed surrogate — not fold-wise refit)."""
     cases, catalog_note = load_case_catalog()
     splits = split_ids()
     all_ids = [c["id"] for c in cases]
     folds = []
     for held_id in all_ids:
-        # Surrogate has no per-fold retrain of mechanics; LOO scores held-out ID
-        # with blend OFF. Optional linear leakage scale uses train-fold ratios only.
-        row = score_cases(cases, [held_id], blend=False, role="loo_heldout")[0]
+        row = score_cases(
+            cases, [held_id], blend=False, role="leave_one_case_blend_off_diagnostic"
+        )[0]
         train_ids = [i for i in all_ids if i != held_id]
         row["notional_calibration_pool"] = train_ids
         row["anchor_blend_applied"] = False
+        row["fold_wise_refit"] = False
         row["note"] = (
-            "LOO reports physics prediction vs published peak-systole quantities "
-            "for the held-out case_id. Default path does not re-estimate SPH/ROA "
-            "YAML anchors per fold."
+            "Leave-one-case blend-off diagnostic on the fixed rule-based surrogate. "
+            "Does not re-estimate SPH/ROA parameters per fold. "
+            "Not LOO validation — see analysis/fit_response_model.py for true CV."
         )
         if refit_scale:
             alpha = _loo_scale_alpha(cases, train_ids)
-            row["loo_scale_alpha"] = alpha
+            row["diagnostic_scale_alpha"] = alpha
             row["refit_scale"] = True
             if alpha is not None and row.get("pred_regurgitation_pct") is not None:
                 row["pred_regurgitation_pct_unrefit"] = row["pred_regurgitation_pct"]
                 row["pred_regurgitation_pct"] = float(row["pred_regurgitation_pct"]) * alpha
-                # Refresh leakage absolute error after scale.
                 pub = (row.get("published") or {}).get("regurgitation_pct")
                 if pub is not None:
                     err = float(row["pred_regurgitation_pct"]) - float(pub)
                     row["err_regurgitation_pct_points"] = err
                     row["abs_err_regurgitation_pct_points"] = abs(err)
                 row["note"] = (
-                    "Optional per-fold linear leakage scale alpha=mean(pub/pred) on "
-                    "train IDs; phenomenological post-hoc only — not new physics and "
-                    "not Dryad chamber-partition re-simulation."
+                    "Optional per-case linear leakage scale alpha=mean(pub/pred) on "
+                    "other IDs; phenomenological post-hoc only — still not fold-wise "
+                    "mechanics refit."
                 )
             else:
                 row["refit_scale"] = False
@@ -317,23 +324,35 @@ def run_loo(*, refit_scale: bool = False) -> dict[str, Any]:
             row["refit_scale"] = False
         folds.append(row)
     honesty = (
-        "Leave-one-case-out over seven discrete Galili peak-systole cases. "
-        "Not patient-level external validation. Calibration-blend cases must "
-        "not be advertised as validated when blend was used."
+        "Leave-one-case blend-off diagnostic over seven discrete Galili "
+        "peak-systole cases on a fixed surrogate (no per-fold parameter refit). "
+        "Not patient-level external validation and not true LOO CV."
     )
     if refit_scale:
         honesty += (
-            " Optional --refit-scale applies train-fold linear leakage ratios only."
+            " Optional --refit-scale applies linear leakage ratios from other IDs only."
         )
     return {
-        "mode": "loo",
+        "mode": "leave_one_case_blend_off_diagnostic",
         "catalog": catalog_note,
         "splits": splits,
         "refit_scale": refit_scale,
+        "fold_wise_refit": False,
         "honesty": honesty,
         "folds": folds,
-        "summary": _summarize(folds, label="loo_blend_off_refit" if refit_scale else "loo_blend_off"),
+        "summary": _summarize(
+            folds,
+            label=(
+                "leave_one_case_blend_off_diagnostic_refit"
+                if refit_scale
+                else "leave_one_case_blend_off_diagnostic"
+            ),
+        ),
     }
+
+
+# Backward-compatible alias
+run_loo = run_casewise_diagnostic
 
 
 def _summarize(rows: list[dict[str, Any]], *, label: str) -> dict[str, Any]:
@@ -346,9 +365,16 @@ def _summarize(rows: list[dict[str, Any]], *, label: str) -> dict[str, Any]:
     return {
         "label": label,
         "n": len(rows),
-        "mae_ap_mm": mean_abs("abs_err_ap_mm"),
         "mae_roa_mm2": mean_abs("abs_err_roa_mm2"),
         "mae_regurgitation_pct_points": mean_abs("abs_err_regurgitation_pct_points"),
+        "ap_prediction_metric_applicable": False,
+        "mae_ap_mm_passthrough_note": (
+            "AP passthrough error is table-lookup consistency only — "
+            "not predictive accuracy."
+        ),
+        "mae_ap_mm_passthrough": mean_abs("abs_err_ap_mm_passthrough"),
+        # Legacy key retained but flagged non-applicable.
+        "mae_ap_mm": None,
     }
 
 
@@ -356,23 +382,34 @@ def run(mode: str = "both", *, refit_scale: bool = False) -> dict[str, Any]:
     out: dict[str, Any] = {
         "paper_doi": "10.1098/rsos.211464",
         "dryad_doi": "10.5061/dryad.bzkh1899d",
+        "evaluation_kind": "anchor_free_casewise_diagnostic",
+        "true_fold_wise_cv": "analysis/fit_response_model.py → results/output/cross_validation/",
     }
     if mode in {"heldout", "both"}:
         out["heldout_evaluation"] = run_heldout()
-    if mode in {"loo", "both"}:
-        out["loo_evaluation"] = run_loo(refit_scale=refit_scale)
+    if mode in {"loo", "diagnostic", "both"}:
+        # Keep loo_evaluation key for backward compat; value is diagnostic.
+        diag = run_casewise_diagnostic(refit_scale=refit_scale)
+        out["casewise_blend_off_diagnostic"] = diag
+        out["loo_evaluation"] = diag  # deprecated alias
     return out
 
 
 def main(argv: Optional[list[str]] = None) -> int:
-    ap = argparse.ArgumentParser(description="Galili held-out / LOO evaluation")
-    ap.add_argument("--mode", choices=["heldout", "loo", "both"], default="both")
+    ap = argparse.ArgumentParser(
+        description="Galili held-out / leave-one-case blend-off diagnostic (not true LOO CV)"
+    )
+    ap.add_argument(
+        "--mode",
+        choices=["heldout", "loo", "diagnostic", "both"],
+        default="both",
+    )
     ap.add_argument("--write", action="store_true", help=f"Write {OUT_DEFAULT}")
     ap.add_argument("--out", type=Path, default=OUT_DEFAULT)
     ap.add_argument(
         "--refit-scale",
         action="store_true",
-        help="Optional per-fold linear leakage scale from train ratios (phenomenological)",
+        help="Optional linear leakage scale from other-case ratios (phenomenological)",
     )
     args = ap.parse_args(argv)
     payload = run(args.mode, refit_scale=args.refit_scale)
@@ -381,18 +418,20 @@ def main(argv: Optional[list[str]] = None) -> int:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(text, encoding="utf-8")
         print("Wrote", args.out)
-    # Compact stdout summary
     if "heldout_evaluation" in payload:
         s = payload["heldout_evaluation"]["summary"]
         print(
-            f"Held-out MAE: AP={s.get('mae_ap_mm')}, "
-            f"ROA={s.get('mae_roa_mm2')}, leak_pp={s.get('mae_regurgitation_pct_points')}"
+            f"Held-out diagnostic MAE: ROA={s.get('mae_roa_mm2')}, "
+            f"leak_pp={s.get('mae_regurgitation_pct_points')} "
+            f"(AP MAE N/A — literature mapping input)"
         )
-    if "loo_evaluation" in payload:
-        s = payload["loo_evaluation"]["summary"]
+    diag = payload.get("casewise_blend_off_diagnostic") or payload.get("loo_evaluation")
+    if diag:
+        s = diag["summary"]
         print(
-            f"LOO MAE: AP={s.get('mae_ap_mm')}, "
-            f"ROA={s.get('mae_roa_mm2')}, leak_pp={s.get('mae_regurgitation_pct_points')}"
+            f"Casewise blend-off diagnostic MAE: ROA={s.get('mae_roa_mm2')}, "
+            f"leak_pp={s.get('mae_regurgitation_pct_points')} "
+            f"(not true fold-wise LOO)"
         )
     return 0
 

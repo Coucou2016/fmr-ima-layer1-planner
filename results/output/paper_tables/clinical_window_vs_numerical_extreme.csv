@@ -3,8 +3,8 @@ MAVERIC/ARTO pair 41.4→35.3 mm,ARTO (IMA-AP class),,clinical_literature,35.3,1
 MAVERIC/ARTO pair 45.0→38.7 mm,ARTO (IMA-AP class),,clinical_literature,38.7,14.0,,,true,second ARTO/MAVERIC AP pair
 Carillon TITAN II AP context ~15%,Carillon (IMA-CS class),,clinical_literature,,15.0,,,true,"~15% AP reduction is directional clinical context for Carillon, not a fitted η_CS from bridge-shortening % and not derived from MAVERIC/ARTO.
 "
-Galili IMA-AP 50% suture (peak-systolic AP 15.9 mm),IMA-AP,50.0,galili,15.9,39.08,0.0367,central,false,Near-direct AP effect; not undeformed 34.4 mm / not 0% AP reduction
-Galili IMA-AP 70% suture (peak-systolic AP 12.4 mm),IMA-AP,70.0,galili,12.4,52.49,5.5852,commissural,false,Excessive AP reduction; commissural leak in LHHM
+Galili IMA-AP 50% suture (peak-systolic AP 15.9 mm),IMA-AP,50.0,galili,15.9,39.08,0.0354,central,false,Near-direct AP effect; not undeformed 34.4 mm / not 0% AP reduction
+Galili IMA-AP 70% suture (peak-systolic AP 12.4 mm),IMA-AP,70.0,galili,12.4,52.49,2.4552,commissural,false,Excessive AP reduction; commissural leak in LHHM
 Planning map IMA-AP 50% suture (~15% AP; assumption η_ap=0.30),IMA-AP,50.0,clinical,29.24,15.0,0.1467,central,true,assumption prior → ARTO/MAVERIC-like AP talk track (not FEA-identified)
 Planning map IMA-CS 22% bridge (assumption η_cs; not MAVERIC-fit),IMA-CS,22.0,clinical,30.238,12.1,0.0826,central,true,η_cs is assumption prior only; CS–LCx may fail on default 11 mm anatomy
 Planner AP-reduction ceiling,constraint,,clinical,,20.0,,,true,window 14.0-20.0%

@@ -59,38 +59,71 @@ def _point_key(p: DesignPoint | dict[str, Any]) -> str:
     )
 
 
-def _pareto_frontier(points: list[DesignPoint]) -> list[dict[str, Any]]:
-    """Non-dominated set minimizing leakage & strain risk; maximizing AP↓ & LCx.
+def _pareto_common_objectives(points: list[DesignPoint]) -> list[dict[str, Any]]:
+    """Global Pareto on objectives shared by all device families.
 
-    Objectives (exploratory screening language — not clinical utility):
-      1. minimize physics_regurgitation_pct
-      2. maximize ap_reduction_pct (benefit proxy under AP ceiling)
-      3. maximize cs_lcx_mm when present (else neutral)
-      4. minimize niti_alternating_strain_pct when present (else neutral)
+    Objectives only:
+      1. minimize physics_regurgitation_pct (leakage proxy)
+      2. maximize ap_reduction_pct
+    LCx / NiTi are **not** objectives here (IMA-CS feasibility constraints only).
+    Never substitute 1e9 / 0.0 for missing LCx/NiTi.
     """
     feas = [p for p in points if p.feasible and p.device is not None]
     if not feas:
         return []
 
     def dominates(a: DesignPoint, b: DesignPoint) -> bool:
-        # a better-or-equal on all, strict on at least one
         a_leak, b_leak = a.physics_regurgitation_pct, b.physics_regurgitation_pct
         a_ap, b_ap = a.ap_reduction_pct, b.ap_reduction_pct
-        a_lcx = a.cs_lcx_mm if a.cs_lcx_mm is not None else 1e9
-        b_lcx = b.cs_lcx_mm if b.cs_lcx_mm is not None else 1e9
-        a_st = a.niti_alternating_strain_pct if a.niti_alternating_strain_pct is not None else 0.0
-        b_st = b.niti_alternating_strain_pct if b.niti_alternating_strain_pct is not None else 0.0
+        better_eq = a_leak <= b_leak + 1e-12 and a_ap >= b_ap - 1e-12
+        strict = a_leak < b_leak - 1e-12 or a_ap > b_ap + 1e-12
+        return better_eq and strict
+
+    frontier = []
+    for p in feas:
+        if any(dominates(q, p) for q in feas if q is not p):
+            continue
+        frontier.append(
+            {
+                **p.to_dict(),
+                "pareto_family": "global_common_objectives",
+                "pareto_objectives": {
+                    "minimize_physics_regurgitation_pct": p.physics_regurgitation_pct,
+                    "maximize_ap_reduction_pct": p.ap_reduction_pct,
+                },
+            }
+        )
+    frontier.sort(key=lambda d: d["physics_regurgitation_pct"])
+    return frontier
+
+
+def _pareto_ima_cs_family(points: list[DesignPoint]) -> list[dict[str, Any]]:
+    """IMA-CS-only Pareto: leakage ↓, AP↓ ↑, LCx ↑, NiTi strain ↓ (all present)."""
+    feas = [
+        p
+        for p in points
+        if p.feasible
+        and p.device == "IMA-CS"
+        and p.cs_lcx_mm is not None
+        and p.niti_alternating_strain_pct is not None
+    ]
+    if not feas:
+        return []
+
+    def dominates(a: DesignPoint, b: DesignPoint) -> bool:
         better_eq = (
-            a_leak <= b_leak + 1e-12
-            and a_ap >= b_ap - 1e-12
-            and a_lcx >= b_lcx - 1e-12
-            and a_st <= b_st + 1e-12
+            a.physics_regurgitation_pct <= b.physics_regurgitation_pct + 1e-12
+            and a.ap_reduction_pct >= b.ap_reduction_pct - 1e-12
+            and a.cs_lcx_mm >= b.cs_lcx_mm - 1e-12  # type: ignore[operator]
+            and a.niti_alternating_strain_pct
+            <= b.niti_alternating_strain_pct + 1e-12  # type: ignore[operator]
         )
         strict = (
-            a_leak < b_leak - 1e-12
-            or a_ap > b_ap + 1e-12
-            or a_lcx > b_lcx + 1e-12
-            or a_st < b_st - 1e-12
+            a.physics_regurgitation_pct < b.physics_regurgitation_pct - 1e-12
+            or a.ap_reduction_pct > b.ap_reduction_pct + 1e-12
+            or a.cs_lcx_mm > b.cs_lcx_mm + 1e-12  # type: ignore[operator]
+            or a.niti_alternating_strain_pct
+            < b.niti_alternating_strain_pct - 1e-12  # type: ignore[operator]
         )
         return better_eq and strict
 
@@ -101,17 +134,57 @@ def _pareto_frontier(points: list[DesignPoint]) -> list[dict[str, Any]]:
         frontier.append(
             {
                 **p.to_dict(),
+                "pareto_family": "ima_cs_family",
                 "pareto_objectives": {
                     "minimize_physics_regurgitation_pct": p.physics_regurgitation_pct,
                     "maximize_ap_reduction_pct": p.ap_reduction_pct,
-                    "maximize_cs_lcx_mm_or_neutral": p.cs_lcx_mm,
-                    "minimize_niti_alternating_strain_pct_or_neutral": p.niti_alternating_strain_pct,
+                    "maximize_cs_lcx_mm": p.cs_lcx_mm,
+                    "minimize_niti_alternating_strain_pct": p.niti_alternating_strain_pct,
                 },
             }
         )
     frontier.sort(key=lambda d: d["physics_regurgitation_pct"])
     return frontier
 
+
+def _pareto_ima_ap_family(points: list[DesignPoint]) -> list[dict[str, Any]]:
+    """IMA-AP-only Pareto on common objectives (no LCx/NiTi — not applicable)."""
+    feas = [p for p in points if p.feasible and p.device == "IMA-AP"]
+    if not feas:
+        return []
+
+    def dominates(a: DesignPoint, b: DesignPoint) -> bool:
+        better_eq = (
+            a.physics_regurgitation_pct <= b.physics_regurgitation_pct + 1e-12
+            and a.ap_reduction_pct >= b.ap_reduction_pct - 1e-12
+        )
+        strict = (
+            a.physics_regurgitation_pct < b.physics_regurgitation_pct - 1e-12
+            or a.ap_reduction_pct > b.ap_reduction_pct + 1e-12
+        )
+        return better_eq and strict
+
+    frontier = []
+    for p in feas:
+        if any(dominates(q, p) for q in feas if q is not p):
+            continue
+        frontier.append(
+            {
+                **p.to_dict(),
+                "pareto_family": "ima_ap_family",
+                "pareto_objectives": {
+                    "minimize_physics_regurgitation_pct": p.physics_regurgitation_pct,
+                    "maximize_ap_reduction_pct": p.ap_reduction_pct,
+                },
+            }
+        )
+    frontier.sort(key=lambda d: d["physics_regurgitation_pct"])
+    return frontier
+
+
+def _pareto_frontier(points: list[DesignPoint]) -> list[dict[str, Any]]:
+    """Backward-compatible alias → global common-objective Pareto."""
+    return _pareto_common_objectives(points)
 
 def _apply_patient_cs_lcx(
     points: list[DesignPoint],
@@ -141,30 +214,61 @@ def run_uncertainty_analysis(
     patient_cs_lcx_mm: Optional[float],
     n_eta_samples: int = 9,
     eta_relative_span: float = 0.20,
+    independent_eta: bool = True,
 ) -> dict[str, Any]:
-    """Sweep η within ±span and summarize feasibility / ranking stability.
+    """Sweep η and summarize feasibility / ranking stability.
 
+    Default: independent η_AP ~ U(0.24, 0.36) and η_CS ~ U(0.44, 0.66)
+    (nominal ±20%). Legacy common-factor sampling kept when independent_eta=False.
     η are assumption priors — not clinically calibrated constants.
     """
     rng = np.random.default_rng(seed)
     cmap = design_space.get("clinical_mapping", {})
     eta_ap0 = float(cmap.get("ap_transfer_eta_ima_ap", 0.30))
     eta_cs0 = float(cmap.get("ap_transfer_eta_ima_cs", 0.55))
-
-    # Deterministic grid on relative factors plus a few RNG samples for stability.
-    grid = np.linspace(1.0 - eta_relative_span, 1.0 + eta_relative_span, max(3, n_eta_samples // 2))
-    extras = rng.uniform(1.0 - eta_relative_span, 1.0 + eta_relative_span, size=max(0, n_eta_samples - len(grid)))
-    factors = np.unique(np.round(np.concatenate([grid, extras]), 5))
+    eta_ap_lo, eta_ap_hi = eta_ap0 * (1.0 - eta_relative_span), eta_ap0 * (1.0 + eta_relative_span)
+    eta_cs_lo, eta_cs_hi = eta_cs0 * (1.0 - eta_relative_span), eta_cs0 * (1.0 + eta_relative_span)
 
     wins: dict[str, int] = {}
     feasible_counts: list[int] = []
     evaluated = 0
     best_keys: list[str] = []
+    pairs: list[tuple[float, float]] = []
 
-    for fac in factors:
+    if independent_eta:
+        # Deterministic corners + RNG samples for stability.
+        grid_ap = np.linspace(eta_ap_lo, eta_ap_hi, 3)
+        grid_cs = np.linspace(eta_cs_lo, eta_cs_hi, 3)
+        for ea in grid_ap:
+            for ec in grid_cs:
+                pairs.append((float(ea), float(ec)))
+        n_extra = max(0, n_eta_samples - len(pairs))
+        for _ in range(n_extra):
+            pairs.append(
+                (
+                    float(rng.uniform(eta_ap_lo, eta_ap_hi)),
+                    float(rng.uniform(eta_cs_lo, eta_cs_hi)),
+                )
+            )
+        sampling_mode = "independent_eta_ap_cs"
+    else:
+        grid = np.linspace(
+            1.0 - eta_relative_span, 1.0 + eta_relative_span, max(3, n_eta_samples // 2)
+        )
+        extras = rng.uniform(
+            1.0 - eta_relative_span,
+            1.0 + eta_relative_span,
+            size=max(0, n_eta_samples - len(grid)),
+        )
+        factors = np.unique(np.round(np.concatenate([grid, extras]), 5))
+        for fac in factors:
+            pairs.append((eta_ap0 * float(fac), eta_cs0 * float(fac)))
+        sampling_mode = "common_relative_factor_sensitivity"
+
+    for eta_ap, eta_cs in pairs:
         cfg = copy.deepcopy(design_space)
-        cfg["clinical_mapping"]["ap_transfer_eta_ima_ap"] = eta_ap0 * float(fac)
-        cfg["clinical_mapping"]["ap_transfer_eta_ima_cs"] = eta_cs0 * float(fac)
+        cfg["clinical_mapping"]["ap_transfer_eta_ima_ap"] = eta_ap
+        cfg["clinical_mapping"]["ap_transfer_eta_ima_cs"] = eta_cs
         points = run_sweep(
             mappings=[mapping_mode],
             seed=seed,
@@ -182,7 +286,8 @@ def run_uncertainty_analysis(
                 enforce_lcx=enforce_lcx,
             )
         feas = [p for p in clinical if p.device is not None and p.feasible]
-        evaluated = len(clinical)
+        device_n = len([p for p in clinical if p.device is not None])
+        evaluated = device_n
         feasible_counts.append(len(feas))
         best = _best(feas)
         if best is not None:
@@ -190,14 +295,22 @@ def run_uncertainty_analysis(
             wins[key] = wins.get(key, 0) + 1
             best_keys.append(key)
 
-    n = max(len(factors), 1)
-    p_feasible_mean = float(np.mean([c / max(evaluated, 1) for c in feasible_counts])) if feasible_counts else 0.0
+    n = max(len(pairs), 1)
+    p_feasible_mean = (
+        float(np.mean([c / max(evaluated, 1) for c in feasible_counts]))
+        if feasible_counts
+        else 0.0
+    )
     top = sorted(wins.items(), key=lambda kv: (-kv[1], kv[0]))
     stability = {
-        "n_eta_factors": int(len(factors)),
+        "n_eta_samples": int(len(pairs)),
+        "n_eta_factors": int(len(pairs)),  # legacy key
         "eta_relative_span": eta_relative_span,
         "eta_ap_nominal": eta_ap0,
         "eta_cs_nominal": eta_cs0,
+        "eta_ap_range": [round(eta_ap_lo, 5), round(eta_ap_hi, 5)],
+        "eta_cs_range": [round(eta_cs_lo, 5), round(eta_cs_hi, 5)],
+        "eta_sampling_mode": sampling_mode,
         "eta_role": "assumption_prior_distribution",
         "mean_fraction_feasible": round(p_feasible_mean, 4),
         "p_feasible_at_nominal_grid": None,  # filled by caller
@@ -206,9 +319,10 @@ def run_uncertainty_analysis(
         ],
         "ranking_stability_top1_fraction": round(top[0][1] / n, 4) if top else 0.0,
         "honesty": (
-            "η±span sampling is assumption-prior sensitivity for exploratory ranking; "
+            "η sampling is assumption-prior sensitivity for exploratory ranking; "
             "not imaging–FEA identification, Abaqus/LHHM UQ, or clinical calibration. "
-            "η_CS is not from MAVERIC/ARTO."
+            "η_CS is not from MAVERIC/ARTO. "
+            f"Sampling mode: {sampling_mode}."
         ),
     }
     return stability
@@ -275,9 +389,19 @@ def run_scenario_ranker(
     best_dual = _best(ap_dual)
     best_cs = _best(cs)
     best_candidate = _best(all_feas)
-    pareto = _pareto_frontier(clinical)
+    pareto_global = _pareto_common_objectives(clinical)
+    pareto_cs = _pareto_ima_cs_family(clinical)
+    pareto_ap = _pareto_ima_ap_family(clinical)
+    pareto = pareto_global  # backward-compat primary key
 
-    p_feasible = (len(all_feas) / len(device_eval)) if device_eval else 0.0
+    n_total_points = len(clinical)
+    n_device_candidates = len(device_eval)
+    n_feasible_device_candidates = len(all_feas)
+    p_feasible_device_candidates = (
+        (n_feasible_device_candidates / n_device_candidates) if device_eval else 0.0
+    )
+    # Legacy aliases (device-grid denominator — pathology is not a candidate).
+    p_feasible = p_feasible_device_candidates
 
     if skip_uncertainty:
         uncertainty: dict[str, Any] = {
@@ -297,7 +421,8 @@ def run_scenario_ranker(
             patient_cs_lcx_mm=patient_cs_lcx_mm,
             n_eta_samples=n_eta_samples,
         )
-    uncertainty["p_feasible_at_nominal_grid"] = round(p_feasible, 4)
+    uncertainty["p_feasible_at_nominal_grid"] = round(p_feasible_device_candidates, 4)
+    uncertainty["p_feasible_device_candidates"] = round(p_feasible_device_candidates, 4)
 
     notes = [
         "Layer-1 exploratory scenario ranker — phenomenological mechanics + literature-calibrated leakage proxy.",
@@ -315,10 +440,14 @@ def run_scenario_ranker(
         "cinch model `baseline − 0.12×shortening` is a labeled assumption "
         "(default baseline 11 mm from design_space.yaml).",
         "NiTi 0.4% = illustrative engineering screen only.",
-        "Pareto frontier is multi-objective exploratory screening language "
-        "(leakage vs AP reduction vs LCx vs strain) — not a medical recommendation set.",
+        "Pareto: global common objectives = min leakage + max AP↓; "
+        "LCx/NiTi enter only the IMA-CS family frontier (never 1e9/0 N/A fillers).",
         "Physics regurg % ≠ clinical regurgitant volume.",
         "Reported settings are grid points (suture/bridge % steps), not interpolated implants.",
+        f"Feasibility counts: n_total_points={n_total_points} "
+        f"(includes pathology), n_device_candidates={n_device_candidates}, "
+        f"n_feasible_device_candidates={n_feasible_device_candidates}, "
+        f"p_feasible_device_candidates={p_feasible_device_candidates:.4f}.",
     ]
     if patient_cs_lcx_mm is not None:
         notes.append(
@@ -345,6 +474,7 @@ def run_scenario_ranker(
         "framing": "exploratory_screening_best_under_assumptions",
         "constraints": {
             "clinical_max_ap_reduction_pct": cap,
+            "exploratory_planning_range_ap_reduction_pct": [14.0, 20.0],
             "niti_alternating_strain_pct_max": cons.get("niti_alternating_strain_pct_max", 0.4),
             "cs_lcx_min_mm": cons.get("cs_lcx_min_mm", 8.6) if enforce_lcx else None,
             "enforce_lcx": enforce_lcx,
@@ -362,8 +492,13 @@ def run_scenario_ranker(
             "dual_suture_commissural_factor": dual_factor,
             "dual_suture_role": "exploratory_hypothesis_parameter",
         },
-        "n_evaluated": len(clinical),
-        "n_feasible": len(all_feas),
+        "n_total_points": n_total_points,
+        "n_device_candidates": n_device_candidates,
+        "n_feasible_device_candidates": n_feasible_device_candidates,
+        "p_feasible_device_candidates": round(p_feasible_device_candidates, 4),
+        # Legacy keys (same device-grid semantics; pathology excluded from denominator).
+        "n_evaluated": n_total_points,
+        "n_feasible": n_feasible_device_candidates,
         "p_feasible": round(p_feasible, 4),
         "best_candidate": _payload(best_candidate),
         "recommended": _payload(best_candidate),  # backward-compat shim
@@ -372,6 +507,9 @@ def run_scenario_ranker(
             "best_ima_ap_dual": _payload(best_dual),
             "best_ima_cs": _payload(best_cs),
         },
+        "pareto_global_common_objectives": pareto_global,
+        "pareto_ima_cs_family": pareto_cs,
+        "pareto_ima_ap_family": pareto_ap,
         "pareto_frontier": pareto,
         "uncertainty": uncertainty,
         "notes": notes,
@@ -417,8 +555,10 @@ def main(argv: Optional[list[str]] = None) -> dict[str, Any]:
     )
     rec_pt = rec.get("best_candidate") or rec.get("recommended") or {}
     print("=== IMA exploratory scenario ranker (Layer-1 surrogate) ===")
-    print(f"Feasible / evaluated: {rec['n_feasible']} / {rec['n_evaluated']}  "
-          f"P(feasible)={rec.get('p_feasible')}")
+    print(f"Feasible device candidates: {rec.get('n_feasible_device_candidates', rec['n_feasible'])} / "
+          f"{rec.get('n_device_candidates', rec['n_evaluated'])}  "
+          f"P(feasible)={rec.get('p_feasible_device_candidates', rec.get('p_feasible'))}  "
+          f"(n_total_points={rec.get('n_total_points', rec['n_evaluated'])})")
     if rec_pt:
         ns = rec_pt.get("n_sutures") or 0
         suture_note = f", n_sutures={int(ns)}" if rec_pt.get("device") == "IMA-AP" else ""

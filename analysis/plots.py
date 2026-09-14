@@ -226,7 +226,7 @@ def _fig1_nonmonotonic(points, path: Path) -> None:
                 color="C0",
                 label="IMA-AP physics (clinical AP mapping)",
             )
-        ax.axvspan(46.7, 66.7, color="C2", alpha=0.12, label="Clinical AP window ~14–20% (η=0.30)")
+        ax.axvspan(46.7, 66.7, color="C2", alpha=0.12, label="Exploratory planning range ~14–20% AP (η=0.30)")
         ax.set_xlabel("Suture shortening (%)")
         ax.set_ylabel("Physics regurgitation (%)")
         ax.set_title("IMA-AP: non-monotonic Galili curve vs clinical AP dose")
@@ -264,13 +264,13 @@ def _fig2_dose_map(points, path: Path) -> None:
                 [p.ap_reduction_pct for p in cs_clin],
                 "^-",
                 color="C3",
-                label="IMA-CS clinical η≈0.67",
+                label="IMA-CS clinical η=0.55 (assumption prior)",
             )
-        ax.axhspan(14.0, 20.0, color="C2", alpha=0.15, label="Clinical AP window 14–20%")
-        ax.axhline(58.43, color="0.4", ls=":", label="Galili 70% numerical extreme (~58% AP)")
+        ax.axhspan(14.0, 20.0, color="C2", alpha=0.15, label="Exploratory planning range 14–20% AP")
+        ax.axhline(52.49, color="0.4", ls=":", label="Galili 70% numerical extreme (~52% AP vs disease)")
         ax.set_xlabel("Device shortening (%)")
         ax.set_ylabel("AP diameter reduction (%)")
-        ax.set_title("Innovation A: map shortening % onto AP-mm / AP-% space")
+        ax.set_title("Map shortening % onto AP-mm / AP-% space")
         ax.grid(True, alpha=0.3)
         ax.legend(loc="best", frameon=False, fontsize=8)
         fig.tight_layout()
@@ -345,10 +345,10 @@ def _fig4_pareto(points, path: Path, recommendation: Optional[dict[str, Any]] = 
                     (p.cs_lcx_mm, p.physics_regurgitation_pct),
                     fontsize=7,
                 )
-        axes[0].axvline(8.6, color="C3", ls="--", label="Rottländer 8.6 mm")
+        axes[0].axvline(8.6, color="C3", ls="--", label="Rottländer 8.6 mm risk screen")
         axes[0].set_xlabel("CS–LCx distance (mm)")
         axes[0].set_ylabel("Physics regurgitation (%)")
-        axes[0].set_title("IMA-CS: regurg vs LCx safety")
+        axes[0].set_title("IMA-CS: regurg vs LCx risk screen")
         axes[0].grid(True, alpha=0.3)
         axes[0].legend(frameon=False, fontsize=8)
 
@@ -359,10 +359,10 @@ def _fig4_pareto(points, path: Path, recommendation: Optional[dict[str, Any]] = 
                 "s-",
                 color="C1",
             )
-        axes[1].axvline(0.4, color="C3", ls="--", label="Alternating strain 0.4%")
+        axes[1].axvline(0.4, color="C3", ls="--", label="Alternating strain 0.4% eng. screen")
         axes[1].set_xlabel("NiTi alternating strain (%)")
         axes[1].set_ylabel("Physics regurgitation (%)")
-        axes[1].set_title("IMA-CS: regurg vs NiTi fatigue strain")
+        axes[1].set_title("IMA-CS: regurg vs NiTi engineering screen")
         axes[1].grid(True, alpha=0.3)
         axes[1].legend(frameon=False, fontsize=8)
 
@@ -377,43 +377,51 @@ def _fig4_pareto(points, path: Path, recommendation: Optional[dict[str, Any]] = 
                 zorder=4,
             )
 
-        fig.suptitle("Pareto view (clinical mapping; illustrative CS–LCx anatomy)")
+        fig.suptitle("Pareto / risk-screen view (clinical mapping; illustrative CS–LCx anatomy)")
         fig.tight_layout()
         _savefig(fig, path)
 
 
 def _fig5_dual(points, path: Path) -> None:
+    """Dual-suture commissural-factor sensitivity (0.25/0.5/0.75/1.0), not a discovery claim."""
+    from analysis.evaluate import evaluate_design_point
+
+    factors = [0.25, 0.5, 0.75, 1.0]
+    shortenings = [30, 50, 60, 70]
     with _science_style():
-        fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
-        for mapping, ax in (("galili", axes[0]), ("clinical", axes[1])):
+        fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), sharey=True)
+        for ax, mapping in zip(axes, ("galili", "clinical")):
+            for fac in factors:
+                xs, ys = [], []
+                for sh in shortenings:
+                    pt = evaluate_design_point(
+                        device_type="IMA-AP",
+                        shortening_pct=float(sh),
+                        mapping_mode=mapping,
+                        n_sutures=2,
+                        blend=False,
+                    )
+                    # Nominal dual uses x0.5; rescale commissural fraction relative to that.
+                    scale = float(fac) / 0.5
+                    ys.append(min(max(pt.commissural_fraction * scale, 0.0), 1.0))
+                    xs.append(sh)
+                ax.plot(xs, ys, "o-", label=f"dual factor x{fac:g}")
             single = _ap_single(points, mapping)
-            dual = _dual(points, mapping)
             if single:
                 ax.plot(
                     [p.shortening_pct for p in single],
                     [p.commissural_fraction for p in single],
-                    "s-",
-                    label="Single suture",
-                )
-                ax.plot(
-                    [p.shortening_pct for p in single],
-                    [p.physics_regurgitation_pct for p in single],
                     "s--",
-                    alpha=0.7,
-                    label="Single — physics regurg %",
-                )
-            if dual:
-                ax.plot(
-                    [p.shortening_pct for p in dual],
-                    [p.commissural_fraction for p in dual],
-                    "o-",
-                    label="Dual suture",
+                    color="0.4",
+                    label="single suture",
                 )
             ax.set_title(f"{mapping} mapping")
             ax.set_xlabel("Suture shortening (%)")
-            ax.set_ylabel("Commissural fraction / regurg %")
+            ax.set_ylabel("Commissural fraction (scaled)")
             ax.grid(True, alpha=0.3)
-            ax.legend(frameon=False, fontsize=8)
-        fig.suptitle("Innovation D: dual vs single IMA-AP (commissural leak)")
+            ax.legend(frameon=False, fontsize=7)
+        fig.suptitle(
+            "Dual-suture commissural-factor sensitivity (0.25/0.5/0.75/1.0) — hypothesis parameter"
+        )
         fig.tight_layout()
         _savefig(fig, path)

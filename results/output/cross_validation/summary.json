@@ -1,0 +1,45 @@
+{
+  "label": "fold_wise_response_model_loo",
+  "n": 7,
+  "mae_roa_mm2": 27.633081357148118,
+  "mae_regurgitation_pct_points": 0.8958053625181162,
+  "heldout_subset_ids": [
+    "ima_cs_14",
+    "ima_cs_18",
+    "ima_ap_30",
+    "ima_ap_70"
+  ],
+  "heldout_subset_mae_roa_mm2": 6.36858640210969,
+  "heldout_subset_mae_regurgitation_pct_points": 0.24499392778581666,
+  "ap_prediction_metric_applicable": false,
+  "mae_ap_mm_note": "AP is literature_mapping_input (table lookup / prescribed geometry); do not report AP MAE as predictive accuracy.",
+  "engineering_targets": {
+    "roa_heldout_mae_mm2": 25.0,
+    "leak_mae_pp": 0.5,
+    "ap70_roa_abs_err_mm2": 25.0,
+    "ap70_leak_abs_err_pp": 0.5,
+    "note": "Internal engineering targets \u2014 NOT medical validation thresholds.",
+    "compared_against": "heldout_subset_mae (same IDs as rule-based blend-off baseline)"
+  },
+  "baseline_rule_based_blend_off": {
+    "heldout_mae_roa_mm2": 50.18,
+    "heldout_mae_leak_pp": 1.445,
+    "ap70_abs_err_roa_mm2": 94.17,
+    "ap70_abs_err_leak_pp": 5.455
+  },
+  "ima_ap_70": {
+    "abs_err_roa_mm2": 6.604851722708766,
+    "abs_err_regurgitation_pct_points": 0.1982707113839876,
+    "pred_roa_mm2": 39.495148277291236,
+    "published_roa_mm2": 46.1,
+    "pred_regurgitation_pct": 0.3282707113839876,
+    "published_regurgitation_pct": 0.13
+  },
+  "engineering_targets_met": {
+    "roa_mae": true,
+    "leak_mae": true,
+    "ap70_roa": true,
+    "ap70_leak": true
+  },
+  "scientific_framing": "fold-wise response model met internal engineering targets on the held-out Galili subset \u2014 still not patient-level external validation"
+}

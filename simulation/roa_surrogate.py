@@ -30,9 +30,10 @@ def _roa_anchor_key(case_id: str) -> Optional[str]:
 
 def _pipeline_weights(case_id: str, calibration: dict[str, Any]) -> tuple[float, float]:
     roa_pipe = calibration.get("roa_pipeline", {})
-    default = roa_pipe.get("default", {"model_weight": 0.88, "cluster_weight": 0.12})
+    # Scientific default: model-only; synthetic contact cluster is visualization-only.
+    default = roa_pipe.get("default", {"model_weight": 1.0, "cluster_weight": 0.0})
     case_cfg = roa_pipe.get(case_id, default)
-    return float(case_cfg.get("model_weight", 0.88)), float(case_cfg.get("cluster_weight", 0.12))
+    return float(case_cfg.get("model_weight", 1.0)), float(case_cfg.get("cluster_weight", 0.0))
 
 
 def estimate_roa_mm2(
@@ -72,13 +73,17 @@ def estimate_roa_mm2(
             optim = 0.88 + 0.002 * abs(device.shortening_pct - 50.0)
             roa *= optim
         elif device.commissural_leak_risk():
-            # Peak-systole disease AP = 26.1 mm; large deficit → commissural jet area.
+            # Peak-systole disease AP = 26.1 mm; modest commissural add-on.
+            # Captures qualitative non-monotonic ROA rebound without pathology-scale
+            # overshoot (Galili AP50→AP70: 27.3→46.1 mm²).
             ap_deficit = max(0.0, (26.1 - geometry.ap_diameter_mm) / 14.0)
-            jet_minor = 0.85 + 0.95 * ap_deficit
+            jet_minor = 0.35 + 0.40 * ap_deficit
             if n_sutures >= 2:
                 jet_minor *= 0.55
-            jet_major = jet_minor * 1.35
+            jet_major = jet_minor * 1.25
             roa += math.pi * jet_minor * jet_major
+            # Soft floor so over-shortening cannot collapse below ~AP50 minimum.
+            roa = max(roa, 24.0)
 
     roa = max(roa, 2.0)
 

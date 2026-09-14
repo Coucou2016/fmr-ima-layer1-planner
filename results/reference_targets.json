@@ -1,7 +1,7 @@
 {
   "meta": {
     "note": "Subset of results/reference_data.yaml for pytest. Peak-systole Galili facts; undeformed diastole AP=34.4 is separate.",
-    "doi": "10.1098/rsos.211726"
+    "doi": "10.1098/rsos.211464"
   },
   "geometry_undeformed_diastole": {
     "cardiac_phase": "undeformed_diastole",

@@ -46,5 +46,7 @@ results/output/**
 !results/output/planner/
 !results/output/planner/**
 !results/output/loo_evaluation.json
+!results/output/cross_validation/
+!results/output/cross_validation/**
 
 # Optional: keep recommendation JSON only under planner; ignore other planner noise if added later

@@ -487,6 +487,18 @@ def main():
                 physics_by_case=physics_map,
                 seed=args.seed,
             )
+            # Blend-off diagnostic + true fold-wise response-model CV
+            from tools.loo_evaluate import run as run_loo_diag
+            from analysis.fit_response_model import run_loo_cv, write_outputs
+
+            loo_payload = run_loo_diag("both")
+            loo_out = ROOT / "results" / "output" / "loo_evaluation.json"
+            loo_out.parent.mkdir(parents=True, exist_ok=True)
+            loo_out.write_text(json.dumps(loo_payload, indent=2), encoding="utf-8")
+            cv_payload = run_loo_cv()
+            write_outputs(cv_payload)
+            print(f"Blend-off diagnostic: {loo_out}")
+            print(f"Fold-wise CV: {ROOT / 'results' / 'output' / 'cross_validation'}")
             print(f"Paper tables: {ROOT / 'results' / 'output' / 'paper_tables'}")
             print(f"Paper figures: {ROOT / 'results' / 'output' / 'paper_figures'}")
 

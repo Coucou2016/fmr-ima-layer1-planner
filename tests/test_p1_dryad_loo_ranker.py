@@ -84,16 +84,17 @@ def test_loo_heldout_split_and_no_validation_claim_on_blend():
     held = payload["heldout_evaluation"]["heldout"]
     assert held
     assert all(r.get("blend") is False for r in held if "blend" in r)
-    assert all(r.get("validation_claim_allowed") is True for r in held if "validation_claim_allowed" in r)
+    assert all("validation_claim_allowed" not in r for r in held)
+    assert all(r.get("ap_prediction_metric_applicable") is False for r in held)
 
     calib = payload["heldout_evaluation"]["calibration_reproduction"]
     assert calib
     assert all(r.get("blend") is True for r in calib if "blend" in r)
-    assert all(r.get("validation_claim_allowed") is False for r in calib if "validation_claim_allowed" in r)
 
     loo = payload["loo_evaluation"]
     assert loo["summary"]["n"] >= 4
-    assert "mae_ap_mm" in loo["summary"]
+    assert loo["summary"].get("ap_prediction_metric_applicable") is False
+    assert loo.get("fold_wise_refit") is False
 
 
 def test_scenario_ranker_uncertainty_and_pareto(tmp_path):
@@ -105,14 +106,16 @@ def test_scenario_ranker_uncertainty_and_pareto(tmp_path):
         output_dir=tmp_path,
         n_eta_samples=5,
     )
-    assert "p_feasible" in rec
-    assert 0.0 < rec["p_feasible"] <= 1.0
+    assert "p_feasible_device_candidates" in rec
+    assert 0.0 < rec["p_feasible_device_candidates"] <= 1.0
+    assert rec["n_device_candidates"] == rec["n_total_points"] - 1
     unc = rec["uncertainty"]
     assert unc.get("skipped") is not True
     assert "ranking_stability_top1_fraction" in unc
     assert "best_candidate_win_counts" in unc
     assert "assumption" in (unc.get("honesty") or "").lower()
     assert isinstance(rec.get("pareto_frontier"), list)
+    assert isinstance(rec.get("pareto_global_common_objectives"), list)
     assert rec["hypotheses"]["dual_suture_role"] == "exploratory_hypothesis_parameter"
     assert rec["constraints"]["cs_lcx_cinch_role"] == "labeled_assumption_slope"
     assert rec["framing"] == "exploratory_screening_best_under_assumptions"

@@ -13,7 +13,7 @@
 
 ## Paper DOI note
 
-Crossref / DataCite list the Galili article as **10.1098/rsos.211464**. Earlier drafts incorrectly cited `10.1098/rsos.211726` (404 on Crossref).
+Crossref / DataCite list the Galili article as **10.1098/rsos.211464**.
 
 ## Processed table
 

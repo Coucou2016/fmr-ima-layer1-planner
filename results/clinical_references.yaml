@@ -12,8 +12,9 @@ meta:
     context. Rottländer supplies an LCx *risk-screening* threshold, not safety.
 
 galili_rsos_2022:
-  citation: "Galili L. et al. Indirect mitral annuloplasty using a coronary sinus device versus an anteroposterior suture: a computational comparison. R. Soc. Open Sci. 2022."
-  doi: "10.1098/rsos.211726"
+  citation: "Galili L. et al. Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation. R. Soc. Open Sci. 2022."
+  doi: "10.1098/rsos.211464"
+  paper_title: "Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation"
   dryad_doi: "10.5061/dryad.bzkh1899d"
   geometry_undeformed_diastole:
     cardiac_phase: undeformed_diastole
@@ -172,11 +173,26 @@ mapping_assumptions:
     invalid_prior_calibration_removed: "eta_cs ≈ 0.668 from MAVERIC 41.4→35.3 at Galili 22% CS — DELETED (wrong device class)."
 
 clinical_window:
+  # Legacy key retained; prefer exploratory_planning_range below.
   ap_reduction_pct_min: 14.0
   ap_reduction_pct_max: 20.0
   default_planner_ceiling_pct: 20.0
   context_arto_maveric_pct: [14.0, 15.0]
   context_carillon_titan_ii_pct_approx: 15.0
+  role: clinically_contextualized_exploratory_planning_range
+  note: >
+    ~14–15% AP reduction is the ARTO/MAVERIC (IMA-AP) attested anchor context;
+    20% is an exploratory planning ceiling — not a clinical efficacy window.
+  numerical_extreme_example:
+    label: "Galili IMA-AP 70% peak systole"
+    ap_mm: 12.4
+    ap_reduction_pct_vs_disease_peak_sys: 52.49
+    clinically_attainable: false
+
+exploratory_planning_range:
+  ap_reduction_pct_anchor: [14.0, 15.0]
+  ap_reduction_pct_ceiling: 20.0
+  label: clinically_contextualized_exploratory_planning_range
   numerical_extreme_example:
     label: "Galili IMA-AP 70% peak systole"
     ap_mm: 12.4

@@ -21,16 +21,25 @@ jobs:
           pip install -U pip
           pip install -r requirements.txt
           pip install pytest-cov ruff
-      - name: Ruff (non-blocking style)
+      - name: Ruff (non-blocking; repo still has legacy style debt)
         continue-on-error: true
         run: ruff check analysis models simulation sph tools tests run_pipeline.py
-      - name: Dryad fixture process + LOO
+      - name: DOI hygiene (ban wrong Galili DOI fragment)
+        run: |
+          BAD=$(python -c "print('211'+'726')")
+          if grep -RIn --exclude-dir=__pycache__ --exclude-dir=.git --exclude-dir=.pytest_cache --exclude=ci.yml --exclude=test_round2_scientific_review.py "$BAD" . ; then
+            echo "Incorrect Galili DOI fragment found" >&2
+            exit 1
+          fi
+          echo "DOI hygiene OK"
+      - name: Dryad fixture process + diagnostics + fold-wise CV
         run: |
           python tools/import_galili_dryad.py --from-fixture --process
           python tools/loo_evaluate.py --mode both --write
+          python -m analysis.fit_response_model --write
       - name: Run pipeline + paper bundle
         run: python run_pipeline.py --seed 42 --paper --no-export
-      - name: Assert paper figures exist
+      - name: Assert paper figures / CV artifacts exist
         run: |
           set -e
           FIG=results/output/paper_figures
@@ -45,6 +54,7 @@ jobs:
           test -f results/output/paper_tables/eta_sensitivity.csv
           test -f results/output/planner/scenario_ranking.json
           test -f results/output/loo_evaluation.json
+          test -f results/output/cross_validation/loo_response_model.json
           test -f data/processed/galili_cases.csv
           ls -la "$FIG"
       - name: Pytest + coverage

@@ -103,6 +103,10 @@ class DesignPoint:
         d = asdict(self)
         d["feasible"] = self.feasible
         d["constraint_violations"] = ",".join(self.constraint_violations)
+        # Preferred aliases (legacy keys retained).
+        d["leakage_proxy_pct"] = self.physics_regurgitation_pct
+        d["strain_risk_score"] = self.max_principal_strain
+        d["contact_score"] = None  # filled by callers with mechanics contact when available
         return d
 
 

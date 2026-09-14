@@ -2,7 +2,8 @@
 """Import Galili RSOS 2022 supporting data from Dryad (or local drop / fixture).
 
 Dryad DOI: 10.5061/dryad.bzkh1899d
-Paper DOI: 10.1098/rsos.211726
+Paper DOI: 10.1098/rsos.211464
+Paper title: Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation
 
 Dryad file inventory (API v2 version 156393):
   - Deformed_coordinates_and_contact.zip   (~315 KB)
@@ -70,7 +71,7 @@ REFERENCE = ROOT / "results" / "reference_data.yaml"
 FIXTURE = ROOT / "data" / "fixtures" / "galili_dryad_mini"
 
 DRYAD_DOI = "10.5061/dryad.bzkh1899d"
-# Crossref / DataCite cite the RSOS article as 10.1098/rsos.211464 (not 211726).
+# Crossref / DataCite cite the RSOS article as 10.1098/rsos.211464.
 PAPER_DOI = "10.1098/rsos.211464"
 DRYAD_LANDING = f"https://doi.org/{DRYAD_DOI}"
 DRYAD_API = "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.bzkh1899d"
@@ -963,8 +964,7 @@ def write_provenance(
             "citation": "Galili L. et al. R. Soc. Open Sci. 2022",
             "paper_doi": PAPER_DOI,
             "paper_doi_note": (
-                "Crossref/DataCite article DOI is 10.1098/rsos.211464; "
-                "earlier drafts incorrectly cited 10.1098/rsos.211726."
+                "Crossref/DataCite article DOI is 10.1098/rsos.211464."
             ),
             "dryad_doi": DRYAD_DOI,
             "dryad_landing": DRYAD_LANDING,

@@ -23,13 +23,13 @@ version: "0.2.0"
 date-released: "2026-09-14"
 references:
   - type: article
-    title: "Numerical biomechanics modelling of indirect mitral annuloplasty techniques"
+    title: "Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation"
     authors:
       - family-names: Galili
         given-names: L.
     year: 2022
-    doi: "10.1098/rsos.211726"
+    doi: "10.1098/rsos.211464"
   - type: data
-    title: "Data from: Numerical biomechanics modelling of indirect mitral annuloplasty techniques"
+    title: "Data from: Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation"
     year: 2022
     doi: "10.5061/dryad.bzkh1899d"

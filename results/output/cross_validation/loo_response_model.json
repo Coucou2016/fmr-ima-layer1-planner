@@ -1,0 +1,776 @@
+{
+  "mode": "fold_wise_response_model_loo",
+  "cross_validation_role": "true_fold_wise_fit",
+  "paper_doi": "10.1098/rsos.211464",
+  "dryad_doi": "10.5061/dryad.bzkh1899d",
+  "catalog": "processed_galili_cases:dryad_derived",
+  "honesty": "True leave-one-case-out: each fold refits f_ROA(\u0394AP, device family, annular reduction, contact_fraction) and f_leak(ROA, coaptation proxy, contact, device mechanism) on the other six Galili peak-systole cases. Held-out ROA/leakage never enter fit arrays. AP is prescribed geometry input. Fixed kappa_overshort prior encodes Galili non-monotonic ROA rebound beyond ~AP50. Not patient-level external validation.",
+  "folds": [
+    {
+      "held_id": "pathology",
+      "cross_validation_role": "loo_fold_wise_response_model",
+      "train_ids": [
+        "ima_cs_14",
+        "ima_cs_18",
+        "ima_cs_22",
+        "ima_ap_30",
+        "ima_ap_50",
+        "ima_ap_70"
+      ],
+      "fitted_params": {
+        "roa_coef": [
+          2.633739268118389,
+          -0.056946898960999845,
+          1.5335334255784248,
+          1.1002058425399541,
+          0.049697739277291646,
+          0.0007364608689910271,
+          -0.017585148837439356,
+          0.049697739277293054
+        ],
+        "leak_coef": [
+          0.19433271291103077,
+          0.08411598664591716,
+          0.28909719075285045,
+          -0.019552531040033894,
+          0.006408368873791266,
+          0.18792434403724048,
+          -0.003998322934709395
+        ],
+        "train_ids": [
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "ridge_roa": 0.05,
+        "ridge_leak": 0.05,
+        "kappa_overshort": 1.85,
+        "feature_names_roa": [
+          "intercept",
+          "delta_ap_mm",
+          "is_ima_ap",
+          "is_ima_cs",
+          "annular_reduction_mm",
+          "contact_fraction",
+          "is_ap_x_delta",
+          "is_cs_x_annular"
+        ],
+        "feature_names_leak": [
+          "intercept",
+          "log_roa_ratio",
+          "coaptation_proxy",
+          "contact_fraction",
+          "is_ima_ap",
+          "is_ima_cs",
+          "overshort_sq"
+        ],
+        "roa_space": "log_plus_overshort_prior"
+      },
+      "fitting_audit": {
+        "held_id_in_fitting_targets": false,
+        "n_train": 6,
+        "held_roa_mm2": 172.8,
+        "held_regurgitation_pct": 5.26,
+        "train_roa_mm2": [
+          56.7,
+          55.3,
+          48.2,
+          51.1,
+          27.3,
+          46.1
+        ],
+        "train_regurgitation_pct": [
+          0.52,
+          0.41,
+          0.29,
+          0.16,
+          0.08,
+          0.13
+        ]
+      },
+      "published": {
+        "ap_diameter_mm": 26.1,
+        "roa_mm2": 172.8,
+        "regurgitation_pct": 5.26,
+        "contact_fraction": 0.01172447484123107,
+        "cardiac_phase": "peak_systole"
+      },
+      "pred_ap_diameter_mm": 26.1,
+      "pred_roa_mm2": 13.925865005003896,
+      "pred_regurgitation_pct": 0.11808731891208991,
+      "ap_role": "literature_mapping_input",
+      "ap_prediction_metric_applicable": false,
+      "err_roa_mm2": -158.87413499499613,
+      "err_regurgitation_pct_points": -5.14191268108791,
+      "abs_err_roa_mm2": 158.87413499499613,
+      "abs_err_regurgitation_pct_points": 5.14191268108791,
+      "abs_err_ap_mm_passthrough": 0.0
+    },
+    {
+      "held_id": "ima_cs_14",
+      "cross_validation_role": "loo_fold_wise_response_model",
+      "train_ids": [
+        "pathology",
+        "ima_cs_18",
+        "ima_cs_22",
+        "ima_ap_30",
+        "ima_ap_50",
+        "ima_ap_70"
+      ],
+      "fitted_params": {
+        "roa_coef": [
+          4.8835553724908225,
+          -0.08703930643176604,
+          -0.4088288259081977,
+          -0.04793333131731604,
+          -0.12308241584635525,
+          0.13336268058867043,
+          -0.017518839627946436,
+          -0.12308241584635676
+        ],
+        "leak_coef": [
+          0.9968274828672615,
+          0.44299014561851435,
+          0.9244157613732996,
+          0.11596569094885506,
+          -0.8338853323368945,
+          -0.9645305213174777,
+          -0.02288396151099623
+        ],
+        "train_ids": [
+          "pathology",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "ridge_roa": 0.05,
+        "ridge_leak": 0.05,
+        "kappa_overshort": 1.85,
+        "feature_names_roa": [
+          "intercept",
+          "delta_ap_mm",
+          "is_ima_ap",
+          "is_ima_cs",
+          "annular_reduction_mm",
+          "contact_fraction",
+          "is_ap_x_delta",
+          "is_cs_x_annular"
+        ],
+        "feature_names_leak": [
+          "intercept",
+          "log_roa_ratio",
+          "coaptation_proxy",
+          "contact_fraction",
+          "is_ima_ap",
+          "is_ima_cs",
+          "overshort_sq"
+        ],
+        "roa_space": "log_plus_overshort_prior"
+      },
+      "fitting_audit": {
+        "held_id_in_fitting_targets": false,
+        "n_train": 6,
+        "held_roa_mm2": 56.7,
+        "held_regurgitation_pct": 0.52,
+        "train_roa_mm2": [
+          172.8,
+          55.3,
+          48.2,
+          51.1,
+          27.3,
+          46.1
+        ],
+        "train_regurgitation_pct": [
+          5.26,
+          0.41,
+          0.29,
+          0.16,
+          0.08,
+          0.13
+        ]
+      },
+      "published": {
+        "ap_diameter_mm": 25.5,
+        "roa_mm2": 56.7,
+        "regurgitation_pct": 0.52,
+        "contact_fraction": 0.08036150464093796,
+        "cardiac_phase": "peak_systole"
+      },
+      "pred_ap_diameter_mm": 25.5,
+      "pred_roa_mm2": 69.59595584645734,
+      "pred_regurgitation_pct": 0.5961106836961311,
+      "ap_role": "literature_mapping_input",
+      "ap_prediction_metric_applicable": false,
+      "err_roa_mm2": 12.89595584645734,
+      "err_regurgitation_pct_points": 0.07611068369613105,
+      "abs_err_roa_mm2": 12.89595584645734,
+      "abs_err_regurgitation_pct_points": 0.07611068369613105,
+      "abs_err_ap_mm_passthrough": 0.0
+    },
+    {
+      "held_id": "ima_cs_18",
+      "cross_validation_role": "loo_fold_wise_response_model",
+      "train_ids": [
+        "pathology",
+        "ima_cs_14",
+        "ima_cs_22",
+        "ima_ap_30",
+        "ima_ap_50",
+        "ima_ap_70"
+      ],
+      "fitted_params": {
+        "roa_coef": [
+          4.869623569549937,
+          0.03326262239861308,
+          -0.39896621818728817,
+          -0.3536063842470543,
+          -0.10330218944943953,
+          0.1195344132496264,
+          -0.13722694219944626,
+          -0.103302189449437
+        ],
+        "leak_coef": [
+          0.9968689424483984,
+          0.44773763351639556,
+          0.9256199855791608,
+          0.11351659723525184,
+          -0.8277115997180242,
+          -0.9403022843385207,
+          -0.022944400230285312
+        ],
+        "train_ids": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "ridge_roa": 0.05,
+        "ridge_leak": 0.05,
+        "kappa_overshort": 1.85,
+        "feature_names_roa": [
+          "intercept",
+          "delta_ap_mm",
+          "is_ima_ap",
+          "is_ima_cs",
+          "annular_reduction_mm",
+          "contact_fraction",
+          "is_ap_x_delta",
+          "is_cs_x_annular"
+        ],
+        "feature_names_leak": [
+          "intercept",
+          "log_roa_ratio",
+          "coaptation_proxy",
+          "contact_fraction",
+          "is_ima_ap",
+          "is_ima_cs",
+          "overshort_sq"
+        ],
+        "roa_space": "log_plus_overshort_prior"
+      },
+      "fitting_audit": {
+        "held_id_in_fitting_targets": false,
+        "n_train": 6,
+        "held_roa_mm2": 55.3,
+        "held_regurgitation_pct": 0.41,
+        "train_roa_mm2": [
+          172.8,
+          56.7,
+          48.2,
+          51.1,
+          27.3,
+          46.1
+        ],
+        "train_regurgitation_pct": [
+          5.26,
+          0.52,
+          0.29,
+          0.16,
+          0.08,
+          0.13
+        ]
+      },
+      "published": {
+        "ap_diameter_mm": 24.7,
+        "roa_mm2": 55.3,
+        "regurgitation_pct": 0.41,
+        "contact_fraction": 0.08671226184660479,
+        "cardiac_phase": "peak_systole"
+      },
+      "pred_ap_diameter_mm": 24.7,
+      "pred_roa_mm2": 53.406333551884025,
+      "pred_regurgitation_pct": 0.41714057100410784,
+      "ap_role": "literature_mapping_input",
+      "ap_prediction_metric_applicable": false,
+      "err_roa_mm2": -1.8936664481159724,
+      "err_regurgitation_pct_points": 0.007140571004107865,
+      "abs_err_roa_mm2": 1.8936664481159724,
+      "abs_err_regurgitation_pct_points": 0.007140571004107865,
+      "abs_err_ap_mm_passthrough": 0.0
+    },
+    {
+      "held_id": "ima_cs_22",
+      "cross_validation_role": "loo_fold_wise_response_model",
+      "train_ids": [
+        "pathology",
+        "ima_cs_14",
+        "ima_cs_18",
+        "ima_ap_30",
+        "ima_ap_50",
+        "ima_ap_70"
+      ],
+      "fitted_params": {
+        "roa_coef": [
+          4.875243442362428,
+          0.11086258866808649,
+          -0.4047446883604709,
+          -0.2296517405127423,
+          -0.14364874180661913,
+          0.12021181885158744,
+          -0.21481031320172284,
+          -0.14364874180661608
+        ],
+        "leak_coef": [
+          0.9800130482076846,
+          0.41918881461910756,
+          0.9379277439285912,
+          0.11715990807361856,
+          -0.8655234825581305,
+          -0.9479159036923716,
+          -0.02275556427532275
+        ],
+        "train_ids": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_ap_30",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "ridge_roa": 0.05,
+        "ridge_leak": 0.05,
+        "kappa_overshort": 1.85,
+        "feature_names_roa": [
+          "intercept",
+          "delta_ap_mm",
+          "is_ima_ap",
+          "is_ima_cs",
+          "annular_reduction_mm",
+          "contact_fraction",
+          "is_ap_x_delta",
+          "is_cs_x_annular"
+        ],
+        "feature_names_leak": [
+          "intercept",
+          "log_roa_ratio",
+          "coaptation_proxy",
+          "contact_fraction",
+          "is_ima_ap",
+          "is_ima_cs",
+          "overshort_sq"
+        ],
+        "roa_space": "log_plus_overshort_prior"
+      },
+      "fitting_audit": {
+        "held_id_in_fitting_targets": false,
+        "n_train": 6,
+        "held_roa_mm2": 48.2,
+        "held_regurgitation_pct": 0.29,
+        "train_roa_mm2": [
+          172.8,
+          56.7,
+          55.3,
+          51.1,
+          27.3,
+          46.1
+        ],
+        "train_regurgitation_pct": [
+          5.26,
+          0.52,
+          0.41,
+          0.16,
+          0.08,
+          0.13
+        ]
+      },
+      "published": {
+        "ap_diameter_mm": 24.8,
+        "roa_mm2": 48.2,
+        "regurgitation_pct": 0.29,
+        "contact_fraction": 0.09941377625793844,
+        "cardiac_phase": "peak_systole"
+      },
+      "pred_ap_diameter_mm": 24.8,
+      "pred_roa_mm2": 44.528195057611576,
+      "pred_regurgitation_pct": 0.3587491453956366,
+      "ap_role": "literature_mapping_input",
+      "ap_prediction_metric_applicable": false,
+      "err_roa_mm2": -3.6718049423884267,
+      "err_regurgitation_pct_points": 0.06874914539563665,
+      "abs_err_roa_mm2": 3.6718049423884267,
+      "abs_err_regurgitation_pct_points": 0.06874914539563665,
+      "abs_err_ap_mm_passthrough": 0.0
+    },
+    {
+      "held_id": "ima_ap_30",
+      "cross_validation_role": "loo_fold_wise_response_model",
+      "train_ids": [
+        "pathology",
+        "ima_cs_14",
+        "ima_cs_18",
+        "ima_cs_22",
+        "ima_ap_50",
+        "ima_ap_70"
+      ],
+      "fitted_params": {
+        "roa_coef": [
+          4.865519744596346,
+          0.07612233896603872,
+          -0.5085511185627621,
+          -0.3308191484679747,
+          -0.11276167398231397,
+          0.11690171293953218,
+          -0.1710621204380667,
+          -0.11276167398231325
+        ],
+        "leak_coef": [
+          0.8433628414854202,
+          0.7861860299308986,
+          1.1015787069407075,
+          -0.0441875257149445,
+          -0.03022535426449066,
+          -0.5994285764136745,
+          -0.05220920752713704
+        ],
+        "train_ids": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_50",
+          "ima_ap_70"
+        ],
+        "ridge_roa": 0.05,
+        "ridge_leak": 0.05,
+        "kappa_overshort": 1.85,
+        "feature_names_roa": [
+          "intercept",
+          "delta_ap_mm",
+          "is_ima_ap",
+          "is_ima_cs",
+          "annular_reduction_mm",
+          "contact_fraction",
+          "is_ap_x_delta",
+          "is_cs_x_annular"
+        ],
+        "feature_names_leak": [
+          "intercept",
+          "log_roa_ratio",
+          "coaptation_proxy",
+          "contact_fraction",
+          "is_ima_ap",
+          "is_ima_cs",
+          "overshort_sq"
+        ],
+        "roa_space": "log_plus_overshort_prior"
+      },
+      "fitting_audit": {
+        "held_id_in_fitting_targets": false,
+        "n_train": 6,
+        "held_roa_mm2": 51.1,
+        "held_regurgitation_pct": 0.16,
+        "train_roa_mm2": [
+          172.8,
+          56.7,
+          55.3,
+          48.2,
+          27.3,
+          46.1
+        ],
+        "train_regurgitation_pct": [
+          5.26,
+          0.52,
+          0.41,
+          0.29,
+          0.08,
+          0.13
+        ]
+      },
+      "published": {
+        "ap_diameter_mm": 20.7,
+        "roa_mm2": 51.1,
+        "regurgitation_pct": 0.16,
+        "contact_fraction": 0.0537371763556424,
+        "cardiac_phase": "peak_systole"
+      },
+      "pred_ap_diameter_mm": 20.7,
+      "pred_roa_mm2": 47.02012840884332,
+      "pred_regurgitation_pct": 0.8584537450590402,
+      "ap_role": "literature_mapping_input",
+      "ap_prediction_metric_applicable": false,
+      "err_roa_mm2": -4.079871591156682,
+      "err_regurgitation_pct_points": 0.6984537450590401,
+      "abs_err_roa_mm2": 4.079871591156682,
+      "abs_err_regurgitation_pct_points": 0.6984537450590401,
+      "abs_err_ap_mm_passthrough": 0.0
+    },
+    {
+      "held_id": "ima_ap_50",
+      "cross_validation_role": "loo_fold_wise_response_model",
+      "train_ids": [
+        "pathology",
+        "ima_cs_14",
+        "ima_cs_18",
+        "ima_cs_22",
+        "ima_ap_30",
+        "ima_ap_70"
+      ],
+      "fitted_params": {
+        "roa_coef": [
+          4.87245649496392,
+          0.07517504724662089,
+          -0.37168944840803947,
+          -0.3340817975247154,
+          -0.11241439710681128,
+          0.0654165215572476,
+          -0.17533773705602634,
+          -0.11241439710681124
+        ],
+        "leak_coef": [
+          0.8106806967858597,
+          0.9444741628797363,
+          1.1218790416232227,
+          -0.03728852160619772,
+          -0.39811193082054624,
+          -0.4087409274834477,
+          -0.004438655455467181
+        ],
+        "train_ids": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_70"
+        ],
+        "ridge_roa": 0.05,
+        "ridge_leak": 0.05,
+        "kappa_overshort": 1.85,
+        "feature_names_roa": [
+          "intercept",
+          "delta_ap_mm",
+          "is_ima_ap",
+          "is_ima_cs",
+          "annular_reduction_mm",
+          "contact_fraction",
+          "is_ap_x_delta",
+          "is_cs_x_annular"
+        ],
+        "feature_names_leak": [
+          "intercept",
+          "log_roa_ratio",
+          "coaptation_proxy",
+          "contact_fraction",
+          "is_ima_ap",
+          "is_ima_cs",
+          "overshort_sq"
+        ],
+        "roa_space": "log_plus_overshort_prior"
+      },
+      "fitting_audit": {
+        "held_id_in_fitting_targets": false,
+        "n_train": 6,
+        "held_roa_mm2": 27.3,
+        "held_regurgitation_pct": 0.08,
+        "train_roa_mm2": [
+          172.8,
+          56.7,
+          55.3,
+          48.2,
+          51.1,
+          46.1
+        ],
+        "train_regurgitation_pct": [
+          5.26,
+          0.52,
+          0.41,
+          0.29,
+          0.16,
+          0.13
+        ]
+      },
+      "published": {
+        "ap_diameter_mm": 15.9,
+        "roa_mm2": 27.3,
+        "regurgitation_pct": 0.08,
+        "contact_fraction": 0.1316560820713239,
+        "cardiac_phase": "peak_systole"
+      },
+      "pred_ap_diameter_mm": 15.9,
+      "pred_roa_mm2": 32.71128395421351,
+      "pred_regurgitation_pct": 0.0,
+      "ap_role": "literature_mapping_input",
+      "ap_prediction_metric_applicable": false,
+      "err_roa_mm2": 5.411283954213513,
+      "err_regurgitation_pct_points": -0.08,
+      "abs_err_roa_mm2": 5.411283954213513,
+      "abs_err_regurgitation_pct_points": 0.08,
+      "abs_err_ap_mm_passthrough": 0.0
+    },
+    {
+      "held_id": "ima_ap_70",
+      "cross_validation_role": "loo_fold_wise_response_model",
+      "train_ids": [
+        "pathology",
+        "ima_cs_14",
+        "ima_cs_18",
+        "ima_cs_22",
+        "ima_ap_30",
+        "ima_ap_50"
+      ],
+      "fitted_params": {
+        "roa_coef": [
+          4.880878239626953,
+          0.068106545459989,
+          -0.19172105866983424,
+          -0.3412198893374659,
+          -0.11099863321009537,
+          0.04824585910661652,
+          -0.20509382537060153,
+          -0.11099863321008642
+        ],
+        "leak_coef": [
+          0.9934004178102781,
+          0.4463249033705617,
+          0.9281652677898774,
+          0.1135600327275673,
+          -0.8287263997960036,
+          -0.9484842612264065,
+          9.168638366122385e-30
+        ],
+        "train_ids": [
+          "pathology",
+          "ima_cs_14",
+          "ima_cs_18",
+          "ima_cs_22",
+          "ima_ap_30",
+          "ima_ap_50"
+        ],
+        "ridge_roa": 0.05,
+        "ridge_leak": 0.05,
+        "kappa_overshort": 1.85,
+        "feature_names_roa": [
+          "intercept",
+          "delta_ap_mm",
+          "is_ima_ap",
+          "is_ima_cs",
+          "annular_reduction_mm",
+          "contact_fraction",
+          "is_ap_x_delta",
+          "is_cs_x_annular"
+        ],
+        "feature_names_leak": [
+          "intercept",
+          "log_roa_ratio",
+          "coaptation_proxy",
+          "contact_fraction",
+          "is_ima_ap",
+          "is_ima_cs",
+          "overshort_sq"
+        ],
+        "roa_space": "log_plus_overshort_prior"
+      },
+      "fitting_audit": {
+        "held_id_in_fitting_targets": false,
+        "n_train": 6,
+        "held_roa_mm2": 46.1,
+        "held_regurgitation_pct": 0.13,
+        "train_roa_mm2": [
+          172.8,
+          56.7,
+          55.3,
+          48.2,
+          51.1,
+          27.3
+        ],
+        "train_regurgitation_pct": [
+          5.26,
+          0.52,
+          0.41,
+          0.29,
+          0.16,
+          0.08
+        ]
+      },
+      "published": {
+        "ap_diameter_mm": 12.4,
+        "roa_mm2": 46.1,
+        "regurgitation_pct": 0.13,
+        "contact_fraction": 0.2256961406936981,
+        "cardiac_phase": "peak_systole"
+      },
+      "pred_ap_diameter_mm": 12.4,
+      "pred_roa_mm2": 39.495148277291236,
+      "pred_regurgitation_pct": 0.3282707113839876,
+      "ap_role": "literature_mapping_input",
+      "ap_prediction_metric_applicable": false,
+      "err_roa_mm2": -6.604851722708766,
+      "err_regurgitation_pct_points": 0.1982707113839876,
+      "abs_err_roa_mm2": 6.604851722708766,
+      "abs_err_regurgitation_pct_points": 0.1982707113839876,
+      "abs_err_ap_mm_passthrough": 0.0
+    }
+  ],
+  "summary": {
+    "label": "fold_wise_response_model_loo",
+    "n": 7,
+    "mae_roa_mm2": 27.633081357148118,
+    "mae_regurgitation_pct_points": 0.8958053625181162,
+    "heldout_subset_ids": [
+      "ima_cs_14",
+      "ima_cs_18",
+      "ima_ap_30",
+      "ima_ap_70"
+    ],
+    "heldout_subset_mae_roa_mm2": 6.36858640210969,
+    "heldout_subset_mae_regurgitation_pct_points": 0.24499392778581666,
+    "ap_prediction_metric_applicable": false,
+    "mae_ap_mm_note": "AP is literature_mapping_input (table lookup / prescribed geometry); do not report AP MAE as predictive accuracy.",
+    "engineering_targets": {
+      "roa_heldout_mae_mm2": 25.0,
+      "leak_mae_pp": 0.5,
+      "ap70_roa_abs_err_mm2": 25.0,
+      "ap70_leak_abs_err_pp": 0.5,
+      "note": "Internal engineering targets \u2014 NOT medical validation thresholds.",
+      "compared_against": "heldout_subset_mae (same IDs as rule-based blend-off baseline)"
+    },
+    "baseline_rule_based_blend_off": {
+      "heldout_mae_roa_mm2": 50.18,
+      "heldout_mae_leak_pp": 1.445,
+      "ap70_abs_err_roa_mm2": 94.17,
+      "ap70_abs_err_leak_pp": 5.455
+    },
+    "ima_ap_70": {
+      "abs_err_roa_mm2": 6.604851722708766,
+      "abs_err_regurgitation_pct_points": 0.1982707113839876,
+      "pred_roa_mm2": 39.495148277291236,
+      "published_roa_mm2": 46.1,
+      "pred_regurgitation_pct": 0.3282707113839876,
+      "published_regurgitation_pct": 0.13
+    },
+    "engineering_targets_met": {
+      "roa_mae": true,
+      "leak_mae": true,
+      "ap70_roa": true,
+      "ap70_leak": true
+    },
+    "scientific_framing": "fold-wise response model met internal engineering targets on the held-out Galili subset \u2014 still not patient-level external validation"
+  }
+}

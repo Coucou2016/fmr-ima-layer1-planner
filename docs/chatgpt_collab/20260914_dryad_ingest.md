@@ -63,7 +63,7 @@ AP MAE = 0 under Galili mapping because published AP is reproduced by case looku
 
 ## Paper DOI correction
 
-Crossref resolves Galili RSOS as **10.1098/rsos.211464** (not 211726). Updated in importer / provenance / reference_data.
+Crossref resolves Galili RSOS as **10.1098/rsos.211464**. Updated in importer / provenance / reference_data.
 
 ## Pipeline / tests
 

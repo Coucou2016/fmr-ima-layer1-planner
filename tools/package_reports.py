@@ -96,23 +96,14 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
     (
         "fig5",
         "图 5",
-        "双缝线 vs 单缝线 IMA-AP：匹配 AP 缩减下的交界区泄漏对照",
+        "双缝线交界因子敏感性（0.25/0.5/0.75/1.0）——假设参数，非 Innovation D 发现",
         "fig5_dual_vs_single_suture.png",
         """
-来龙去脉与读图说明：可选贡献 C4（Innovation D）在相同缝线缩短 %（故相同临床 AP 缩减）下比较单/双缝线。
-纵轴关注交界区 ROA 分数；虚线可叠加单缝线 physics 反流作对照。左右面板对照 Galili / 临床映射。
-本图隔离“缝线数量”变量，回答机制问题，不是器械清关或产品声明。
-
-如何读：在 60% 临床映射点，单缝线 jet=mixed、交界分数 0.330；双缝线 jet=central、交界分数 0.165，
-physics 泄漏代理由约 0.075% 降至约 0.074%——分类改善更醒目，幅度改善相对温和。70% 点 AP 缩减 21%
-超出默认 20% 规划上限，仅作机制对照，不作植入候选声明。双缝线交界因子 ×0.5 为显式假设参数。
-
-结论：双缝线是假设生成情景；seed-42 场景排序最优候选双缝线 60% 正是在该对照下选出的网格点。
-勿将 ~0.074% physics 等同于临床反流容积改善。
+来龙去脉与读图说明：本图展示双缝线交界因子（0.25/0.5/0.75/1.0）敏感性，不是“Innovation D discovery”。
+名义因子 ×0.5 为显式假设参数；排序对因子选择敏感。勿将 physics 泄漏差（如 dual60 vs single ~0.0018 pp）写成临床反流容积改善。
 """,
     ),
 ]
-
 
 def b64_png(path: Path) -> str:
     data = path.read_bytes()
@@ -452,9 +443,9 @@ def build_report_md(rec: dict, tables: dict, figs: list[dict]) -> str:
 
 **方法：** 在可复现的 Python 一层代理（代数力学代理 + SPH-inspired 文献校准泄漏代理）上实现：（C1）缝线/桥缩短 % → 解剖 AP 缩减的假设映射（ARTO/MAVERIC 提供约 14–15% AP 可达语境；规划上限 20%；η 为假设先验，非临床标定）；（C2）连续设计空间扫掠 + 约束网格探索性情景排序；（C3）IMA-CS 远端着陆区 CS–LCx（coronary sinus–left circumflex）文献风险筛查阈值 ≥ 8.6 mm 与 NiTi 交变应变工程筛查 &lt; 0.4%；可选（C4）双缝线 vs 单缝线在相同 AP 缩减下的交界区泄漏对照（×0.5 为假设参数）。主图使用 **physics** 泄漏代理；YAML 锚点混合仅用于 Galili **校准/复现**病例 ID（非外部验证）。
 
-**结果（seed=42）：** 假设映射下，情景排序器评估 36 个网格点、保留 30 个可行设计（P(feasible)≈0.86）；**假设下最优候选**为 **IMA-AP 双缝线 60%**（η=0.30 → AP 缩减 **18.0%**，physics 泄漏代理（见 JSON），jet=`central`）。同剂量单缝线为 jet=`mixed`、交界区分数更高。IMA-CS 在默认示意解剖（基线 CS–LCx 11.0 mm）上，可行最优为桥缩短 **20%**（CS–LCx 恰为 **8.6 mm**）。η±20% 时 top-1 稳定性约 0.33（η−→双 70%；η+→双 50%）。
+**结果（seed=42）：** 先报告诚实留出/交叉验证：规则基 blend-off 留出 MAE ROA≈50.18 mm²、泄漏≈1.445 pp（IMA-AP70 曾为 46.1→140.3 / 0.13%→5.585%）；折内重拟合响应模型留出子集 MAE ROA≈6.4 mm²、泄漏≈0.25 pp（AP70≈6.6 mm² / 0.20 pp）。**随后**才是假设驱动的探索性排序：n_total_points=36，n_device_candidates=35，n_feasible_device_candidates=30，p_feasible_device_candidates≈0.857；在名义双缝线假设下双缝线 60% 排第一（相对匹配单缝线泄漏差约 0.0018 pp），排序对假设敏感。
 
-**结论：** 一层代理可将 AP 窗口、射流位置与 LCx **风险筛查**写成探索性情景排序（非临床推荐）；不能替代患者特异 LHHM/FSI，也不能把 η 当作新高保真力学辨识结果。
+**结论：** 一层代理可将 AP 探索性规划区间、射流位置与 LCx **风险筛查**写成探索性情景排序（非临床推荐、非已验证预测）；不能替代患者特异 LHHM/FSI。
 
 ### English abstract（与稿件一致）
 
@@ -462,9 +453,9 @@ Background: Preoperative planning for IMA often treats computational suture/brid
 
 Methods: On a reproducible Python Layer-1 surrogate (algebraic mechanics + literature-calibrated leakage proxy) we implement C1–C3 (and optional C4). Main figures use physics leakage-proxy; YAML anchor blending is restricted to Galili calibration/reproduction case IDs.
 
-Results (seed=42): The scenario ranker evaluates 36 points and retains 30 feasible designs; best candidate under assumptions is IMA-AP dual suture 60% (η=0.30 → AP reduction 18.0%, physics leakage-proxy (see JSON), jet=`central`).
+Results (seed=42): Held-out / fold-wise CV first (rule-based blend-off MAE ROA 50.18 mm² / leak 1.445 pp; response-model held-out subset ≈6.4 / 0.25; AP70 improved vs 94.17/5.455). Then assumption-driven exploratory ranking: 35 device candidates / 30 feasible (p≈0.857); under nominal dual-suture hypothesis dual AP60 ranked first (Δleak vs matched single ~0.0018 pp; ranking assumption-sensitive).
 
-Conclusions: A Layer-1 surrogate can encode the AP window, jet location, and LCx risk screening into an exploratory scenario ranking (not a clinical recommendation). It does not replace patient-specific LHHM/FSI and must not treat η as a newly identified high-fidelity mechanics parameter.
+Conclusions: A Layer-1 surrogate supports exploratory screening with honest held-out reporting — not validated prediction or clinical recommendation.
 
 **关键词 / Keywords：** functional mitral regurgitation; indirect mitral annuloplasty; exploratory screening; coronary sinus; LCx; Layer-1 surrogate
 
@@ -696,9 +687,40 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
     table1 = csv_to_html(summary_rows, "表 1. 情景排序主结果（clinical/假设映射，seed=42）")
     table2 = csv_to_html(tables["galili"], "表 2. Galili vs surrogate（Level 0 校准/复现）")
     phys = float(rec_rec["physics_regurgitation_pct"])
-    p_feas = rec.get("p_feasible", rec["n_feasible"] / max(rec["n_evaluated"], 1))
+    p_feas = rec.get(
+        "p_feasible_device_candidates",
+        rec.get("p_feasible", rec["n_feasible"] / max(rec.get("n_device_candidates", rec["n_evaluated"]), 1)),
+    )
+    n_dev = rec.get("n_device_candidates", rec.get("n_evaluated"))
+    n_feas = rec.get("n_feasible_device_candidates", rec.get("n_feasible"))
+    n_tot = rec.get("n_total_points", rec.get("n_evaluated"))
     stab = (rec.get("uncertainty") or {}).get("ranking_stability_top1_fraction")
     stab_txt = f"{stab:.2f}" if isinstance(stab, (int, float)) else "见 JSON"
+    # Load CV / blend-off summaries when present (held-out BEFORE planner emphasis).
+    cv_path = ROOT / "results" / "output" / "cross_validation" / "summary.json"
+    loo_path = ROOT / "results" / "output" / "loo_evaluation.json"
+    cv_summary = {}
+    if cv_path.is_file():
+        cv_summary = json.loads(cv_path.read_text(encoding="utf-8"))
+    held_diag = {}
+    if loo_path.is_file():
+        loo_payload = json.loads(loo_path.read_text(encoding="utf-8"))
+        held_diag = (loo_payload.get("heldout_evaluation") or {}).get("summary") or {}
+    cv_roa = cv_summary.get("heldout_subset_mae_roa_mm2")
+    cv_leak = cv_summary.get("heldout_subset_mae_regurgitation_pct_points")
+    ap70 = cv_summary.get("ima_ap_70") or {}
+    held_block = f"""
+  <section id="heldout">
+    <h2>留出 / 折内交叉验证（先于情景排序）</h2>
+    <div class="honesty">规则基 blend-off 诊断 ≠ 真折内 LOO；真折内见 <code>analysis/fit_response_model.py</code>。AP MAE 不适用（文献几何输入）。</div>
+    <ul>
+      <li>规则基留出 MAE：ROA={held_diag.get('mae_roa_mm2', '—')} mm²，leak_pp={held_diag.get('mae_regurgitation_pct_points', '—')}</li>
+      <li>折内响应模型留出子集 MAE：ROA={cv_roa if cv_roa is not None else '—'} mm²，leak_pp={cv_leak if cv_leak is not None else '—'}</li>
+      <li>IMA-AP70（折内）：pred ROA={ap70.get('pred_roa_mm2', '—')}（发表 46.1），abs_err={ap70.get('abs_err_roa_mm2', '—')}；
+          pred leak={ap70.get('pred_regurgitation_pct', '—')}（发表 0.13%），abs_err={ap70.get('abs_err_regurgitation_pct_points', '—')} pp</li>
+    </ul>
+  </section>
+"""
     table3 = csv_to_html(tables["window"], "表 3. 临床窗口 vs 数值极端")
     table4 = csv_to_html(tables["eta"], "表 4. η±20% 规划假设敏感性")
     table5 = csv_to_html(dual_key, "表 5. 双缝线 vs 单缝线（50/60/70% 关键行）")
@@ -723,7 +745,7 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
     <div><span class="badge">研究报告</span><span class="badge">Layer-1</span><span class="badge">seed=42</span></div>
     <h1>功能性质二尖瓣反流（FMR）间接二尖瓣成形（IMA）文献锚定低阶代理探索性筛查报告</h1>
     <p class="en">A literature-anchored low-order surrogate for exploratory screening of indirect mitral annuloplasty strategies</p>
-    <p class="meta">生成日期：{today} · 数据：<code>run_pipeline.py --seed 42 --paper</code> · 假设下最优候选：IMA-AP 双缝线 60% · AP 18.0% · physics {phys:.4f}% · jet=central · P(feasible)≈{p_feas:.2f} · η top-1 稳定性 {stab_txt}</p>
+    <p class="meta">生成日期：{today} · 数据：<code>run_pipeline.py --seed 42 --paper</code> · 先 CV/留出再排序 · n_device={n_dev} 可行={n_feas} P≈{p_feas:.2f} · 名义双缝假设下 dual60 · physics {phys:.4f}% · η top-1 {stab_txt}</p>
   </header>
 
   <nav class="toc" id="toc">
@@ -733,7 +755,8 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
       <li><a href="#bg">背景与目标</a></li>
       <li><a href="#methods">数据与方法</a></li>
       <li><a href="#process">研究过程</a></li>
-      <li><a href="#results">结果</a></li>
+      <li><a href="#heldout">留出 / 折内 CV</a></li>
+      <li><a href="#results">结果（情景排序）</a></li>
       <li><a href="#discussion">分析与讨论</a></li>
       <li><a href="#conclusions">结论</a></li>
       <li><a href="#limitations">局限性与展望</a></li>
@@ -745,12 +768,12 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
   <section id="abstract">
     <h2 class="sec">一、摘要</h2>
     <h3>中文摘要</h3>
-    <p><strong>背景：</strong>间接二尖瓣成形（IMA，indirect mitral annuloplasty，不直接修补瓣叶而经装置重塑瓣环几何的介入策略）术前规划，常把计算文献中的缝线/桥缩短百分比直接当作前后径（AP，anteroposterior diameter，二尖瓣环前后方向直径）缩减百分比。在本仓库 Galili 映射表约定下，IMA-AP 50% 峰缩期 AP=15.9 mm（近直接缩 AP；勿与未变形舒张期 34.4 mm 混用），70% 才塌缩至约 58% AP——后者是数值极端而非临床剂量。</p>
-    <p><strong>方法：</strong>在可复现 Python 一层代理（代数力学代理 + SPH-inspired 文献校准泄漏代理）上实现 C1 假设剂量映射、C2 扫掠与情景排序、C3 LCx/NiTi 筛查，以及可选 C4 双缝线对照（×0.5 假设参数）。主图使用 physics 泄漏代理；YAML 混合仅限 Galili 校准/复现病例。</p>
-    <p><strong>结果（seed=42）：</strong>评估 {rec['n_evaluated']} / 可行 {rec['n_feasible']}（P(feasible)≈{p_feas:.2f}）；假设下最优候选 <strong>IMA-AP 双缝线 60%</strong>（η=0.30 → AP 缩减 <strong>18.0%</strong>，physics 泄漏代理 <strong>{phys:.4f}%</strong>，jet=<code>central</code>）。同剂量单缝线 jet=<code>mixed</code>。IMA-CS 可行最优桥缩短 <strong>20%</strong>（CS–LCx=<strong>8.6 mm</strong>）。η top-1 稳定性 {stab_txt}（η−→双 70%；η+→双 50%）。</p>
-    <p><strong>结论：</strong>一层代理可编码 AP 窗口、射流位置与 LCx 风险筛查为探索性情景排序（非临床推荐）；不能替代患者特异 LHHM/FSI，不能把 η 当作新高保真力学辨识结果。</p>
+    <p><strong>背景：</strong>间接二尖瓣成形（IMA）术前规划常把计算缩短百分比直接当作 AP 缩减。Galili RSOS 2022（doi:10.1098/rsos.211464）峰缩期 IMA-AP 50% → AP=<strong>15.9 mm</strong>（勿与舒张期 34.4 mm 混用）。MAVERIC=ARTO≠Carillon。</p>
+    <p><strong>方法：</strong>Layer-1 代数力学 + 文献校准泄漏代理；Dryad 提取 contact_fraction；真折内响应模型 CV + 规则基 blend-off 诊断；情景排序为假设驱动探索分析（非已验证预测）。</p>
+    <p><strong>结果（seed=42）：</strong>先留出/CV（规则基 MAE ROA≈50.18 / leak≈1.445；折内留出子集≈6.4 / 0.25；AP70 折内≈6.6 mm² / 0.20 pp）。再排序：n_total={n_tot}，n_device={n_dev}，可行={n_feas}，p≈{p_feas:.4f}；名义双缝假设下 dual60 第一（Δleak≈0.0018 pp），排序假设敏感。</p>
+    <p><strong>结论：</strong>支持探索性筛查与诚实留出报告；非临床推荐、非患者级外部验证。</p>
     <h3>English abstract</h3>
-    <p>A Layer-1 surrogate encodes AP dose, jet location, and LCx risk screening into an exploratory scenario ranker. Seed-42 best under assumptions: dual IMA-AP 60%, AP reduction 18.0%, physics leakage-proxy {phys:.4f}%, jet=central. Not production FEA/SPH; η is an assumption prior.</p>
+    <p>Held-out / fold-wise CV first, then assumption-driven ranking (n_device={n_dev}, feasible={n_feas}, p≈{p_feas:.4f}). Dual60 ranks first only under the nominal dual-suture hypothesis. Not validated prediction.</p>
     <p class="abbr"><strong>Keywords:</strong> FMR; IMA; exploratory screening; coronary sinus; LCx; Layer-1 surrogate</p>
   </section>
 
@@ -771,17 +794,20 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
     <h2 class="sec">四、研究过程</h2>
     <ol>
       <li>Level-0：离散 YAML 病例对齐 Galili 锚点（blended + physics 分列）。</li>
+      <li>真折内响应模型 CV + 规则基 blend-off 诊断（先于排序报告）。</li>
       <li>Level-1：假设映射扫掠 → 情景排序 → <code>scenario_ranking.json</code>。</li>
       <li><code>--paper</code> 导出五图与 CSV 表。</li>
       <li>本脚本将 PNG 转 base64、CSV 转 HTML 表，生成自包含报告。</li>
     </ol>
   </section>
 
+{held_block}
+
   <section id="results">
-    <h2 class="sec">五、结果</h2>
+    <h2 class="sec">五、结果（探索性情景排序；假设驱动）</h2>
     <h3>5.1 情景排序主结果</h3>
     {table1}
-    <p class="note">表 1 数字来自 <code>planner/scenario_ranking.json</code>（或兼容 shim），未经人工改写。</p>
+    <p class="note">表 1 数字来自 <code>planner/scenario_ranking.json</code>（或兼容 shim），未经人工改写。排序是假设驱动探索分析，不是已验证预测。</p>
 
     <h3>5.2 Galili 锚点</h3>
     {table2}

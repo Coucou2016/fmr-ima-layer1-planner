@@ -82,12 +82,14 @@ def _leak_index(roa_mm2: float, coaptation_gap_mm: float, sph: dict[str, Any]) -
 
 
 def _sph_scale(cfg: dict[str, Any]) -> float:
+    """Pathology regurgitation fraction used as the literature scale constant.
+
+    Historically written as path_pct / (ref_leak/ref_leak)**exp ≡ path_pct.
+    Kept as an explicit identity with this comment so future edits do not
+    re-introduce a vacuous ratio.
+    """
     sph = cfg["sph"]
-    path_pct = sph["pathology_regurgitation_pct"] / 100.0
-    ref_gap = float(sph.get("pathology_coaptation_gap_mm", 1.25))
-    ref_leak = _leak_index(float(sph["pathology_roa_mm2"]), ref_gap, sph)
-    # k chosen so leak_index == ref_leak and f_ann == 1 reproduces pathology anchor
-    return path_pct / ((ref_leak / ref_leak) ** float(sph["roa_exponent"]))
+    return float(sph["pathology_regurgitation_pct"]) / 100.0
 
 
 
@@ -160,12 +162,15 @@ def regurgitation_fraction_from_physics(
     ap_ratio = geometry.ap_diameter_mm / max(ref_ap, 1e-9)
     frac_central *= max(ap_ratio, 0.5) ** 0.2
 
-    comm = 1.0 + 3.5 * max(0.0, 1.0 - ap_ratio) ** 1.05
-    comm *= 1.0 + 0.2 * max(coaptation_gap_mm - 0.9, 0.0)
-    roa_eff = min(max(roa_mm2, 12.0) * comm**0.35, 48.0)
+    comm = 1.0 + 1.2 * max(0.0, 1.0 - ap_ratio) ** 1.05
+    comm *= 1.0 + 0.12 * max(coaptation_gap_mm - 0.9, 0.0)
+    roa_eff = min(max(roa_mm2, 12.0) * comm**0.25, 60.0)
     leak_eff = _leak_index(roa_eff, coaptation_gap_mm, sph)
     f_leak_comm = (leak_eff / ref_leak) ** float(sph["roa_exponent"])
     frac_comm = k * f_leak_comm * f_ann
+    # Cap commissural branch so over-shortening captures qualitative rebound
+    # (Galili 0.08→0.13%) without pathology-scale leaks.
+    frac_comm = min(frac_comm, max(frac_central * 8.0, 0.004))
 
     if commissural_fraction is None:
         cf = 1.0 if commissural_leak else 0.0

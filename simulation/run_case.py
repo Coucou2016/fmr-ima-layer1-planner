@@ -77,13 +77,15 @@ def run_mechanics_proxy(
                 strain += 0.01
         else:
             # Galili peak-systole branch: AP shortens nearly directly with suture %.
+            # Over-shortening opens gap modestly (qualitative non-monotonicity) without
+            # stacking a pathology-scale leak (Galili 0.08→0.13%, not 0.08→5%).
             ap_red = device.ap_reduction_pct()
             if device.shortening_pct <= 50:
                 gap -= 0.020 * device.shortening_pct
                 gap -= 0.01 * max(0.0, ap_red - 15.0)
             else:
                 over = device.shortening_pct - 50.0
-                penalty = 0.035 * over + 0.75
+                penalty = 0.012 * over + 0.15
                 if n_sutures >= 2:
                     penalty *= 0.5  # hypothesis parameter
                 gap += penalty

@@ -1,0 +1,103 @@
+{
+  "held_id": "ima_ap_50",
+  "cross_validation_role": "loo_fold_wise_response_model",
+  "train_ids": [
+    "pathology",
+    "ima_cs_14",
+    "ima_cs_18",
+    "ima_cs_22",
+    "ima_ap_30",
+    "ima_ap_70"
+  ],
+  "fitted_params": {
+    "roa_coef": [
+      4.87245649496392,
+      0.07517504724662089,
+      -0.37168944840803947,
+      -0.3340817975247154,
+      -0.11241439710681128,
+      0.0654165215572476,
+      -0.17533773705602634,
+      -0.11241439710681124
+    ],
+    "leak_coef": [
+      0.8106806967858597,
+      0.9444741628797363,
+      1.1218790416232227,
+      -0.03728852160619772,
+      -0.39811193082054624,
+      -0.4087409274834477,
+      -0.004438655455467181
+    ],
+    "train_ids": [
+      "pathology",
+      "ima_cs_14",
+      "ima_cs_18",
+      "ima_cs_22",
+      "ima_ap_30",
+      "ima_ap_70"
+    ],
+    "ridge_roa": 0.05,
+    "ridge_leak": 0.05,
+    "kappa_overshort": 1.85,
+    "feature_names_roa": [
+      "intercept",
+      "delta_ap_mm",
+      "is_ima_ap",
+      "is_ima_cs",
+      "annular_reduction_mm",
+      "contact_fraction",
+      "is_ap_x_delta",
+      "is_cs_x_annular"
+    ],
+    "feature_names_leak": [
+      "intercept",
+      "log_roa_ratio",
+      "coaptation_proxy",
+      "contact_fraction",
+      "is_ima_ap",
+      "is_ima_cs",
+      "overshort_sq"
+    ],
+    "roa_space": "log_plus_overshort_prior"
+  },
+  "fitting_audit": {
+    "held_id_in_fitting_targets": false,
+    "n_train": 6,
+    "held_roa_mm2": 27.3,
+    "held_regurgitation_pct": 0.08,
+    "train_roa_mm2": [
+      172.8,
+      56.7,
+      55.3,
+      48.2,
+      51.1,
+      46.1
+    ],
+    "train_regurgitation_pct": [
+      5.26,
+      0.52,
+      0.41,
+      0.29,
+      0.16,
+      0.13
+    ]
+  },
+  "published": {
+    "ap_diameter_mm": 15.9,
+    "roa_mm2": 27.3,
+    "regurgitation_pct": 0.08,
+    "contact_fraction": 0.1316560820713239,
+    "cardiac_phase": "peak_systole"
+  },
+  "pred_ap_diameter_mm": 15.9,
+  "pred_roa_mm2": 32.71128395421351,
+  "pred_regurgitation_pct": 0.0,
+  "ap_role": "literature_mapping_input",
+  "ap_prediction_metric_applicable": false,
+  "err_roa_mm2": 5.411283954213513,
+  "err_regurgitation_pct_points": -0.08,
+  "abs_err_roa_mm2": 5.411283954213513,
+  "abs_err_regurgitation_pct_points": 0.08,
+  "abs_err_ap_mm_passthrough": 0.0
+}

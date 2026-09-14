@@ -45,17 +45,19 @@ roa_anchor_blend_weight:
   pathology_typical: 0.85
   ima_ap_50_minimum: 0.94
 
-# Pipeline ROA: model + contact cluster (cluster weight low at anchor cases)
+# Pipeline ROA: model estimate; synthetic contact cluster is visualization-only.
+# Scientific default keeps cluster_weight=0 (Dryad contact_fraction is the
+# science feature used by models/response_model.py).
 roa_pipeline:
   default:
-    model_weight: 0.88
-    cluster_weight: 0.12
+    model_weight: 1.0
+    cluster_weight: 0.0
   ima_ap_50:
-    model_weight: 0.98
-    cluster_weight: 0.02
+    model_weight: 1.0
+    cluster_weight: 0.0
   pathology:
-    model_weight: 0.95
-    cluster_weight: 0.05
+    model_weight: 1.0
+    cluster_weight: 0.0
 
 # Leakage-proxy scale (literature-calibrated at pathology only).
 # Physics regurg % ≠ clinical regurgitant volume.
