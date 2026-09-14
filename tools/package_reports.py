@@ -361,6 +361,128 @@ def load_artifacts():
     return rec, tables, figs
 
 
+def load_heldout_cv_artifacts() -> dict:
+    """Load blend-off + fold-wise CV payloads for front-and-center reporting."""
+    cv_path = ROOT / "results" / "output" / "cross_validation" / "loo_response_model.json"
+    summary_path = ROOT / "results" / "output" / "cross_validation" / "summary.json"
+    loo_path = ROOT / "results" / "output" / "loo_evaluation.json"
+    out: dict = {
+        "cv_folds": [],
+        "cv_summary": {},
+        "held_rows": [],
+        "held_summary": {},
+    }
+    if summary_path.is_file():
+        out["cv_summary"] = json.loads(summary_path.read_text(encoding="utf-8"))
+    if cv_path.is_file():
+        payload = json.loads(cv_path.read_text(encoding="utf-8"))
+        out["cv_folds"] = payload.get("folds") or []
+        if not out["cv_summary"]:
+            out["cv_summary"] = payload.get("summary") or {}
+    if loo_path.is_file():
+        loo = json.loads(loo_path.read_text(encoding="utf-8"))
+        held = loo.get("heldout_evaluation") or {}
+        out["held_rows"] = held.get("heldout") or []
+        out["held_summary"] = held.get("summary") or {}
+    return out
+
+
+HELDOUT_TABLE_IDS = ("ima_cs_14", "ima_cs_18", "ima_ap_30", "ima_ap_70")
+
+
+def _fmt_num(v, nd=2):
+    if v is None:
+        return "—"
+    try:
+        return f"{float(v):.{nd}f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def build_heldout_table_rows(cv: dict) -> list[dict]:
+    """Join rule-based + fold-wise predictions for CS14/18, AP30/70."""
+    rule_by = {r.get("case_id"): r for r in cv.get("held_rows") or []}
+    fold_by = {f.get("held_id"): f for f in cv.get("cv_folds") or []}
+    rows = []
+    for cid in HELDOUT_TABLE_IDS:
+        r = rule_by.get(cid) or {}
+        f = fold_by.get(cid) or {}
+        pub = (r.get("published") or f.get("published") or {})
+        rows.append(
+            {
+                "case": cid,
+                "pub_roa": pub.get("roa_mm2"),
+                "rule_roa": r.get("pred_roa_mm2"),
+                "rule_roa_err": r.get("abs_err_roa_mm2"),
+                "fold_roa": f.get("pred_roa_mm2"),
+                "fold_roa_err": f.get("abs_err_roa_mm2"),
+                "pub_leak": pub.get("regurgitation_pct"),
+                "rule_leak": r.get("pred_regurgitation_pct"),
+                "rule_leak_err": r.get("abs_err_regurgitation_pct_points"),
+                "fold_leak": f.get("pred_regurgitation_pct"),
+                "fold_leak_err": f.get("abs_err_regurgitation_pct_points"),
+            }
+        )
+    return rows
+
+
+def heldout_table_md(rows: list[dict]) -> str:
+    lines = [
+        "| Case | Pub ROA | Rule ROA (abs err) | Fold ROA (abs err) | Pub leak % | Rule leak (abs err pp) | Fold leak (abs err pp) |",
+        "|------|---------|--------------------|--------------------|------------|------------------------|------------------------|",
+    ]
+    for row in rows:
+        case = row["case"]
+        mark = "**" if case == "ima_ap_70" else ""
+        lines.append(
+            "| {case} | {pub_roa} | {rule_roa} ({rule_roa_err}) | {fold_roa} ({fold_roa_err}) | "
+            "{pub_leak} | {rule_leak} ({rule_leak_err}) | {fold_leak} ({fold_leak_err}) |".format(
+                case=f"{mark}{case}{mark}",
+                pub_roa=_fmt_num(row["pub_roa"], 1),
+                rule_roa=_fmt_num(row["rule_roa"], 1),
+                rule_roa_err=_fmt_num(row["rule_roa_err"], 1),
+                fold_roa=_fmt_num(row["fold_roa"], 1),
+                fold_roa_err=_fmt_num(row["fold_roa_err"], 1),
+                pub_leak=_fmt_num(row["pub_leak"], 2),
+                rule_leak=_fmt_num(row["rule_leak"], 2),
+                rule_leak_err=_fmt_num(row["rule_leak_err"], 2),
+                fold_leak=_fmt_num(row["fold_leak"], 2),
+                fold_leak_err=_fmt_num(row["fold_leak_err"], 2),
+            )
+        )
+    return "\n".join(lines)
+
+
+def heldout_table_html(rows: list[dict]) -> str:
+    body = []
+    for row in rows:
+        bold = row["case"] == "ima_ap_70"
+        def cell(v, nd=2):
+            t = _fmt_num(v, nd)
+            return f"<strong>{t}</strong>" if bold else t
+
+        case = f"<strong>{html.escape(row['case'])}</strong>" if bold else html.escape(row["case"])
+        body.append(
+            "<tr>"
+            f"<td>{case}</td>"
+            f"<td>{cell(row['pub_roa'], 1)}</td>"
+            f"<td>{cell(row['rule_roa'], 1)} ({cell(row['rule_roa_err'], 1)})</td>"
+            f"<td>{cell(row['fold_roa'], 1)} ({cell(row['fold_roa_err'], 1)})</td>"
+            f"<td>{cell(row['pub_leak'], 2)}</td>"
+            f"<td>{cell(row['rule_leak'], 2)} ({cell(row['rule_leak_err'], 2)})</td>"
+            f"<td>{cell(row['fold_leak'], 2)} ({cell(row['fold_leak_err'], 2)})</td>"
+            "</tr>"
+        )
+    return (
+        '<table class="data"><thead><tr>'
+        "<th>Case</th><th>Pub ROA</th><th>Rule ROA (abs err)</th><th>Fold ROA (abs err)</th>"
+        "<th>Pub leak %</th><th>Rule leak (abs err pp)</th><th>Fold leak (abs err pp)</th>"
+        "</tr></thead><tbody>"
+        + "".join(body)
+        + "</tbody></table>"
+    )
+
+
 def figure_html(fig: dict) -> str:
     return f"""
 <figure class="fig" id="{html.escape(fig['key'])}">
@@ -389,6 +511,19 @@ def build_report_md(rec: dict, tables: dict, figs: list[dict]) -> str:
 
     # dual key rows for readability
     dual_key = [r for r in tables["dual"] if r["suture_shortening_pct"] in {"50.0", "60.0", "70.0"}]
+    cv = load_heldout_cv_artifacts()
+    held_rows = build_heldout_table_rows(cv)
+    held_md = heldout_table_md(held_rows)
+    cv_sum = cv.get("cv_summary") or {}
+    held_sum = cv.get("held_summary") or {}
+    ap70 = cv_sum.get("ima_ap_70") or {}
+    n_tot = rec.get("n_total_points", rec.get("n_evaluated"))
+    n_dev = rec.get("n_device_candidates", rec.get("n_evaluated"))
+    n_feas = rec.get("n_feasible_device_candidates", rec.get("n_feasible"))
+    p_feas = rec.get(
+        "p_feasible_device_candidates",
+        rec.get("p_feasible", n_feas / max(n_dev, 1)),
+    )
 
     parts = []
     parts.append(
@@ -411,12 +546,13 @@ def build_report_md(rec: dict, tables: dict, figs: list[dict]) -> str:
 3. [背景与目标](#背景与目标)
 4. [数据与方法](#数据与方法)
 5. [研究过程](#研究过程)
-6. [结果](#结果)
-7. [分析与讨论](#分析与讨论)
-8. [结论](#结论)
-9. [局限性与展望](#局限性与展望)
-10. [附录：图表与原始表](#附录图表与原始表)
-11. [第十九节：双代理协作终报](#第十九节双代理协作终报)
+6. [留出 / 折内 CV](#留出--折内-cv先于情景排序)
+7. [结果](#结果)
+8. [分析与讨论](#分析与讨论)
+9. [结论](#结论)
+10. [局限性与展望](#局限性与展望)
+11. [附录：图表与原始表](#附录图表与原始表)
+12. [第十九节：双代理协作终报](#第十九节双代理协作终报)
 
 ---
 
@@ -524,9 +660,24 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 ---
 
+## 留出 / 折内 CV（先于情景排序）
+
+规则基 blend-off 诊断 ≠ 真折内 LOO。AP 为文献几何输入（`ap_prediction_metric_applicable=false`）。
+
+- 历史规则基留出 MAE（pre-dampen baseline）：ROA≈50.18 mm²，leak≈1.445 pp；当前 dampened 留出 MAE：ROA={_fmt_num(held_sum.get('mae_roa_mm2'), 2)}，leak_pp={_fmt_num(held_sum.get('mae_regurgitation_pct_points'), 3)}
+- 折内响应模型留出子集 MAE：ROA={_fmt_num(cv_sum.get('heldout_subset_mae_roa_mm2'), 2)} mm²，leak_pp={_fmt_num(cv_sum.get('heldout_subset_mae_regurgitation_pct_points'), 3)}
+- IMA-AP70（折内）：pred ROA={_fmt_num(ap70.get('pred_roa_mm2'), 2)}（发表 46.1），abs_err={_fmt_num(ap70.get('abs_err_roa_mm2'), 2)}；pred leak={_fmt_num(ap70.get('pred_regurgitation_pct'), 3)}（发表 0.13%），abs_err={_fmt_num(ap70.get('abs_err_regurgitation_pct_points'), 3)} pp
+- **AP70 诚实表述：** 规则基捕捉到定性非单调倾向，但**显著高估泄漏幅度**（非“复现 Galili 非单调行为”的无限定表述）。
+
+{held_md}
+
+可行性分母（排序节）：n_total_points={n_tot}，n_device_candidates={n_dev}，n_feasible_device_candidates={n_feas}，p_feasible_device_candidates≈{float(p_feas):.4f}。
+
+---
+
 ## 结果
 
-### 6.1 规划器主结果（clinical 映射，seed=42）
+### 6.1 规划器主结果（clinical 映射，seed=42；假设驱动，后于留出报告）
 
 | 指标 | 数值 |
 |------|------|
@@ -697,28 +848,27 @@ def build_report_html(rec: dict, tables: dict, figs: list[dict], final_section_h
     stab = (rec.get("uncertainty") or {}).get("ranking_stability_top1_fraction")
     stab_txt = f"{stab:.2f}" if isinstance(stab, (int, float)) else "见 JSON"
     # Load CV / blend-off summaries when present (held-out BEFORE planner emphasis).
-    cv_path = ROOT / "results" / "output" / "cross_validation" / "summary.json"
-    loo_path = ROOT / "results" / "output" / "loo_evaluation.json"
-    cv_summary = {}
-    if cv_path.is_file():
-        cv_summary = json.loads(cv_path.read_text(encoding="utf-8"))
-    held_diag = {}
-    if loo_path.is_file():
-        loo_payload = json.loads(loo_path.read_text(encoding="utf-8"))
-        held_diag = (loo_payload.get("heldout_evaluation") or {}).get("summary") or {}
+    cv = load_heldout_cv_artifacts()
+    held_rows = build_heldout_table_rows(cv)
+    held_html_table = heldout_table_html(held_rows)
+    cv_summary = cv.get("cv_summary") or {}
+    held_diag = cv.get("held_summary") or {}
     cv_roa = cv_summary.get("heldout_subset_mae_roa_mm2")
     cv_leak = cv_summary.get("heldout_subset_mae_regurgitation_pct_points")
     ap70 = cv_summary.get("ima_ap_70") or {}
     held_block = f"""
   <section id="heldout">
     <h2>留出 / 折内交叉验证（先于情景排序）</h2>
-    <div class="honesty">规则基 blend-off 诊断 ≠ 真折内 LOO；真折内见 <code>analysis/fit_response_model.py</code>。AP MAE 不适用（文献几何输入）。</div>
+    <div class="honesty">规则基 blend-off 诊断 ≠ 真折内 LOO；真折内见 <code>analysis/fit_response_model.py</code>。AP MAE 不适用（文献几何输入）。
+    规则基捕捉定性非单调倾向，但<strong>显著高估 AP70 泄漏幅度</strong>——不作“复现 Galili 非单调行为”的无限定表述。</div>
     <ul>
-      <li>规则基留出 MAE：ROA={held_diag.get('mae_roa_mm2', '—')} mm²，leak_pp={held_diag.get('mae_regurgitation_pct_points', '—')}</li>
+      <li>规则基留出 MAE（当前）：ROA={held_diag.get('mae_roa_mm2', '—')} mm²，leak_pp={held_diag.get('mae_regurgitation_pct_points', '—')}（历史 baseline 50.18 / 1.445）</li>
       <li>折内响应模型留出子集 MAE：ROA={cv_roa if cv_roa is not None else '—'} mm²，leak_pp={cv_leak if cv_leak is not None else '—'}</li>
       <li>IMA-AP70（折内）：pred ROA={ap70.get('pred_roa_mm2', '—')}（发表 46.1），abs_err={ap70.get('abs_err_roa_mm2', '—')}；
           pred leak={ap70.get('pred_regurgitation_pct', '—')}（发表 0.13%），abs_err={ap70.get('abs_err_regurgitation_pct_points', '—')} pp</li>
     </ul>
+    <h3>完整留出表（CS14 / CS18 / AP30 / AP70）</h3>
+    {held_html_table}
   </section>
 """
     table3 = csv_to_html(tables["window"], "表 3. 临床窗口 vs 数值极端")

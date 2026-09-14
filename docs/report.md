@@ -4,7 +4,7 @@
 
 **工作短题：** Literature-anchored IMA exploratory screening (Layer-1)
 
-**生成日期：** 2026-09-14  
+**生成日期：** 2026-09-15  
 **数据来源：** `python run_pipeline.py --seed 42 --paper`（可复现；非新 Abaqus/LHHM FSI）  
 **证据层级：** Level 0（Galili 校准/复现）+ Level 1（假设映射 + 扫掠/情景排序）；Level 2 超出范围  
 
@@ -17,12 +17,13 @@
 3. [背景与目标](#背景与目标)
 4. [数据与方法](#数据与方法)
 5. [研究过程](#研究过程)
-6. [结果](#结果)
-7. [分析与讨论](#分析与讨论)
-8. [结论](#结论)
-9. [局限性与展望](#局限性与展望)
-10. [附录：图表与原始表](#附录图表与原始表)
-11. [第十九节：双代理协作终报](#第十九节双代理协作终报)
+6. [留出 / 折内 CV](#留出--折内-cv先于情景排序)
+7. [结果](#结果)
+8. [分析与讨论](#分析与讨论)
+9. [结论](#结论)
+10. [局限性与展望](#局限性与展望)
+11. [附录：图表与原始表](#附录图表与原始表)
+12. [第十九节：双代理协作终报](#第十九节双代理协作终报)
 
 ---
 
@@ -130,9 +131,29 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 
 ---
 
+## 留出 / 折内 CV（先于情景排序）
+
+规则基 blend-off 诊断 ≠ 真折内 LOO。AP 为文献几何输入（`ap_prediction_metric_applicable=false`）。
+
+- 历史规则基留出 MAE（pre-dampen baseline）：ROA≈50.18 mm²，leak≈1.445 pp；当前 dampened 留出 MAE：ROA=28.58，leak_pp=0.662
+- 折内响应模型留出子集 MAE：ROA=6.37 mm²，leak_pp=0.245
+- IMA-AP70（折内）：pred ROA=39.50（发表 46.1），abs_err=6.60；pred leak=0.328（发表 0.13%），abs_err=0.198 pp
+- **AP70 诚实表述：** 规则基捕捉到定性非单调倾向，但**显著高估泄漏幅度**（非“复现 Galili 非单调行为”的无限定表述）。
+
+| Case | Pub ROA | Rule ROA (abs err) | Fold ROA (abs err) | Pub leak % | Rule leak (abs err pp) | Fold leak (abs err pp) |
+|------|---------|--------------------|--------------------|------------|------------------------|------------------------|
+| ima_cs_14 | 56.7 | 24.0 (32.7) | 69.6 (12.9) | 0.52 | 0.65 (0.13) | 0.60 (0.08) |
+| ima_cs_18 | 55.3 | 17.6 (37.7) | 53.4 (1.9) | 0.41 | 0.34 (0.07) | 0.42 (0.01) |
+| ima_ap_30 | 51.1 | 14.9 (36.2) | 47.0 (4.1) | 0.16 | 0.28 (0.12) | 0.86 (0.70) |
+| **ima_ap_70** | 46.1 | 53.9 (7.8) | 39.5 (6.6) | 0.13 | 2.46 (2.33) | 0.33 (0.20) |
+
+可行性分母（排序节）：n_total_points=36，n_device_candidates=35，n_feasible_device_candidates=30，p_feasible_device_candidates≈0.8571。
+
+---
+
 ## 结果
 
-### 6.1 规划器主结果（clinical 映射，seed=42）
+### 6.1 规划器主结果（clinical 映射，seed=42；假设驱动，后于留出报告）
 
 | 指标 | 数值 |
 |------|------|
@@ -410,8 +431,8 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 
 ### 打包脚本状态附记
 
-- PDF：report.pdf: PASS → report.pdf (1573614 bytes); paper.pdf: PASS → docs/paper.pdf (1352419 bytes)
-- report.html size：1340396 bytes
+- PDF：report.pdf: PASS → report.pdf (1589974 bytes); paper.pdf: PASS → docs/paper.pdf (1355321 bytes)
+- report.html size：1341619 bytes
 - data:image count：5
 
 ## 第十九节（完整）：双代理协作终报
@@ -419,7 +440,7 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 | 项 | 内容 |
 |----|------|
 | GitHub URL | https://github.com/Coucou2016/fmr-ima-layer1-planner（PUBLIC；顾问可读完整代码/文档） |
-| Commit hash | `0d08fd51c761cfdfbbb535513c1b8491510fc939` |
+| Commit hash | `6b6e5057934c4c8409e676909ea63399a363ede9` |
 | Push status | main; tracking status: ## main...origin/main |
 | ChatGPT URL | https://chatgpt.com/c/6a807186-6f88-83ea-afc5-49dddcff3a65 |
 | ChatGPT told full-repo readable | **Yes**（brief 明确写明 public GitHub 为 source of truth；本轮 MCP 粘贴受阻） |
@@ -430,6 +451,6 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 | Rejected | Layer-1=LHHM；first CS-vs-AP；≥8.6 mm=safe；η±20%=FEA UQ；旗舰 Nature |
 | Files | docs/manuscript_draft.md, docs/paper_framework_nature.md, docs/paper.html, docs/paper.md, docs/paper.pdf, report.html, report.md, report.pdf, docs/report.html, docs/report.md, tools/package_reports.py, docs/chatgpt_collab/rounds/round_01.md, docs/chatgpt_collab/rounds/round_02.md, docs/chatgpt_collab/rounds/round_03.md, docs/chatgpt_collab/rounds/round_04.md, docs/chatgpt_collab/rounds/round_05.md, docs/chatgpt_collab/20260816_five_round_final.md |
 | Tests | PASS — PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -q (40 passed); PASS — python run_pipeline.py --seed 42 --paper --no-export (planner: IMA-AP dual 60%, AP 18.0%, physics (see JSON), jet=central) |
-| PDF | report.pdf: PASS → report.pdf (1573614 bytes); paper.pdf: PASS → docs/paper.pdf (1352419 bytes) |
+| PDF | report.pdf: PASS → report.pdf (1589974 bytes); paper.pdf: PASS → docs/paper.pdf (1355321 bytes) |
 | Risks | base64 HTML 体积大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待补档 |
 | Scope | 公开 push 已完成；无 PR；无 deploy |

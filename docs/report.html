@@ -103,7 +103,7 @@ footer.doc {
     <div><span class="badge">研究报告</span><span class="badge">Layer-1</span><span class="badge">seed=42</span></div>
     <h1>功能性质二尖瓣反流（FMR）间接二尖瓣成形（IMA）文献锚定低阶代理探索性筛查报告</h1>
     <p class="en">A literature-anchored low-order surrogate for exploratory screening of indirect mitral annuloplasty strategies</p>
-    <p class="meta">生成日期：2026-09-14 · 数据：<code>run_pipeline.py --seed 42 --paper</code> · 先 CV/留出再排序 · n_device=35 可行=30 P≈0.86 · 名义双缝假设下 dual60 · physics 0.0735% · η top-1 0.33</p>
+    <p class="meta">生成日期：2026-09-15 · 数据：<code>run_pipeline.py --seed 42 --paper</code> · 先 CV/留出再排序 · n_device=35 可行=30 P≈0.86 · 名义双缝假设下 dual60 · physics 0.0735% · η top-1 0.33</p>
   </header>
 
   <nav class="toc" id="toc">
@@ -162,13 +162,16 @@ footer.doc {
 
   <section id="heldout">
     <h2>留出 / 折内交叉验证（先于情景排序）</h2>
-    <div class="honesty">规则基 blend-off 诊断 ≠ 真折内 LOO；真折内见 <code>analysis/fit_response_model.py</code>。AP MAE 不适用（文献几何输入）。</div>
+    <div class="honesty">规则基 blend-off 诊断 ≠ 真折内 LOO；真折内见 <code>analysis/fit_response_model.py</code>。AP MAE 不适用（文献几何输入）。
+    规则基捕捉定性非单调倾向，但<strong>显著高估 AP70 泄漏幅度</strong>——不作“复现 Galili 非单调行为”的无限定表述。</div>
     <ul>
-      <li>规则基留出 MAE：ROA=28.57935299628845 mm²，leak_pp=0.661967822107072</li>
+      <li>规则基留出 MAE（当前）：ROA=28.57935299628845 mm²，leak_pp=0.661967822107072（历史 baseline 50.18 / 1.445）</li>
       <li>折内响应模型留出子集 MAE：ROA=6.36858640210969 mm²，leak_pp=0.24499392778581666</li>
       <li>IMA-AP70（折内）：pred ROA=39.495148277291236（发表 46.1），abs_err=6.604851722708766；
           pred leak=0.3282707113839876（发表 0.13%），abs_err=0.1982707113839876 pp</li>
     </ul>
+    <h3>完整留出表（CS14 / CS18 / AP30 / AP70）</h3>
+    <table class="data"><thead><tr><th>Case</th><th>Pub ROA</th><th>Rule ROA (abs err)</th><th>Fold ROA (abs err)</th><th>Pub leak %</th><th>Rule leak (abs err pp)</th><th>Fold leak (abs err pp)</th></tr></thead><tbody><tr><td>ima_cs_14</td><td>56.7</td><td>24.0 (32.7)</td><td>69.6 (12.9)</td><td>0.52</td><td>0.65 (0.13)</td><td>0.60 (0.08)</td></tr><tr><td>ima_cs_18</td><td>55.3</td><td>17.6 (37.7)</td><td>53.4 (1.9)</td><td>0.41</td><td>0.34 (0.07)</td><td>0.42 (0.01)</td></tr><tr><td>ima_ap_30</td><td>51.1</td><td>14.9 (36.2)</td><td>47.0 (4.1)</td><td>0.16</td><td>0.28 (0.12)</td><td>0.86 (0.70)</td></tr><tr><td><strong>ima_ap_70</strong></td><td><strong>46.1</strong></td><td><strong>53.9</strong> (<strong>7.8</strong>)</td><td><strong>39.5</strong> (<strong>6.6</strong>)</td><td><strong>0.13</strong></td><td><strong>2.46</strong> (<strong>2.33</strong>)</td><td><strong>0.33</strong> (<strong>0.20</strong>)</td></tr></tbody></table>
   </section>
 
 
@@ -319,7 +322,7 @@ seed-42 假设下最优候选双缝线 60% 的机制来源可在本图与图 5 �
 <p><strong>本轮新增/更新文件：</strong></p>
 <ul><li><code>docs/manuscript_draft.md</code></li><li><code>docs/paper_framework_nature.md</code></li><li><code>docs/paper.html</code></li><li><code>docs/paper.md</code></li><li><code>docs/paper.pdf</code></li><li><code>report.html</code></li><li><code>report.md</code></li><li><code>report.pdf</code></li><li><code>docs/report.html</code></li><li><code>docs/report.md</code></li><li><code>tools/package_reports.py</code></li><li><code>docs/chatgpt_collab/rounds/round_01.md</code></li><li><code>docs/chatgpt_collab/rounds/round_02.md</code></li><li><code>docs/chatgpt_collab/rounds/round_03.md</code></li><li><code>docs/chatgpt_collab/rounds/round_04.md</code></li><li><code>docs/chatgpt_collab/rounds/round_05.md</code></li><li><code>docs/chatgpt_collab/20260816_five_round_final.md</code></li></ul>
 <p><strong>测试：</strong>PASS — PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -q (40 passed); PASS — python run_pipeline.py --seed 42 --paper --no-export (planner: IMA-AP dual 60%, AP 18.0%, physics (see JSON), jet=central)</p>
-<p><strong>PDF：</strong>report.pdf: PASS → report.pdf (1573614 bytes); paper.pdf: PASS → docs/paper.pdf (1352419 bytes)</p>
+<p><strong>PDF：</strong>report.pdf: PASS → report.pdf (1589974 bytes); paper.pdf: PASS → docs/paper.pdf (1355321 bytes)</p>
 <p><strong>风险：</strong>HTML 因 base64 变大；示意解剖与 η 限制外推；Level-2 待补充；ChatGPT GitHub 审阅回复待浏览器恢复后补档。</p>
 <p><strong>范围：</strong>公开 GitHub 推送已完成；无 PR；无 deploy。</p>
 

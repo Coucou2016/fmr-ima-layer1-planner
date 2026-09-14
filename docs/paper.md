@@ -18,7 +18,7 @@
 
 **Methods.** We implement a reproducible Python Layer-1 surrogate: phenomenological mechanics plus a literature-calibrated leakage proxy. Dryad (doi:10.5061/dryad.bzkh1899d) supplies primary provenance for `contact_fraction` and SPH particle counts; scalar AP/ROA/leakage remain table-backed unless derivable. We fit fold-wise response models `f_ROA(ΔAP, device family, annular reduction, contact_fraction)` and `f_leak(ROA, coaptation proxy, contact, device mechanism)` under true leave-one-case-out. A discrete scenario ranker minimizes leakage-proxy regurgitation subject to an AP ceiling, an illustrative NiTi engineering screen, and a Rottländer CS–LCx risk-screening threshold, reporting device-candidate P(feasible), independent η_AP/η_CS ranking stability, and family-separated Pareto frontiers. Dual-suture commissural factor is an exploratory hypothesis parameter (sensitivity 0.25/0.5/0.75/1.0). Ranking is assumption-driven exploratory analysis, not validated prediction.
 
-**Results (seed=42).** Fold-wise response-model CV on the held-out Galili subset improves ROA MAE from rule-based blend-off **50.18 mm²** to about **6.4 mm²** and leak MAE from **1.445** to about **0.25** percentage points; IMA-AP 70% absolute ROA/leak errors fall from **94.17 mm² / 5.455 pp** to about **6.6 mm² / 0.20 pp** (internal engineering targets, not medical validation). The fixed rule-based surrogate still overestimates AP70 leak magnitude while capturing qualitative non-monotonic tendency. Under the planning map the ranker evaluates **36** total points (**35** device candidates; pathology is not a candidate) and retains **30** feasible designs (**p_feasible_device_candidates≈0.857**). Under the nominal dual-suture hypothesis, dual AP60 ranked first (leakage delta vs matched single ~0.0018 pp); ranking is assumption-sensitive.
+**Results (seed=42).** Fold-wise response-model CV on the held-out Galili subset improves ROA MAE from rule-based blend-off **50.18 mm²** to about **6.4 mm²** and leak MAE from **1.445** to about **0.25** percentage points; IMA-AP 70% absolute ROA/leak errors fall from **94.17 mm² / 5.455 pp** to about **6.6 mm² / 0.20 pp** (internal engineering targets, not medical validation). The fixed rule-based surrogate still **substantially overestimates AP70 leak magnitude** (≈2.46% vs 0.13%) while only capturing a qualitative non-monotonic tendency — not an unqualified reproduction claim. Under the planning map the ranker evaluates **36** total points (**35** device candidates; pathology is not a candidate) and retains **30** feasible designs (**p_feasible_device_candidates≈0.857**). Under the nominal dual-suture hypothesis, dual AP60 ranked first (leakage delta vs matched single ~0.0018 pp); ranking is assumption-sensitive.
 
 **Conclusions.** A literature-anchored low-order surrogate can support **exploratory screening** of IMA strategy settings with inspectable assumptions, honest held-out reporting, and uncertainty language. It is not a preoperative clinical decision system and must not equate physics % with clinical regurgitant volume.
 
@@ -86,14 +86,20 @@ Calibration IDs with blend ON are reproduction only.
 
 ### 5.3 Anchor-free diagnostic and true fold-wise CV (includes AP70 failure/improvement)
 
-**Rule-based blend-off diagnostic** (`tools/loo_evaluate.py`, held-out IDs): baseline MAE ROA **50.18 mm²**, leak **1.445 pp**. IMA-AP 70%: published ROA 46.1 / leak 0.13%; rule-based prediction previously **140.3 / 5.585%** (abs err **94.17 / 5.455**). After over-shortening dampening the rule-based path still **overestimates AP70 leak magnitude** while capturing qualitative non-monotonic tendency (Galili 0.08→0.13%).
+**Rule-based blend-off diagnostic** (`tools/loo_evaluate.py`, held-out IDs): historical pre-dampen baseline MAE ROA **50.18 mm²**, leak **1.445 pp**; IMA-AP 70% previously **140.3 / 5.585%** (abs err **94.17 / 5.455**). Current dampened rule-based held-out MAE ≈ **28.6 mm² / 0.66 pp**. Critically, the rule-based path **captures a qualitative non-monotonic tendency** (Galili AP50 leak 0.08% → AP70 0.13%) but **substantially overestimates AP70 leak magnitude** (pred ≈2.46% vs published 0.13%; abs err ≈2.33 pp) — this is **not** an unqualified claim that the surrogate “reproduces Galili non-monotonic behavior.”
 
-**True fold-wise response-model LOO** (`analysis/fit_response_model.py` → `results/output/cross_validation/`): held-out-subset MAE ROA ≈ **6.4 mm²**, leak ≈ **0.25 pp**; AP70 abs err ≈ **6.6 mm² / 0.20 pp**. Internal engineering targets (ROA MAE < 25, leak MAE < 0.5, AP70 ROA < 25, AP70 leak < 0.5) are met on this seven-case table — **not** patient-level external validation. Full seven-fold MAE remains inflated by the pathology leave-out (large ROA scale gap).
+**True fold-wise response-model LOO** (`analysis/fit_response_model.py` → `results/output/cross_validation/`): held-out-subset MAE ROA ≈ **6.4 mm²**, leak ≈ **0.25 pp**; AP70 abs err ≈ **6.6 mm² / 0.20 pp**. Internal engineering targets (ROA MAE < 25, leak MAE < 0.5, AP70 ROA < 25, AP70 leak < 0.5) are met on this seven-case table — **not** patient-level external validation. Full seven-fold MAE remains inflated by the pathology leave-out (large ROA scale gap). AP is literature geometry input (`ap_prediction_metric_applicable=false`).
 
-| Case (held) | Role | Notes |
-|-------------|------|-------|
-| ima_cs_14 / 18 / ima_ap_30 / **ima_ap_70** | held-out subset | Reported in body; AP70 no longer hidden |
-| pathology / ima_cs_22 / ima_ap_50 | calibration / other folds | Blend-ON reproduction ≠ validation |
+**Full held-out table (CS14 / CS18 / AP30 / AP70)** — published vs rule-based blend-off vs fold-wise response model:
+
+| Case | Pub ROA | Rule ROA (abs err) | Fold ROA (abs err) | Pub leak % | Rule leak (abs err pp) | Fold leak (abs err pp) |
+|------|---------|--------------------|--------------------|------------|------------------------|------------------------|
+| ima_cs_14 | 56.7 | 24.0 (32.7) | 69.6 (12.9) | 0.52 | 0.65 (0.13) | 0.60 (0.08) |
+| ima_cs_18 | 55.3 | 17.6 (37.7) | 53.4 (1.9) | 0.41 | 0.34 (0.07) | 0.42 (0.01) |
+| ima_ap_30 | 51.1 | 14.9 (36.2) | 47.0 (4.1) | 0.16 | 0.28 (0.12) | 0.86 (0.70) |
+| **ima_ap_70** | **46.1** | **53.9 (7.8)** | **39.5 (6.6)** | **0.13** | **2.46 (2.33)** | **0.33 (0.20)** |
+
+AP70 row is reported front-and-center: fold-wise meets internal engineering screens; rule-based leak remains a prominent failure mode.
 
 ### 5.4 Exploratory scenario ranking (planning map, seed=42; assumption-driven)
 
@@ -125,4 +131,4 @@ A Layer-1 literature-anchored surrogate can rank exploratory IMA scenarios under
 
 ---
 
-*Collab notes:* `docs/chatgpt_collab/20260913_p0_review_response.md`, `docs/chatgpt_collab/20260914_p1p2_implementation.md`, `docs/chatgpt_collab/20260914_round2_major_revision.md`
+*Collab notes:* `docs/chatgpt_collab/20260913_p0_review_response.md`, `docs/chatgpt_collab/20260914_p1p2_implementation.md`, `docs/chatgpt_collab/20260914_round2_major_revision.md`, `docs/chatgpt_collab/20260915_r2_major_revision.md`

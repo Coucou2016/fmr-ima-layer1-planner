@@ -189,3 +189,5 @@ def test_design_point_leakage_proxy_alias():
     assert "leakage_proxy_pct" in d
     assert abs(d["leakage_proxy_pct"] - d["physics_regurgitation_pct"]) < 1e-12
     assert "strain_risk_score" in d
+    assert "contact_score" in d
+    assert d["contact_score"] is not None

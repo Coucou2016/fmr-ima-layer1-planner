@@ -62,11 +62,11 @@
       "niti_alternating_strain_pct": null,
       "niti_engineering_strain": null,
       "cs_lcx_mm": null,
+      "contact_score": 1.9200000000000002,
       "constraint_violations": "",
       "feasible": true,
       "leakage_proxy_pct": 0.07354032490281888,
-      "strain_risk_score": 0.1154,
-      "contact_score": null
+      "strain_risk_score": 0.1154
     },
     "recommended": {
       "case_id": "sweep_ap_dual60_clinical",
@@ -91,11 +91,11 @@
       "niti_alternating_strain_pct": null,
       "niti_engineering_strain": null,
       "cs_lcx_mm": null,
+      "contact_score": 1.9200000000000002,
       "constraint_violations": "",
       "feasible": true,
       "leakage_proxy_pct": 0.07354032490281888,
-      "strain_risk_score": 0.1154,
-      "contact_score": null
+      "strain_risk_score": 0.1154
     },
     "alternatives": {
       "best_ima_ap_single": {
@@ -121,11 +121,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.9200000000000002,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.07536204729977003,
-        "strain_risk_score": 0.1154,
-        "contact_score": null
+        "strain_risk_score": 0.1154
       },
       "best_ima_ap_dual": {
         "case_id": "sweep_ap_dual60_clinical",
@@ -150,11 +150,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.9200000000000002,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.07354032490281888,
-        "strain_risk_score": 0.1154,
-        "contact_score": null
+        "strain_risk_score": 0.1154
       },
       "best_ima_cs": {
         "case_id": "sweep_cs_s20_clinical",
@@ -179,11 +179,11 @@
         "niti_alternating_strain_pct": 0.33999999999999997,
         "niti_engineering_strain": 0.2,
         "cs_lcx_mm": 8.6,
+        "contact_score": 1.938181818181819,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.15616163531034766,
-        "strain_risk_score": 0.17,
-        "contact_score": null
+        "strain_risk_score": 0.17
       }
     },
     "pareto_global_common_objectives": [
@@ -210,11 +210,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.9200000000000002,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.07354032490281888,
         "strain_risk_score": 0.1154,
-        "contact_score": null,
         "pareto_family": "global_common_objectives",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.07354032490281888,
@@ -244,11 +244,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.945,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.11600227761461973,
         "strain_risk_score": 0.11515,
-        "contact_score": null,
         "pareto_family": "global_common_objectives",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.11600227761461973,
@@ -280,11 +280,11 @@
         "niti_alternating_strain_pct": 0.33999999999999997,
         "niti_engineering_strain": 0.2,
         "cs_lcx_mm": 8.6,
+        "contact_score": 1.938181818181819,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.15616163531034766,
         "strain_risk_score": 0.17,
-        "contact_score": null,
         "pareto_family": "ima_cs_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.15616163531034766,
@@ -316,11 +316,11 @@
         "niti_alternating_strain_pct": 0.316,
         "niti_engineering_strain": 0.18,
         "cs_lcx_mm": 8.84,
+        "contact_score": 1.906363636363636,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.25698119758556387,
         "strain_risk_score": 0.153,
-        "contact_score": null,
         "pareto_family": "ima_cs_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.25698119758556387,
@@ -352,11 +352,11 @@
         "niti_alternating_strain_pct": 0.29200000000000004,
         "niti_engineering_strain": 0.16,
         "cs_lcx_mm": 9.08,
+        "contact_score": 1.8745454545454547,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.3872235685877508,
         "strain_risk_score": 0.136,
-        "contact_score": null,
         "pareto_family": "ima_cs_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.3872235685877508,
@@ -388,11 +388,11 @@
         "niti_alternating_strain_pct": 0.268,
         "niti_engineering_strain": 0.14,
         "cs_lcx_mm": 9.32,
+        "contact_score": 1.8427272727272734,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.5499097848065787,
         "strain_risk_score": 0.12360000000000002,
-        "contact_score": null,
         "pareto_family": "ima_cs_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.5499097848065787,
@@ -424,11 +424,11 @@
         "niti_alternating_strain_pct": 0.24400000000000002,
         "niti_engineering_strain": 0.12,
         "cs_lcx_mm": 9.56,
+        "contact_score": 1.8109090909090908,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.7481404822851251,
         "strain_risk_score": 0.1208,
-        "contact_score": null,
         "pareto_family": "ima_cs_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.7481404822851251,
@@ -460,11 +460,11 @@
         "niti_alternating_strain_pct": 0.22,
         "niti_engineering_strain": 0.1,
         "cs_lcx_mm": 9.8,
+        "contact_score": 1.7790909090909095,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.985082759565332,
         "strain_risk_score": 0.11800000000000001,
-        "contact_score": null,
         "pareto_family": "ima_cs_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.985082759565332,
@@ -498,11 +498,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.9200000000000002,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.07354032490281888,
         "strain_risk_score": 0.1154,
-        "contact_score": null,
         "pareto_family": "ima_ap_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.07354032490281888,
@@ -532,11 +532,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.945,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.11600227761461973,
         "strain_risk_score": 0.11515,
-        "contact_score": null,
         "pareto_family": "ima_ap_family",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.11600227761461973,
@@ -568,11 +568,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.9200000000000002,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.07354032490281888,
         "strain_risk_score": 0.1154,
-        "contact_score": null,
         "pareto_family": "global_common_objectives",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.07354032490281888,
@@ -602,11 +602,11 @@
         "niti_alternating_strain_pct": null,
         "niti_engineering_strain": null,
         "cs_lcx_mm": null,
+        "contact_score": 1.945,
         "constraint_violations": "",
         "feasible": true,
         "leakage_proxy_pct": 0.11600227761461973,
         "strain_risk_score": 0.11515,
-        "contact_score": null,
         "pareto_family": "global_common_objectives",
         "pareto_objectives": {
           "minimize_physics_regurgitation_pct": 0.11600227761461973,

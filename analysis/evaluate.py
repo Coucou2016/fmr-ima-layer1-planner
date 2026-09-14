@@ -93,6 +93,7 @@ class DesignPoint:
     niti_alternating_strain_pct: Optional[float]
     niti_engineering_strain: Optional[float]
     cs_lcx_mm: Optional[float]
+    contact_score: Optional[float] = None  # mechanics contact proxy (alias)
     constraint_violations: list[str] = field(default_factory=list)
 
     @property
@@ -106,7 +107,7 @@ class DesignPoint:
         # Preferred aliases (legacy keys retained).
         d["leakage_proxy_pct"] = self.physics_regurgitation_pct
         d["strain_risk_score"] = self.max_principal_strain
-        d["contact_score"] = None  # filled by callers with mechanics contact when available
+        # contact_score already on the dataclass (mechanics contact_force_max_n).
         return d
 
 
@@ -268,6 +269,7 @@ def evaluate_design_point(
         niti_alternating_strain_pct=niti_alt,
         niti_engineering_strain=niti_eng,
         cs_lcx_mm=cs_lcx,
+        contact_score=float(fea.contact_force_max_n),
     )
 
 
