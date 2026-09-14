@@ -53,6 +53,10 @@ rg ("211"+"726")  # empty (split token only in CI/test ban)
 ```
 
 ## Git
-- Tip after this pass: _(filled after commit)_
-- Push: `origin/main`
+- Tip after this pass: `61db2e9e4e4b9acdf6776a625e90018fa80c6726`
+- Prior tip: `2dc65205d62ab5f3565cdf11e7de8e642394d28b`
+- Push: `origin/main` (this pass)
+- Tests: **63 passed**; coverage ≈**76%** (fail-under 70); ruff blocking
+- Seed-42 fitted ranking: IMA-CS 20%; LHS N=120; P(top-1)≈0.34
+- Rule AP70 leak: ≈2.46% → ≈1.21%
 
