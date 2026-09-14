@@ -47,5 +47,7 @@ python tools/package_reports.py
 
 ## Git
 
-- Follow-up commit SHA recorded after verify/push.
+- Follow-up commit: `1fc0646a8568d07e6846242f1969da70ba651bbd`
+- Prior Round-2 core: `dfa7b34efbeb2bc99d1c869c7204cb6843d368bf`
+- Push: pending → `origin/main` after this note.
 - No invented ChatGPT replies; no clinical-recommendation framing restored.
