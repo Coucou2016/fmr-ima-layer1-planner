@@ -65,11 +65,15 @@ Rule-based path dampened AP70 (140→~54 ROA; 5.6%→~2.5% leak) but still overe
 
 ## Verification
 ```
-$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
+$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q   # 57 passed
 python run_pipeline.py --seed 42 --paper --no-export
 python tools/package_reports.py
 python -m analysis.fit_response_model --write
 ```
+
+## Git
+- Commit: `dfa7b34efbeb2bc99d1c869c7204cb6843d368bf`
+- Push: `origin/main` succeeded (`0d08fd5..dfa7b34`)
 
 ## Honesty retained
 - Algebraic/phenomenological mechanics + literature-calibrated leakage proxy
