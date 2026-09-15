@@ -36,8 +36,8 @@ Clinically constrained preoperative planning of indirect mitral annuloplasty: ma
 1. FMR / IMA clinical need (1–2 sentences).
 2. Gap: suture/bridge % is not clinical AP dose; discrete Galili-mapping 50% case has 0% mapped AP cinch (AP 34.4 mm table convention); 70% is numerical extreme (~58% AP).
 3. Approach: Layer-1 Python surrogate + clinical mapping (η) + constrained planner + jet/LCx.
-4. Result (seed=42): dual IMA-AP 60%, AP 18%, physics regurg 0.152%, jet=`central`; η±20% flips recommendation.
-5. Boundary: not production FEA; η not imaging–FEA identified.
+4. Result (seed=42, `fitted_response`): best feasible **IMA-CS 20%**, AP↓ **11%**, leakage proxy ≈**0.39%**, jet=`central`; LHS \(P(\mathrm{top\text{-}1})\approx0.34\).
+5. Boundary: not production FEA; η not imaging–FEA identified; not clinical decision support.
 
 ### Introduction (paragraph jobs)
 | ¶ | Job | Content |

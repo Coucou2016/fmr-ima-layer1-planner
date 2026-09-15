@@ -65,13 +65,13 @@ def _science_style(*, serif: bool = True) -> Iterator[None]:
             "font.family": "serif",
             "font.serif": [serif_name, *_SERIF_CANDIDATES],
             "mathtext.fontset": "stix",
-            "font.size": 10,
-            "axes.labelsize": 11,
-            "axes.titlesize": 12,
+            "font.size": 11,
+            "axes.labelsize": 12,
+            "axes.titlesize": 13,
             "axes.linewidth": 0.8,
-            "legend.fontsize": 8,
-            "xtick.labelsize": 9,
-            "ytick.labelsize": 9,
+            "legend.fontsize": 9,
+            "xtick.labelsize": 10,
+            "ytick.labelsize": 10,
             "lines.linewidth": 1.4,
             "lines.markersize": 5.5,
             "figure.facecolor": "white",
@@ -367,8 +367,8 @@ def _fig4_pareto(points, path: Path, recommendation: Optional[dict[str, Any]] = 
                 )
         axes[0].axvline(8.6, color="C3", ls="--", label="Rottländer 8.6 mm risk screen")
         axes[0].set_xlabel("CS–LCx distance (mm)")
-        axes[0].set_ylabel("Physics regurgitation (%)")
-        axes[0].set_title("IMA-CS: regurg vs LCx risk screen")
+        axes[0].set_ylabel("Leakage proxy (%)")
+        axes[0].set_title("IMA-CS: leakage proxy vs LCx risk screen")
         axes[0].grid(True, alpha=0.3)
         axes[0].legend(frameon=False, fontsize=8)
 
@@ -381,8 +381,8 @@ def _fig4_pareto(points, path: Path, recommendation: Optional[dict[str, Any]] = 
             )
         axes[1].axvline(0.4, color="C3", ls="--", label="Alternating strain 0.4% eng. screen")
         axes[1].set_xlabel("NiTi alternating strain (%)")
-        axes[1].set_ylabel("Physics regurgitation (%)")
-        axes[1].set_title("IMA-CS: regurg vs NiTi engineering screen")
+        axes[1].set_ylabel("Leakage proxy (%)")
+        axes[1].set_title("IMA-CS: leakage proxy vs NiTi engineering screen")
         axes[1].grid(True, alpha=0.3)
         axes[1].legend(frameon=False, fontsize=8)
 
