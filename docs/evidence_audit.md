@@ -1,8 +1,7 @@
 # 真实性审查 / Evidence Audit
 
-**Date:** 2026-09-15  
+**Date:** 2026-11-07  
 **Repository:** https://github.com/Coucou2016/fmr-ima-layer1-planner  
-**Public tip (pre-refresh):** `8a882f77968991b979add3d120639d06258b2d83` (`8a882f7`)  
 **Scope:** Document that manuscript / report numbers come from this repo’s code and seed-42 pipeline outputs — not invented, and not Galili table values presented as our predictions.
 
 ---
@@ -29,6 +28,7 @@ cd E:\Projects\20260522-Functional-Mitral-Regurgitation-FMR
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; python -m pytest tests/ -q
 python run_pipeline.py --seed 42 --paper --no-export
 python tools/package_reports.py
+python tools/build_manuscript_docx.py
 ```
 
 Optional provenance / CV refresh:
@@ -45,7 +45,7 @@ python tools/loo_evaluate.py --write
 
 | Claim family | Primary artifact | Code path |
 |--------------|------------------|-----------|
-| Scenario ranking / best candidate | `results/output/planner/scenario_ranking.json` (shim: `recommendation.json`) | `analysis/scenario_ranker.py` / planner |
+| Scenario ranking / best candidate | `results/output/planner/scenario_ranking.json` | `analysis/scenario_ranker.py` / planner |
 | Response path used for paper ranking | `scenario_ranking.json` → `response_path` | `configs/design_space.yaml` |
 | Fold-wise CV summary | `results/output/cross_validation/summary.json` | `analysis/fit_response_model.py` |
 | Fold-wise per-case preds | `results/output/cross_validation/folds/*.json` + `loo_response_model.json` | same |
@@ -55,12 +55,14 @@ python tools/loo_evaluate.py --write
 | Paper figures | `results/output/paper_figures/fig1…fig5.png` | `analysis/plots.py` (SciencePlots) |
 | Galili table-backed scalars | `data/processed/galili_cases.csv` / YAML cases | importer + fixtures |
 | Dryad contact feature | `contact_fraction` in processed CSV / response features | `tools/import_galili_dryad.py` |
+| Final manuscript (Markdown) | `docs/manuscript_final.md` (= `docs/paper.md`) | SCI guide rewrite 2026-11-07 |
+| Final manuscript (Word) | `docs/manuscript_final.docx` + Desktop copy | `tools/build_manuscript_docx.py` |
 
 **Separation rule:** calibration / reproduction (blend ON at calibration IDs) ≠ blend-off diagnostic ≠ fold-wise CV ≠ exploratory ranking. Do not cross-quote metrics across these blocks without labeling the source.
 
 ---
 
-## 4. Seed-42 key numbers (as of refresh; verify against JSON)
+## 4. Seed-42 key numbers (verified 2026-11-07 against JSON)
 
 From `scenario_ranking.json` / `paper_summary.json`:
 
@@ -99,49 +101,20 @@ Documented **historical pre-dampen baseline** (kept for comparison only; not cur
 
 **Table-backed Galili anchors (not our predictions):** pathology 5.26% / 26.1 mm / 172.8 mm²; ima_cs_22 0.29 / 24.8 / 48.2; ima_ap_50 0.08 / **15.9** / 27.3; ima_ap_70 0.13 / 12.4 / 46.1.
 
----
-
-## 5. Hash checklist (fill after regenerate)
-
-Run after `run_pipeline.py --seed 42 --paper` and packaging:
-
-```powershell
-Get-FileHash results\output\planner\scenario_ranking.json,`
-  results\output\cross_validation\summary.json,`
-  results\output\loo_evaluation.json,`
-  results\output\paper_tables\paper_summary.json,`
-  results\output\paper_figures\fig1_ima_ap_nonmonotonic_exploratory_planning_range.png,`
-  results\output\paper_figures\fig2_suture_vs_ap_reduction.png,`
-  results\output\paper_figures\fig3_jet_location.png,`
-  results\output\paper_figures\fig4_pareto_lcx_strain.png,`
-  results\output\paper_figures\fig5_dual_vs_single_suture.png,`
-  report.html, docs\paper.html -Algorithm SHA256
-```
-
-Record SHA256 digests and git `HEAD` in the collab log for this refresh.
+**η ±20% sensitivity (paper_tables/eta_sensitivity.csv):** IMA-CS 20% remains top under minus/nominal/plus; AP reduction 8.8% / 11.0% / 13.2%.
 
 ---
 
-## 6. Packaging self-containment checks
+## 5. Manuscript packaging (2026-11-07 SCI rewrite)
 
-```powershell
-python -c "from pathlib import Path; h=Path('report.html').read_text(encoding='utf-8'); print('data:image', h.count('data:image')); print('http img/css', sum(1 for s in ['src=\"http','href=\"http','cdn.'] if s in h))"
-```
-
-Expect: `data:image` ≥ 5; no external http image/CSS references in `report.html` / `docs/paper.html`.
-
----
-
-## 7. Manuscript spine
-
-User-edited narrative spine for this refresh: `docs/manuscript_draft.md` (rewritten 2026-09-15 to publishable methods style; numbers aligned to current pipeline). No newer Desktop/Downloads manuscript attachment was found.
-
-Paper packaging: `docs/paper.md` (= manuscript copy), `docs/paper.html`, `docs/paper.pdf`.  
-Report packaging: `report.html` / `report.md` / `report.pdf` (+ `docs/report.*` mirrors).
+- Structure follows user SCI Writing guide: Title → Abstract (8-function) → Keywords → Introduction (3 parts) → Methods (numerical five-module adapted) → Results (provenance → calibration → held-out/CV → ranking) → Discussion → Conclusions → Availability → References.
+- Style constraints applied: reduced colon/dash/semicolon load, basic transitions, no defensive placeholders, no local paths in paper body, honest methods framing.
+- Word primary deliverable: `docs/manuscript_final.docx` and `C:\Users\Administrator\Desktop\FMR_IMA_Layer1_manuscript_final.docx` (figures 1–5 embedded).
+- OA reference PDFs stored under `docs/reference_pdfs/` when lawful download succeeded (Worthley MAVERIC; Rottländer Frontiers). Galili RSOS PDF download was blocked by publisher/PMC bot challenges in this session; DOI and structure references remain valid.
 
 ---
 
-## 8. What is computed vs table-backed
+## 6. What is computed vs table-backed
 
 | Quantity | Status |
 |----------|--------|
@@ -152,3 +125,13 @@ Report packaging: `report.html` / `report.md` / `report.pdf` (+ `docs/report.*` 
 | Planning-map sweep ROA / leak / jet / LCx / NiTi | **Computed** under η assumptions |
 | Best candidate / Pareto / LHS stability | **Computed** ranking under assumptions |
 | Clinical trial MR volumes | **Not used** as calibration targets |
+
+---
+
+## 7. Irreducible scientific limits
+
+- n=7 Galili peak-systole cases ≠ patient-level external validation
+- No patient CT / chamber-labeled SPH leakage recompute
+- Algebraic proxies; η and dual factor are assumption priors
+- LCx/NiTi screens are literature/engineering screens, not safety clearances
+- Ranking is assumption-driven exploratory analysis, not validated clinical prediction

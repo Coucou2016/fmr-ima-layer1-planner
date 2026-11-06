@@ -1,0 +1,124 @@
+{
+  "best_oa_location": {
+    "endpoint_id": null,
+    "evidence": "deprecated",
+    "host_type": "publisher",
+    "is_best": true,
+    "license": "cc-by",
+    "oa_date": "2022-01-01",
+    "pmh_id": null,
+    "repository_institution": null,
+    "updated": "deprecated",
+    "url": "https://doi.org/10.1098/rsos.211464",
+    "url_for_landing_page": "https://doi.org/10.1098/rsos.211464",
+    "url_for_pdf": null,
+    "version": "publishedVersion"
+  },
+  "data_standard": 2,
+  "doi": "10.1098/rsos.211464",
+  "doi_url": "https://doi.org/10.1098/rsos.211464",
+  "first_oa_location": {
+    "endpoint_id": null,
+    "evidence": "deprecated",
+    "host_type": "publisher",
+    "is_best": true,
+    "license": "cc-by",
+    "oa_date": "2022-01-01",
+    "pmh_id": null,
+    "repository_institution": null,
+    "updated": "deprecated",
+    "url": "https://doi.org/10.1098/rsos.211464",
+    "url_for_landing_page": "https://doi.org/10.1098/rsos.211464",
+    "url_for_pdf": null,
+    "version": "publishedVersion"
+  },
+  "genre": "journal-article",
+  "has_repository_copy": true,
+  "is_oa": true,
+  "is_paratext": false,
+  "journal_is_in_doaj": true,
+  "journal_is_oa": true,
+  "journal_issn_l": "2054-5703",
+  "journal_issns": "2054-5703",
+  "journal_name": "Royal Society Open Science",
+  "oa_locations": [
+    {
+      "endpoint_id": null,
+      "evidence": "deprecated",
+      "host_type": "publisher",
+      "is_best": true,
+      "license": "cc-by",
+      "oa_date": "2022-01-01",
+      "pmh_id": null,
+      "repository_institution": null,
+      "updated": "deprecated",
+      "url": "https://doi.org/10.1098/rsos.211464",
+      "url_for_landing_page": "https://doi.org/10.1098/rsos.211464",
+      "url_for_pdf": null,
+      "version": "publishedVersion"
+    },
+    {
+      "endpoint_id": "ac9de7698155b820de7",
+      "evidence": "deprecated",
+      "host_type": "repository",
+      "is_best": false,
+      "license": "cc-by",
+      "oa_date": "2022-01-01",
+      "pmh_id": "oai:pubmedcentral.nih.gov:8753151",
+      "repository_institution": "National Institutes of Health",
+      "updated": "deprecated",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/8753151",
+      "url_for_landing_page": "https://www.ncbi.nlm.nih.gov/pmc/articles/8753151",
+      "url_for_pdf": null,
+      "version": "publishedVersion"
+    },
+    {
+      "endpoint_id": "8e556f4518885d9a235",
+      "evidence": "deprecated",
+      "host_type": "repository",
+      "is_best": false,
+      "license": "cc-by-sa",
+      "oa_date": "2022-01-01",
+      "pmh_id": "oai:doaj.org/article:0cdd163163694d15bf9d4bf2ce1f045b",
+      "repository_institution": null,
+      "updated": "deprecated",
+      "url": "https://doaj.org/article/0cdd163163694d15bf9d4bf2ce1f045b",
+      "url_for_landing_page": "https://doaj.org/article/0cdd163163694d15bf9d4bf2ce1f045b",
+      "url_for_pdf": null,
+      "version": "submittedVersion"
+    }
+  ],
+  "oa_locations_embargoed": [],
+  "oa_status": "gold",
+  "published_date": "2022-01-01",
+  "publisher": "The Royal Society",
+  "title": "Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation",
+  "updated": "2026-10-27T16:13:06Z",
+  "year": 2022,
+  "z_authors": [
+    {
+      "author_position": "first",
+      "is_corresponding": false,
+      "raw_affiliation_strings": [
+        "School of Mechanical Engineering, Tel Aviv University, Tel Aviv 6997801, Israel"
+      ],
+      "raw_author_name": "Lee Galili"
+    },
+    {
+      "author_position": "middle",
+      "is_corresponding": false,
+      "raw_affiliation_strings": [
+        "School of Mechanical Engineering, Tel Aviv University, Tel Aviv 6997801, Israel"
+      ],
+      "raw_author_name": "Adi White Zeira"
+    },
+    {
+      "author_position": "last",
+      "is_corresponding": true,
+      "raw_affiliation_strings": [
+        "School of Mechanical Engineering, Tel Aviv University, Tel Aviv 6997801, Israel"
+      ],
+      "raw_author_name": "Gil Marom"
+    }
+  ]
+}

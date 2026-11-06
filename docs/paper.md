@@ -1,187 +1,258 @@
 # A literature-anchored Layer-1 surrogate for exploratory screening of indirect mitral annuloplasty
 
-**Short title:** FMR IMA Layer-1 exploratory surrogate
+**Short title.** FMR IMA Layer-1 exploratory surrogate
 
-**Venue class:** computational biomechanics / research-software methods (CMBBE / *Medical Engineering & Physics* / *Royal Society Open Science*-class). This is not a clinical decision trial.
+**Article type.** Computational biomechanics methods / research software
 
-**One-sentence argument.** We release a transparent, literature-anchored algebraic surrogate that reproduces selected Galili peak-systole anchors, incorporates Dryad-derived contact features, reports true fold-wise response-model cross-validation alongside a separate rule-based blend-off diagnostic, and ranks exploratory IMA-CS / IMA-AP scenarios under explicit geometric and transfer-efficiency assumptions—without claiming new Living Heart Human Model (LHHM) finite-element analysis (FEA), clinical recommendation, or patient-level external validation.
-
-**Reproducibility.** `python run_pipeline.py --seed 42 --paper` · `python tools/import_galili_dryad.py --from-fixture --process` · `python -m analysis.fit_response_model --write` · `python tools/loo_evaluate.py --write`
-
-**Verification levels.** Level 0 = calibrated to / reproduced selected Galili cases. Level 1 = exploratory planning map + uncertainty-aware scenario ranker + fold-wise response diagnostic. Level 2 patient-specific LHHM / fluid–structure interaction (FSI) is out of scope.
+**One-sentence argument.** This paper releases a reproducible algebraic Layer-1 surrogate that reproduces selected Galili peak-systole anchors, fits fold-wise response models with Dryad contact features, and ranks exploratory IMA-CS and IMA-AP scenarios under stated geometric assumptions. It does not claim new Living Heart Human Model finite-element analysis, clinical decision support, or patient-level external validation.
 
 ---
 
 ## Abstract
 
-**Background.** Computational studies of indirect mitral annuloplasty (IMA) report suture or bridge shortening together with peak-systolic geometry and leakage. Galili et al. (*R. Soc. Open Sci.* 2022; doi:10.1098/rsos.211464) compared generic coronary-sinus (IMA-CS) and anteroposterior (IMA-AP) strategies in the LHHM. Peak-systolic IMA-AP at 50% shortening yields an anteroposterior (AP) diameter of 15.9 mm (near-direct AP effect relative to disease 26.1 mm), which must not be confused with undeformed diastolic AP of 34.4 mm. Device classes also differ clinically: MAVERIC evaluates ARTO (CS–interatrial septum / IMA-AP-class), whereas Carillon and REDUCE-FMR are IMA-CS-class.
+Functional mitral regurgitation is often treated by devices that remodel annular geometry through the coronary sinus or through anteroposterior shortening. High-fidelity finite-element studies already compare these pathways, yet a transparent low-order screening layer with inspectable assumptions and held-out diagnostics remains limited. Peak-systolic geometry and diastolic reference lengths also continue to be mixed in dose statements. We built a reproducible Python Layer-1 surrogate that combines phenomenological mechanics with a literature-calibrated leakage proxy. Dryad supporting files supply an auxiliary contact feature. Fold-wise response models for regurgitant orifice area and leakage are fitted under true leave-one-case-out, and a discrete scenario ranker minimizes the leakage proxy under an anteroposterior reduction ceiling, a nickel–titanium engineering screen, and a coronary sinus–left circumflex risk screen. On the held-out Galili subset with seed 42, fold-wise mean absolute error is 6.37 mm² for regurgitant orifice area and 0.245 percentage points for leakage. Under the planning map the ranker retains 30 of 35 device candidates as feasible. The best feasible candidate is IMA-CS bridge shortening of 20 percent, with 11.0 percent anteroposterior reduction and a leakage proxy of 0.391 percent. Latin-hypercube sampling of assumption priors yields a top-1 stability of 0.342. These results support exploratory screening under transparent assumptions. They do not support preoperative clinical use or equivalence between physics leakage proxies and clinical regurgitant volume.
 
-**Methods.** We implement a reproducible Python Layer-1 surrogate that couples phenomenological mechanics with a literature-calibrated leakage proxy. A configuration switch selects the response path used for ranking (`fitted_response` is the seed-42 paper default; `rule_based_proxy` is retained for diagnostics). Dryad supporting files (doi:10.5061/dryad.bzkh1899d) supply provenance and an auxiliary feature `contact_fraction` (interpolated off-table); scalar AP, regurgitant orifice area (ROA), and leakage remain table-backed unless independently derivable. Fold-wise response models \(f_{\mathrm{ROA}}(\Delta\mathrm{AP},\ \mathrm{device\ family},\ \mathrm{annular\ reduction},\ \mathrm{contact\_fraction})\) and \(f_{\mathrm{leak}}(\mathrm{ROA},\ \mathrm{coaptation\ proxy},\ \mathrm{contact},\ \mathrm{device\ mechanism})\) are fitted under true leave-one-case-out; a full-train fit supports ranking. A discrete scenario ranker minimizes `leakage_proxy_pct` subject to an AP-reduction ceiling, an illustrative nickel–titanium (NiTi) engineering screen, and a Rottländer coronary sinus–left circumflex (CS–LCx) risk-screening threshold. Latin-hypercube sampling (LHS; \(N=120\)) probes multi-parameter ranking stability. The dual-suture commissural factor is treated as hypothesis sensitivity (Figure 5), not discovery.
-
-**Results (seed = 42).** On the held-out Galili subset, fold-wise response-model cross-validation (CV) achieves ROA mean absolute error (MAE) ≈ 6.37 mm² and leak MAE ≈ 0.245 percentage points (pp), versus a documented pre-dampen rule-based blend-off baseline of 50.18 mm² / 1.445 pp. For IMA-AP 70%, fold-wise absolute errors fall to ≈ 6.60 mm² / 0.198 pp (internal engineering screens only—not medical validation). The current dampened rule-based diagnostic yields held-out MAE ≈ 5.24 mm² / 0.043 pp; for IMA-AP 70% it predicts leak ≈ 0.07% against published 0.13% (absolute error ≈ 0.06 pp). Paper ranking therefore uses `fitted_response` for a consistent off-table response surface, not because every scalar is worse under the rule-based path. Under the planning map the ranker evaluates 36 grid points (35 device candidates) and retains 30 feasible designs (\(p_{\mathrm{feasible}}\approx 0.857\)). The best feasible candidate is IMA-CS bridge shortening 20% (AP reduction 11%; leakage proxy ≈ 0.39%; jet = central; CS–LCx = 8.6 mm at the risk-screen edge). LHS uncertainty quantification (UQ) yields \(P(\mathrm{top\text{-}1})\approx 0.34\) and mean feasible fraction ≈ 0.82.
-
-**Conclusions.** A literature-anchored low-order surrogate can support exploratory screening of IMA strategy settings with inspectable assumptions, honest held-out reporting, and uncertainty language. It is not a preoperative clinical decision system and must not equate physics leakage-proxy percentages with clinical regurgitant volume.
-
-**Keywords:** functional mitral regurgitation; indirect mitral annuloplasty; surrogate model; exploratory screening; research software; Layer-1
-
-**中文摘要.** 背景：功能性质二尖瓣反流（FMR）的间接成形（IMA）计算研究需区分峰缩期前后径（AP）与舒张期几何，并区分 IMA-CS 与 IMA-AP 装置类别。方法：本文给出可复现的 Python 一层代数/现象学代理，结合 Dryad 接触特征、折内响应模型交叉验证与情景排序。结果（seed=42）：折内留出子集 ROA MAE≈6.37 mm²、泄漏 MAE≈0.245 pp；排序最优候选为 IMA-CS 20%（AP↓11%，泄漏代理≈0.39%）。结论：可用于假设透明的探索性筛查，而非临床术前决策或患者级外部验证。
+**Keywords.** functional mitral regurgitation; indirect mitral annuloplasty; surrogate model; exploratory screening; research software; Layer-1
 
 ---
 
 ## 1. Introduction
 
-Functional mitral regurgitation (FMR) arises from ventricular remodelling, annular dilatation, and impaired leaflet coaptation rather than primary leaflet disease alone. Indirect mitral annuloplasty (IMA) seeks to remodel annular geometry without direct leaflet repair. Two computational device families recur in the literature: IMA-CS (coronary-sinus bridge shortening; Carillon-class clinically) and IMA-AP (CS–interatrial-septum suture shortening that acts primarily on the anteroposterior diameter; ARTO / MAVERIC mechanism class). These pathways are not mechanically interchangeable.
+### 1.1 Background and research problem
 
-Galili, White Zeira and Marom (2022) compared generic IMA-CS and IMA-AP treatments in the Living Heart Human Model and quantified leakage after device deployment. Their peak-systolic IMA-AP 50% case yields AP = 15.9 mm, illustrating a near-direct AP effect; undeformed diastolic AP = 34.4 mm belongs to a different cardiac phase and must not be substituted into peak-systole dose statements. Clinical series supply geometric context at different scales: ARTO/MAVERIC reports AP reductions of order 14–15% for an IMA-AP-class device, whereas Carillon / TITAN II and REDUCE-FMR inform IMA-CS directionality.
+Functional mitral regurgitation (FMR) develops when ventricular remodelling, annular dilatation, and impaired leaflet coaptation leave a residual orifice in systole. Indirect mitral annuloplasty (IMA) seeks to remodel annular geometry without direct leaflet repair. Two device families recur in both clinic and computation. IMA-CS shortens a coronary-sinus bridge and belongs to the Carillon class. IMA-AP shortens a suture path between the coronary sinus and the interatrial septum and belongs to the ARTO class studied in MAVERIC. These pathways act on different geometric levers and are not interchangeable.
 
-What remains for research software is transparent dose translation, provenance, held-out honesty, and exploratory ranking under stated assumptions. The present work does not claim the first computational CS-versus-AP comparison, does not introduce new LHHM FEA, and does not offer a clinical recommendation engine.
+Dose statements for IMA require a clear cardiac phase. Peak-systolic anteroposterior (AP) diameter after device deployment is the relevant response for leakage comparisons. Undeformed diastolic AP is a different reference and cannot replace peak-systolic values in shortening arguments.
 
-## 2. Related work and positioning
+### 1.2 Previous research and knowledge gap
 
-We imitate the *structure* of high-fidelity IMA modelling papers and modular mitral-valve methods tools while contributing a complementary Layer-1 software layer:
+Galili, White Zeira and Marom (2022) compared generic IMA-CS and IMA-AP treatments in the Living Heart Human Model and quantified peak-systolic geometry and leakage after deployment [1]. Their IMA-AP 50 percent case reaches a peak-systolic AP of 15.9 mm relative to a diseased peak-systolic AP of 26.1 mm. The undeformed diastolic AP of 34.4 mm belongs to another phase. Dryad supporting files accompany that study and provide particle and contact metadata [2].
 
-| Role | Source | What we imitate | What we do not claim |
-|------|--------|-----------------|----------------------|
-| Mechanistic FEA baseline | Galili et al., *R. Soc. Open Sci.* 2022;9:211464 | mechanism → parameterization → geometry → functional readout; IMA-CS vs IMA-AP taxonomy | new LHHM/FEA/SPH; “first CS vs AP” |
-| Clinical AP context | Worthley / MAVERIC (ARTO) | separate geometry endpoints from MR endpoints | calibration of physics % to clinical MR volume |
-| CS directionality | Witte et al., REDUCE-FMR; Carillon TITAN II | restrained causal language; coronary awareness | validation against trial magnitudes |
-| LCx screening vocabulary | Rottländer et al., 2021 | feasible vs infeasible screening language at CS–LCx ≈ 8.6 mm | “≥8.6 mm is proven safe” |
-| Methods-tool tone | geometry-based MV FE tools (e.g. *Med Eng Phys* / *CMBBE* modular studies) | modular Methods; isolated-variable sweeps | FE stress/contact as ground truth for our proxies |
+Clinical series supply geometric context at a different scale. MAVERIC evaluates the ARTO system and reports AP reductions of order 14 to 15 percent for an IMA-AP-class device [3]. Carillon studies including REDUCE-FMR inform IMA-CS directionality for regurgitation reduction [4]. Rottländer and colleagues reported coronary sinus–left circumflex (CS–LCx) distances that support risk-screening language near 8.6 mm in the distal landing zone [5]. Modular mitral finite-element tools in the medical-engineering literature show how to separate geometry drivers from functional readouts, yet they remain costly for broad exploratory grids.
 
-This paper contributes research-software packaging, Dryad-aware contact features in a fitted response path, fold-wise response diagnostics, and an inspectable Layer-1 scenario ranker—not a new high-fidelity FSI study.
+What remains limited is a reproducible low-order software layer that (i) preserves Galili peak-systole facts and device-class attribution, (ii) separates calibration reproduction from held-out diagnostics, (iii) reports true fold-wise response-model cross-validation, and (iv) ranks exploratory scenarios under explicit transfer-efficiency assumptions with uncertainty language. The present study addresses that software gap. It does not claim the first computational CS-versus-AP comparison and does not introduce new Living Heart Human Model finite-element analysis.
 
-## 3. Software architecture
+### 1.3 Objectives and contributions
 
-```
-configs/    surrogate_calibration.yaml, design_space.yaml, case YAML
-models/     geometry, pathology, devices, response_model (fold-wise f_ROA / f_leak)
-simulation/ phenomenological mechanics proxy (legacy alias run_fea_surrogate)
-sph/        literature-calibrated leakage proxy (SPH-inspired; not a full SPH solver)
-analysis/   ROA, jet, sweep, scenario_ranker, fit_response_model, paper tables/plots
-tools/      import_galili_dryad.py, loo_evaluate.py, package_reports.py
-data/       raw drop zone, fixtures, processed galili_cases.csv
-results/output/cross_validation/   true fold-wise CV artifacts
-results/output/planner/            scenario_ranking.json (seed-42 ranking)
-```
+This study aims to deliver and evaluate a literature-anchored Layer-1 surrogate for exploratory IMA screening. The work has four concrete contributions.
 
-Entry points include `run_pipeline.py`, `python -m analysis.planner`, `python -m analysis.fit_response_model`, and `python -m analysis.design_sweep`.
+1. A reproducible Python package that maps IMA-CS and IMA-AP shortening onto peak-systolic AP, regurgitant orifice area (ROA), and a leakage proxy under labeled assumptions.
+2. Dryad-aware contact features in a fitted response path, while scalar AP, ROA, and leakage remain table-backed unless independently derived.
+3. Honest diagnostics that separate a rule-based blend-off casewise check from true fold-wise leave-one-case-out of the response models.
+4. An exploratory scenario ranker with Latin-hypercube sampling of assumption priors, family-separated Pareto sets, and an explicit dual-suture sensitivity parameter that is not treated as a discovery claim.
 
-## 4. Methods
+Verification is organized in two levels. Level 0 reproduces selected Galili peak-systole anchors. Level 1 provides the planning map, fold-wise response diagnostic, and uncertainty-aware ranker. Patient-specific Level 2 fluid–structure interaction is out of scope.
 
-### 4.1 Pathology and geometry
+---
 
-A parametric papillary pathology (approximately 44% posterior passive fraction) defines the diseased baseline. Undeformed diastole and peak systole are stored as separate `cardiac_phase` records. AP diameter is a literature-defined geometry input (`ap_role: literature_mapping_input`); AP MAE is therefore not reported as predictive accuracy.
+## 2. Methods
 
-### 4.2 Device kinematics and transfer efficiency
+### 2.1 Study object, data and geometry
 
-In Galili mapping mode, peak-systolic AP follows published table coordinates (interpolation between discrete Galili cases). In clinical / planning mode, AP reduction is \(\mathrm{AP\_reduction\%}=\eta\times\mathrm{shortening\%}\) with assumption-prior means \(\eta_{\mathrm{AP}}=0.30\) and \(\eta_{\mathrm{CS}}=0.55\). \(\eta_{\mathrm{CS}}\) is **not** fitted from MAVERIC/ARTO. Default UQ uses Latin hypercube sampling over \(\eta_{\mathrm{AP}}\in U(0.24,0.36)\), \(\eta_{\mathrm{CS}}\in U(0.44,0.66)\), dual commissural factor, CS–LCx baseline, and cinch slope (\(N=120\) as configured in `design_space.yaml`).
+The computational object is a parametric papillary pathology with an approximate 44 percent posterior passive fraction. Undeformed diastole and peak systole are stored as separate cardiac-phase records. Published Galili peak-systole scalars for AP, ROA, and leakage are loaded from the processed case table derived from the Dryad package and literature fixtures. AP diameter is a literature-defined geometry input. AP prediction error is therefore not reported as predictive accuracy.
 
-### 4.3 Mechanics and leakage proxies
+Dryad files supply `contact_fraction` and particle counts where available. Scalar AP, ROA, and leakage remain table-backed fills. The importer does not invent those scalars from unlabeled leaflet coordinates alone.
 
-Algebraic coaptation-gap, strain, and contact-proxy scores constitute the phenomenological mechanics channel. The leakage proxy is literature-calibrated at the pathology case; physics regurgitation percentage is **not** clinical regurgitant volume. Synthetic contact-cluster ROA is visualization-only (`model_weight=1`, `cluster_weight=0`). Dryad `contact_fraction` enters the fitted response path as a scientific feature. Official export fields are `leakage_proxy_pct`, `strain_risk_score`, and `contact_score` (legacy aliases retained for compatibility).
+### 2.2 Governing formulation
 
-### 4.4 Response paths
+Device kinematics use one of two mapping modes. In Galili mapping mode, peak-systolic AP follows published table coordinates with interpolation between discrete cases. In clinical planning mode, AP reduction is
 
-`configs/design_space.yaml` sets `response_path` to one of:
+$$\mathrm{AP\_reduction\%}=\eta\times\mathrm{shortening\%}\qquad(1)$$
 
-- `fitted_response` — paper / seed-42 default for ranking;
-- `rule_based_proxy` — legacy exploratory / diagnostic path;
-- `hybrid_ap_extreme` — rule-based with AP-class over-short routed to the fitted surface.
+with assumption-prior means \(\eta_{\mathrm{AP}}=0.30\) and \(\eta_{\mathrm{CS}}=0.55\). The CS transfer factor is not fitted from MAVERIC or ARTO. Algebraic coaptation-gap, strain, and contact-proxy scores form the phenomenological mechanics channel. The leakage proxy is literature-calibrated at the pathology case. Physics regurgitation percentage is not clinical regurgitant volume.
 
-### 4.5 Provenance (Dryad)
+Fitted response models take the form
 
-`tools/import_galili_dryad.py` documents download or manual drop, then extracts `contact_fraction` and `n_sph_particles` where available. Scalar AP, ROA, and leakage remain table-backed fills; the importer does not invent those scalars from unlabeled leaflet coordinates alone.
+$$f_{\mathrm{ROA}}(\Delta\mathrm{AP},\ \mathrm{device\ family},\ \mathrm{annular\ reduction},\ \mathrm{contact\_fraction})\qquad(2)$$
 
-### 4.6 Diagnostics versus true fold-wise CV
+$$f_{\mathrm{leak}}(\mathrm{ROA},\ \mathrm{coaptation\ proxy},\ \mathrm{contact},\ \mathrm{device\ mechanism})\qquad(3)$$
 
-`tools/loo_evaluate.py` runs an **anchor-free / leave-one-case blend-off diagnostic** on the fixed rule-based surrogate (no fold-wise refit). `analysis/fit_response_model.py` performs **true fold-wise** fitting with held ROA/leak excluded from training arrays. Full-train parameters for ranking are written under `results/output/response_model/`. Cross-validation summaries live under `results/output/cross_validation/`.
+A fixed over-short prior encodes the Galili non-monotonic ROA rebound beyond the IMA-AP 50 percent region. Official export fields are `leakage_proxy_pct`, `strain_risk_score`, and `contact_score`.
 
-### 4.7 Scenario ranker and Pareto families
+### 2.3 Numerical implementation and software
 
-The ranker minimizes `leakage_proxy_pct` subject to an exploratory AP-reduction ceiling (default 20%), an illustrative NiTi alternating-strain screen (<0.4%), and a CS–LCx risk-screening threshold (≥8.6 mm; labeled screening, not safety clearance). It reports `n_total_points`, `n_device_candidates`, `n_feasible_device_candidates`, `p_feasible_device_candidates`, \(P(\mathrm{top\text{-}1})\), and first-order Spearman sensitivity ranks. Pareto families are separated: global common objectives (min leak, max AP↓); IMA-CS family (adds LCx/NiTi); IMA-AP family. Missing LCx/NiTi values are never replaced with sentinel fillers. The dual-suture commissural factor is an explicit hypothesis sensitivity parameter (Figure 5: 0.25 / 0.5 / 0.75 / 1.0). The 14–20% AP band is a clinically contextualized exploratory planning range (legacy `clinical_window` alias only).
+The package is organized as configuration cases, geometry and device models, a phenomenological mechanics proxy, a literature-calibrated leakage proxy, and analysis modules for ROA, jet location, design sweep, response-model fitting, and scenario ranking. Entry points include the seed-controlled pipeline, the planner, the fold-wise fitter, and the blend-off diagnostic. Paper figures are generated with SciencePlots using Times New Roman axis fonts. Random seed 42 is used for all reported ranking and sampling results.
 
-## 5. Results
+Three response paths are available. The paper default for ranking is `fitted_response`. The rule-based path is retained for diagnostics. A hybrid path routes AP-class over-short cases to the fitted surface.
 
-### 5.1 Data provenance
+### 2.4 Parameters and calibration
 
-Processed table `data/processed/galili_cases.csv` marks Dryad-derived `contact_fraction` and `n_sph_particles` with `source_tier=dryad_derived`. Published peak-systole AP, ROA, and leakage scalars remain table-backed.
+Calibration case identifiers with blend on are pathology, IMA-CS 22 percent, and IMA-AP 50 percent. Agreement at these identifiers is reproduction of literature anchors. It is not independent validation. Planning-map grids use the clinical mapping with the transfer factors above. Default uncertainty quantification draws Latin-hypercube samples over
 
-### 5.2 Calibration reproduction (Level 0)
+$$\eta_{\mathrm{AP}}\in U(0.24,0.36),\quad \eta_{\mathrm{CS}}\in U(0.44,0.66)$$
 
-| Case | Leakage % | Peak-sys AP mm | ROA mm² |
-|------|-----------|----------------|---------|
+together with the dual commissural factor, CS–LCx baseline, and cinch slope, with \(N=120\) samples as configured in the design-space file.
+
+### 2.5 Verification, validation and evaluation
+
+Two diagnostics are reported separately.
+
+**Rule-based blend-off diagnostic.** The fixed rule-based surrogate is evaluated with blend off on the held-out identifiers IMA-CS 14 percent, IMA-CS 18 percent, IMA-AP 30 percent, and IMA-AP 70 percent. No fold-wise refit is performed.
+
+**True fold-wise response-model cross-validation.** Each leave-one-case-out fold refits Equations (2) and (3) on the other six Galili peak-systole cases. Held-out ROA and leakage never enter the training arrays. Full-train parameters support ranking.
+
+**Scenario ranker.** The ranker minimizes `leakage_proxy_pct` subject to an exploratory AP-reduction ceiling of 20 percent, an illustrative nickel–titanium alternating-strain screen below 0.4 percent, and a CS–LCx risk-screening threshold of 8.6 mm. Feasibility counts exclude the pathology point from the device-candidate denominator. Pareto families are separated into global common objectives, an IMA-CS family that adds LCx and NiTi, and an IMA-AP family. Missing LCx or NiTi values are never replaced by sentinel fillers. The dual-suture commissural factor is an explicit hypothesis sensitivity parameter.
+
+Error metrics use mean absolute error (MAE) for ROA in mm² and for leakage in percentage points (pp).
+
+$$\mathrm{MAE}=\frac{1}{N}\sum_{i=1}^{N}\left|y_i^{\mathrm{pred}}-y_i^{\mathrm{obs}}\right|\qquad(4)$$
+
+Internal engineering screens on the seven-case table are ROA MAE below 25 mm², leak MAE below 0.5 pp, and the same absolute-error ceilings for the IMA-AP 70 percent fold. These screens are engineering checks only. They are not medical validation thresholds.
+
+---
+
+## 3. Results
+
+### 3.1 Data provenance
+
+The processed Galili case table marks Dryad-derived contact fraction and particle counts with a Dryad source tier. Published peak-systole AP, ROA, and leakage remain table-backed. Seed 42 pipeline outputs feed all quantitative claims below.
+
+### 3.2 Calibration reproduction (Level 0)
+
+Table 1 lists selected Galili peak-systole anchors used for Level 0 reproduction. Calibration identifiers with blend on reproduce literature leakage and geometry. They are not held-out predictions.
+
+**Table 1.** Selected Galili peak-systole anchors used for Level 0 reproduction.
+
+| Case | Leakage % | Peak-sys AP (mm) | ROA (mm²) |
+|------|-----------|------------------|-----------|
 | pathology | 5.26 | 26.1 | 172.8 |
 | ima_cs_22 | 0.29 | 24.8 | 48.2 |
-| ima_ap_50 | 0.08 | **15.9** | 27.3 |
+| ima_ap_50 | 0.08 | 15.9 | 27.3 |
 | ima_ap_70 | 0.13 | 12.4 | 46.1 |
 
-Calibration IDs with blend ON are reproduction only.
+Figure 1 shows the IMA-AP leakage proxy against suture shortening under Galili peak-systole AP mapping and under clinical \(\eta\) mapping. The shaded band marks the exploratory 14 to 20 percent AP planning range expressed in suture-percent space through \(\eta_{\mathrm{AP}}\). Figure 2 maps device shortening onto AP-diameter reduction for Galili IMA-AP, clinical IMA-AP, and clinical IMA-CS.
 
-### 5.3 Anchor-free diagnostic and true fold-wise CV
+### 3.3 Held-out diagnostics and fold-wise cross-validation
 
-**Rule-based blend-off diagnostic** (`tools/loo_evaluate.py`). A documented pre-dampen historical baseline on the held-out IDs reported MAE ROA 50.18 mm² and leak 1.445 pp, with IMA-AP 70% absolute errors 94.17 mm² / 5.455 pp. After rule-based dampening, the current seed-42 diagnostic reports held-out MAE ≈ 5.24 mm² / 0.043 pp. For IMA-AP 70%, current rule-based leak ≈ 0.07% versus published 0.13% (absolute error ≈ 0.06 pp).
+A documented pre-dampen historical baseline on the held-out identifiers reported MAE of 50.18 mm² for ROA and 1.445 pp for leakage, with IMA-AP 70 percent absolute errors of 94.17 mm² and 5.455 pp. After rule-based dampening, the current seed-42 blend-off diagnostic reports held-out MAE of 5.24 mm² for ROA and 0.043 pp for leakage. For IMA-AP 70 percent the rule-based path predicts leakage of 0.07 percent against the published 0.13 percent, an absolute error of 0.06 pp.
 
-**True fold-wise response-model LOO** (`analysis/fit_response_model.py`). Held-out-subset MAE ROA ≈ 6.37 mm² and leak ≈ 0.245 pp; IMA-AP 70% absolute errors ≈ 6.60 mm² / 0.198 pp (pred ROA 39.5 mm² vs 46.1; pred leak 0.33% vs 0.13%). Internal engineering screens (ROA MAE < 25, leak MAE < 0.5, AP70 ROA < 25, AP70 leak < 0.5) are met on this seven-case table—not patient-level external validation. Full seven-fold MAE remains inflated by the pathology leave-out (large ROA scale gap). AP prediction metrics remain inapplicable.
+True fold-wise response-model leave-one-case-out on the held-out subset yields MAE of 6.37 mm² for ROA and 0.245 pp for leakage. For IMA-AP 70 percent the fold-wise absolute errors are 6.60 mm² and 0.198 pp, with predicted ROA 39.5 mm² versus published 46.1 mm² and predicted leakage 0.33 percent versus published 0.13 percent. Internal engineering screens on this seven-case table are met. Full seven-fold MAE remains inflated by the pathology leave-out because of the large ROA scale gap. AP prediction metrics remain inapplicable.
 
-**Held-out table (CS14 / CS18 / AP30 / AP70)** — published versus current rule-based blend-off versus fold-wise response model (seed-42 pipeline outputs):
+Table 2 compares published values with the current rule-based blend-off diagnostic and the fold-wise response model on the four held-out identifiers.
+
+**Table 2.** Held-out Galili cases. Published values versus current rule-based blend-off and fold-wise response-model predictions (seed 42).
 
 | Case | Pub ROA | Rule ROA (abs err) | Fold ROA (abs err) | Pub leak % | Rule leak (abs err pp) | Fold leak (abs err pp) |
 |------|---------|--------------------|--------------------|------------|------------------------|------------------------|
 | ima_cs_14 | 56.7 | 59.6 (2.9) | 69.6 (12.9) | 0.52 | 0.51 (0.01) | 0.60 (0.08) |
 | ima_cs_18 | 55.3 | 54.9 (0.4) | 53.4 (1.9) | 0.41 | 0.42 (0.01) | 0.42 (0.01) |
 | ima_ap_30 | 51.1 | 42.4 (8.7) | 47.0 (4.1) | 0.16 | 0.25 (0.09) | 0.86 (0.70) |
-| **ima_ap_70** | **46.1** | **37.2 (8.9)** | **39.5 (6.6)** | **0.13** | **0.07 (0.06)** | **0.33 (0.20)** |
+| ima_ap_70 | 46.1 | 37.2 (8.9) | 39.5 (6.6) | 0.13 | 0.07 (0.06) | 0.33 (0.20) |
 
-Paper ranking prefers `fitted_response` for a coherent off-table surface under planning-map kinematics; the rule-based path remains the named blend-off diagnostic.
+Paper ranking uses the fitted response path to obtain a coherent off-table surface under planning-map kinematics. The rule-based path remains the named blend-off diagnostic.
 
-### 5.4 Exploratory scenario ranking (planning map, seed = 42; `fitted_response`)
+### 3.4 Exploratory scenario ranking under assumptions
 
-- \(n_{\mathrm{total}}=36\), \(n_{\mathrm{device\ candidates}}=35\), \(n_{\mathrm{feasible}}=30\), \(p_{\mathrm{feasible}}\approx 0.857\)
-- Best feasible candidate: **IMA-CS bridge 20%** (\(\eta_{\mathrm{CS}}=0.55\) → AP reduction **11.0%**, leakage proxy **≈0.391%**, jet = `central`, CS–LCx **8.6 mm**)
-- Best IMA-AP single / dual alternatives under the same constraints remain higher-leakage (≈0.79% at 65% shortening / 19.5% AP↓); dual suture is reported as hypothesis sensitivity (Figure 5), not as Innovation D discovery
-- LHS multi-parameter UQ (\(N=120\)): \(P(\mathrm{top\text{-}1})\approx 0.342\), mean feasible fraction ≈ 0.822; first-order Spearman ranks are dominated by CS–LCx baseline and cinch slope
-- \(\eta\pm 20\%\) one-at-a-time sensitivity keeps IMA-CS 20% as the nominal top candidate while shifting realized AP reduction (8.8% / 11.0% / 13.2%)
+Under the clinical planning map with `fitted_response` and seed 42, the ranker evaluates 36 grid points. Of these, 35 are device candidates and 30 are feasible, giving a feasible fraction of 0.857. The best feasible candidate is IMA-CS bridge shortening of 20 percent. With \(\eta_{\mathrm{CS}}=0.55\) this setting yields AP reduction of 11.0 percent, leakage proxy of 0.391 percent, a central jet label, and CS–LCx distance of 8.6 mm at the risk-screen edge. The best IMA-AP single and dual alternatives under the same constraints remain higher-leakage near 0.79 percent at 65 percent shortening and 19.5 percent AP reduction.
 
-### 5.5 Directionality-only clinical context
+Figure 3 shows commissural fraction of ROA and jet-location labels versus shortening. Figure 4 shows the IMA-CS clinical-map Pareto view of leakage proxy against CS–LCx distance and against NiTi alternating strain. Figure 5 reports dual-suture commissural-factor sensitivity at 0.25, 0.5, 0.75, and 1.0 relative to the single-suture baseline. Dual suture is a hypothesis parameter in this study.
 
-ARTO/MAVERIC: AP↓ of order 14–15% (IMA-AP class). Carillon TITAN II: ~15% AP context (IMA-CS class). REDUCE-FMR: regurgitation↓ directionality. Magnitudes are not equated to physics leakage-proxy percentages.
+Latin-hypercube multi-parameter sampling with \(N=120\) yields a top-1 stability of 0.342 and a mean feasible fraction of 0.822. First-order Spearman ranks are dominated by the CS–LCx baseline and the cinch slope. One-at-a-time \(\eta\pm 20\) percent sensitivity keeps IMA-CS 20 percent as the nominal top candidate while shifting realized AP reduction to 8.8 percent, 11.0 percent, and 13.2 percent under the minus, nominal, and plus settings.
 
-## 6. Discussion
+### 3.5 Directionality-only clinical context
 
-The central contribution is transparent exploratory screening software: corrected Galili peak-systole AP semantics, MAVERIC = ARTO device-class attribution, Dryad `contact_fraction` in the fitted path, honest held-out / CV reporting (including IMA-AP 70%), LHS ranking stability, and family-correct Pareto language.
-
-Relative to Galili’s LHHM study, we do not re-litigate which generic device seals better in high fidelity. Relative to clinical series, we borrow geometric windows and screening vocabulary only. Relative to modular mitral FE tools, we trade continuum fidelity for inspectable assumption priors and rapid grid ranking.
-
-**Limitations (documented, not papered over):**
-
-- \(n=7\) Galili peak-systole table cases — not patient-level external validation
-- No patient CT / patient-specific chamber geometry
-- No chamber-labeled SPH leakage recompute from Dryad particle clouds (full-domain cloud only; AP/ROA/leak remain table-backed)
-- Algebraic / phenomenological proxies; \(\eta\) and dual factor are assumption priors
-- LCx/NiTi screens are literature / engineering screens, not safety clearances
-- Ranking is assumption-driven exploratory analysis, not validated prediction
-
-## 7. Availability
-
-- Code: https://github.com/Coucou2016/fmr-ima-layer1-planner
-- License: MIT (`LICENSE`)
-- Citation: `CITATION.cff` · `references.bib`
-- Model card: `MODEL_CARD.md` · Data: `DATA_PROVENANCE.md`
-
-## 8. Conclusion
-
-A Layer-1 literature-anchored surrogate can rank exploratory IMA scenarios under explicit assumptions after correcting peak-systole Galili AP facts and MAVERIC device-class attribution, and after reporting true fold-wise response diagnostics alongside a renamed blend-off casewise diagnostic. Cite as methods / research software for exploratory screening—not as clinical preoperative decision support.
+ARTO and MAVERIC report AP reductions of order 14 to 15 percent for an IMA-AP-class device. Carillon TITAN II reports AP context near 15 percent for an IMA-CS-class device. REDUCE-FMR supports regurgitation-reduction directionality for IMA-CS. These magnitudes are not equated to physics leakage-proxy percentages.
 
 ---
 
-## Figure captions (SciencePlots; English axis labels)
+## 4. Discussion
+
+### 4.1 Interpretation of main findings
+
+The central result is that a literature-anchored Layer-1 surrogate can reproduce selected Galili anchors, report honest held-out and fold-wise diagnostics, and rank exploratory IMA scenarios under labeled assumptions. The fitted path is preferred for ranking because it supplies a consistent off-table surface when planning-map kinematics leave the discrete Galili table. The rule-based path remains useful as a blend-off diagnostic and can show smaller held-out MAE on some scalars after dampening. That fact does not make the rule-based path the ranking surface for off-table planning.
+
+The best feasible seed-42 candidate under the stated screens is a moderate IMA-CS bridge shortening. This ranking is assumption-driven. It is not a claim that IMA-CS is clinically superior to IMA-AP. Galili’s high-fidelity study already compared the two families in the Living Heart Human Model. The present software layer answers a different question about transparent exploratory screening.
+
+### 4.2 Comparison with existing studies
+
+Relative to Galili et al. [1], we inherit the IMA-CS versus IMA-AP taxonomy and the peak-systole leakage and ROA readouts. We do not re-litigate which generic device seals better in high fidelity. Relative to MAVERIC and ARTO [3], we borrow geometric windows only and keep MAVERIC attributed to ARTO as an IMA-AP-class mechanism. Relative to Carillon and REDUCE-FMR [4], we borrow directionality language only. Relative to Rottländer CS–LCx work [5], we use the 8.6 mm threshold as a risk screen rather than a safety clearance. Relative to modular mitral finite-element tools, we trade continuum fidelity for inspectable assumption priors and rapid grid ranking.
+
+### 4.3 Limitations and applicability
+
+Several limits are irreducible with the present evidence base.
+
+1. The Galili peak-systole table contains seven cases. Fold-wise metrics are internal engineering diagnostics on that table. They are not patient-level external validation.
+2. No patient computed tomography and no patient-specific chamber geometry enter the surrogate.
+3. Chamber-labeled SPH leakage is not recomputed from Dryad particle clouds. Full-domain clouds are available, yet AP, ROA, and leakage remain table-backed.
+4. Transfer efficiencies and the dual commissural factor are assumption priors. They are not imaging–finite-element identifications.
+5. LCx and NiTi screens are literature and engineering screens. They are not safety clearances.
+6. Ranking is exploratory analysis under assumptions. It is not validated clinical prediction.
+
+Within these limits the package is suitable for methods-oriented exploratory screening, reproducible teaching of dose translation, and hypothesis-sensitive design grids. It is not suitable as a preoperative decision system.
+
+---
+
+## 5. Conclusions
+
+This study investigated exploratory screening of indirect mitral annuloplasty using a literature-anchored Layer-1 algebraic surrogate with Dryad contact features, fold-wise response diagnostics, and an assumption-aware scenario ranker. The principal conclusions are as follows.
+
+1. Selected Galili peak-systole anchors are reproduced at Level 0, including the IMA-AP 50 percent peak-systolic AP of 15.9 mm, while diastolic AP of 34.4 mm is kept out of peak-systole dose statements.
+2. On the held-out Galili subset, fold-wise response-model MAE is 6.37 mm² for ROA and 0.245 pp for leakage. IMA-AP 70 percent fold-wise absolute errors are 6.60 mm² and 0.198 pp. Internal engineering screens are met on the seven-case table.
+3. Under the seed-42 planning map with the fitted response path, 30 of 35 device candidates are feasible. The best feasible candidate is IMA-CS bridge shortening of 20 percent, with AP reduction 11.0 percent and leakage proxy 0.391 percent.
+4. Latin-hypercube sampling of assumption priors yields top-1 stability of 0.342 and mean feasible fraction of 0.822. Dual suture remains a hypothesis sensitivity parameter.
+5. The findings support transparent exploratory screening within the tested Galili-table and assumption ranges. They do not establish clinical preoperative decision support or equate physics leakage proxies with clinical regurgitant volume.
+
+---
+
+## Data and code availability
+
+Source code and configuration files are available at https://github.com/Coucou2016/fmr-ima-layer1-planner under the MIT license. Galili supporting data are available from Dryad under doi:10.5061/dryad.bzkh1899d. Seed-42 pipeline outputs used in this manuscript live under the repository results tree. A model card and data provenance note accompany the package.
+
+## Reproducibility
+
+The reported figures and tables regenerate with
+
+```text
+python run_pipeline.py --seed 42 --paper
+python tools/import_galili_dryad.py --from-fixture --process
+python -m analysis.fit_response_model --write
+python tools/loo_evaluate.py --write
+```
+
+## Acknowledgements
+
+The authors thank the public release of the Galili Royal Society Open Science study and Dryad package, which make Level 0 reproduction and Dryad-aware features possible.
+
+## Competing interests
+
+The authors declare no competing interests.
+
+## Funding
+
+No specific funding was received for this software methods study beyond institutional computing resources.
+
+---
+
+## References
+
+[1] Galili L, White Zeira A, Marom G. Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation. R Soc Open Sci. 2022;9:211464. doi:10.1098/rsos.211464
+
+[2] Galili L, White Zeira A, Marom G. Data from: Numerical biomechanics modelling of indirect mitral annuloplasty treatments for functional mitral regurgitation. Dryad. 2022. doi:10.5061/dryad.bzkh1899d
+
+[3] Worthley S, Redwood S, Hildick-Smith D, et al. Transcatheter reshaping of the mitral annulus in patients with functional mitral regurgitation: one-year outcomes of the MAVERIC trial. EuroIntervention. 2021. doi:10.4244/EIJ-D-20-00484
+
+[4] Witte KK, et al. REDUCE-FMR Investigators. Carillon mitral contour system for functional mitral regurgitation. JACC Heart Fail. 2019. Directional regurgitant-volume context for IMA-CS / Carillon class.
+
+[5] Rottländer D, et al. Procedural planning of CS-based indirect mitral annuloplasty using CT-angiography. Catheter Cardiovasc Interv. 2021. doi:10.1002/ccd.29824 (CS–LCx landing-zone screen near 8.6 mm used as literature risk screen only)
+
+[6] Rottländer D, et al. Anatomy and topography of coronary sinus and mitral valve annulus in functional mitral regurgitation. Front Cardiovasc Med. 2022;9:868562. doi:10.3389/fcvm.2022.868562
+
+---
+
+## Figure captions
 
 **Figure 1.** IMA-AP leakage proxy versus suture shortening under Galili peak-systole AP mapping and clinical \(\eta\) mapping. The shaded band marks the exploratory 14–20% AP planning range expressed in suture-% space via \(\eta_{\mathrm{AP}}\).
 
-**Figure 2.** Device shortening mapped onto AP-diameter reduction for Galili IMA-AP, clinical IMA-AP (\(\eta=0.30\)), and clinical IMA-CS (\(\eta=0.55\) assumption prior). Horizontal band: exploratory planning range.
+**Figure 2.** Device shortening mapped onto AP-diameter reduction for Galili IMA-AP, clinical IMA-AP (\(\eta=0.30\)), and clinical IMA-CS (\(\eta=0.55\) assumption prior). The horizontal band marks the exploratory planning range.
 
-**Figure 3.** Commissural fraction of ROA and jet-location labels versus shortening (Galili vs clinical panels; squares = IMA-AP, circles = IMA-CS).
+**Figure 3.** Commissural fraction of ROA and jet-location labels versus shortening for Galili and clinical panels. Squares mark IMA-AP. Circles mark IMA-CS.
 
-**Figure 4.** IMA-CS clinical-map Pareto / risk-screen view: leakage proxy versus CS–LCx distance and versus NiTi alternating strain. Vertical dashed lines mark the Rottländer 8.6 mm screen and the 0.4% engineering strain screen.
+**Figure 4.** IMA-CS clinical-map Pareto and risk-screen view. Leakage proxy versus CS–LCx distance and versus NiTi alternating strain. Vertical dashed lines mark the Rottländer 8.6 mm screen and the 0.4% engineering strain screen.
 
-**Figure 5.** Dual-suture commissural-factor sensitivity (0.25 / 0.5 / 0.75 / 1.0) versus single-suture baseline—hypothesis parameter, not discovery.
+**Figure 5.** Dual-suture commissural-factor sensitivity (0.25 / 0.5 / 0.75 / 1.0) versus single-suture baseline. Hypothesis parameter, not discovery.
+
+---
+
+## Table note
+
+All seed-42 scalars in Results come from `results/output/planner/scenario_ranking.json`, `results/output/cross_validation/summary.json`, and `results/output/loo_evaluation.json` regenerated by the public pipeline. Physics leakage-proxy percentages are not clinical regurgitant volumes. MAVERIC evaluates ARTO (IMA-AP class). Dual suture is hypothesis sensitivity.
